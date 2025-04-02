@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth Pages</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --background: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-secondary: #94a3b8;
+      --border: #334155;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(100, 100, 255, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(100, 100, 255, 0.1) 0%, transparent 20%);
+      transition: all 0.3s ease;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 450px;
+      padding: 20px;
+    }
+    
+    .auth-card {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.1), transparent 70%);
+      z-index: 0;
+      opacity: 0.5;
+    }
+    
+    .auth-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .auth-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background-color: rgba(99, 102, 241, 0.2);
+      margin-right: 12px;
+    }
+    
+    .auth-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    
+    .code-badge {
+      margin-left: auto;
+      background-color: rgba(99, 102, 241, 0.1);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: var(--primary);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    
+    .auth-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      font-size: 14px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 14px 14px 14px 42px;
+      border-radius: 12px;
+      background-color: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+    }
+    
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 38px;
+      color: var(--text-secondary);
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 14px;
+      top: 38px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+    }
+    
+    .auth-button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      background-color: var(--primary);
+      color: white;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 8px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .auth-button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    
+    .auth-button:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .auth-button:hover::after {
+      opacity: 1;
+    }
+    
+    .auth-footer {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      position: relative;
+      z-index: 1;
+    }
+    
+    .auth-link {
+      color: var(--primary);
+      text-decoration: none;
+      margin-left: 5px;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    
+    .auth-link:hover {
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
+    
+    .social-buttons {
+      margin-top: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .social-divider {
+      display: flex;
+      align-items: center;
+      margin: 24px 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    
+    .social-divider::before,
+    .social-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background-color: var(--border);
+    }
+    
+    .social-divider::before {
+      margin-right: 16px;
+    }
+    
+    .social-divider::after {
+      margin-left: 16px;
+    }
+    
+    .social-button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      background-color: transparent;
+      color: var(--text);
+      font-weight: 500;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 15px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    
+    .social-button:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .social-icon {
+      margin-right: 10px;
+    }
+    
+    .form-switch {
+      display: none;
+    }
+    
+    .auth-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    
+    .auth-tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin: 0 4px;
+      font-weight: 500;
+    }
+    
+    .auth-tab.active {
+      background-color: rgba(99, 102, 241, 0.1);
+      color: var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .auth-card {
+      animation: fadeIn 0.5s ease forwards;
+    }
+    
+    /* Password strength indicator */
+    .password-strength {
+      height: 4px;
+      border-radius: 2px;
+      margin-top: 8px;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    .strength-segment {
+      height: 100%;
+      flex: 1;
+      margin-right: 4px;
+      background-color: var(--border);
+      transition: all 0.3s ease;
+    }
+    
+    .strength-segment:last-child {
+      margin-right: 0;
+    }
+    
+    .strength-segment.active-1 {
+      background-color: var(--error);
+    }
+    
+    .strength-segment.active-2 {
+      background-color: #fb923c;
+    }
+    
+    .strength-segment.active-3 {
+      background-color: #facc15;
+    }
+    
+    .strength-segment.active-4 {
+      background-color: var(--success);
+    }
+    
+    .strength-text {
+      font-size: 12px;
+      margin-top: 4px;
+      color: var(--text-secondary);
+    }
+    
+    /* Loading state */
+    .loading .auth-button {
+      position: relative;
+      color: transparent;
+    }
+    
+    .loading .auth-button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      margin: -12px 0 0 -12px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      z-index: 2;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Success animation */
+    .success-checkmark {
+      display: none;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      position: relative;
+      animation: bounceIn 0.6s;
+    }
+    
+    .success-checkmark .check-icon {
+      width: 80px;
+      height: 80px;
+      position: relative;
+      border-radius: 50%;
+      box-sizing: content-box;
+      border: 4px solid var(--success);
+    }
+    
+    .success-checkmark .check-icon::before {
+      content: "";
+      position: absolute;
+      transform: rotate(45deg);
+      display: block;
+      height: 5px;
+      background-color: var(--success);
+      opacity: 0;
+      left: 34px;
+      top: 52px;
+      width: 8px;
+      animation: slideUpBounce 0.4s 0.2s forwards;
+    }
+    
+    .success-checkmark .check-icon::after {
+      content: "";
+      position: absolute;
+      transform: rotate(45deg);
+      display: block;
+      height: 5px;
+      background-color: var(--success);
+      opacity: 0;
+      left: 23px;
+      top: 47px;
+      width: 24px;
+      animation: slideUpBounce 0.4s 0.3s forwards;
+    }
+    
+    @keyframes bounceIn {
+      0% { transform: scale(0); }
+      60% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes slideUpBounce {
+      0% { opacity: 0; transform: rotate(45deg) translateY(15px); }
+      60% { opacity: 1; transform: rotate(45deg) translateY(-5px); }
+      100% { opacity: 1; transform: rotate(45deg) translateY(0); }
+    }
+
+    /* Error state */
+    .form-input.error {
+      border-color: var(--error);
+    }
+
+    .error-message {
+      color: var(--error);
+      font-size: 12px;
+      margin-top: 4px;
+      display: none;
+    }
+
+    .error-message.visible {
+      display: block;
+    }
+
+    /* Password requirements */
+    .password-requirements {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .req-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 2px;
+    }
+
+    .req-icon {
+      width: 14px;
+      height: 14px;
+      margin-right: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .req-icon.valid {
+      color: var(--success);
+    }
+
+    .req-icon.invalid {
+      color: var(--text-secondary);
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .container {
+        padding: 16px;
+      }
+      
+      .auth-card {
+        padding: 24px;
+      }
+      
+      .auth-title {
+        font-size: 20px;
+      }
+      
+      .auth-tabs {
+        margin-bottom: 12px;
+      }
+    }
+
+    /* Success Page */
+    .success-page {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .success-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--success);
+    }
+
+    .success-message {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .back-to-login {
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-tab="login">Login</div>
+      <div class="auth-tab" data-tab="signup">Sign Up</div>
+    </div>
+    
+    <div class="auth-card">
+      <!-- Login Form -->
+      <div id="login-tab" class="tab-content active">
+        <div class="auth-header">
+          <div class="auth-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <polyline points="10 17 15 12 10 7"></polyline>
+              <line x1="15" y1="12" x2="3" y2="12"></line>
+            </svg>
+          </div>
+          <h1 class="auth-title">Login</h1>
+          <div class="code-badge">Code <30></div>
+        </div>
+        <p class="auth-subtitle">Login your account to continue</p>
+        
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-email" class="form-label">Email</label>
+            <div class="input-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+              </svg>
+            </div>
+            <input type="email" id="login-email" class="form-input" placeholder="Enter your email" value="bayode@gmail.com">
+            <div class="error-message" id="login-email-error">Please enter a valid email address</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="login-password" class="form-label">Password</label>
+            <div class="input-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <input type="password" id="login-password" class="form-input" placeholder="Enter your password" value="••••••••">
+            <button type="button" class="password-toggle" id="login-password-toggle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="login-eye-icon">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+            <div class="error-message" id="login-password-error">Password must be at least 6 characters</div>
+          </div>
+          
+          <button type="submit" class="auth-button" id="login-button">Login</button>
+        </form>
+        
+        <div class="auth-footer">
+          Don't have an account? <a href="#" class="auth-link" id="to-signup">Sign Up</a>
+        </div>
+        
+        <div class="social-divider">or continue with</div>
+        
+        <div class="social-buttons">
+          <button class="social-button">
+            <span class="social-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+            </span>
+            Login with GitHub
+          </button>
+          <button class="social-button">
+            <span class="social-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+            </span>
+            Login with Google
+          </button>
+        </div>
+      </div>
+      
+      <!-- Signup Form -->
+      <div id="signup-tab" class="tab-content">
+        <div class="auth-header">
+          <div class="auth-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <line x1="19" y1="8" x2="19" y2="14"></line>
+              <line x1="22" y1="11" x2="16" y2="11"></line>
+            </svg>
+          </div>
+          <h1 class="auth-title">Sign Up</h1>
+          <div class="code-badge">Code <30></div>
+        </div>
+        <p class="auth-subtitle">Sign up to 30days code challenge</p>
+        
+        <form id="signup-form">
+          <div class="form-group">
+            <label for="full-name" class="form-label">Full name</label>
+            <div class="input-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <input type="text" id="full-name" class="form-input" placeholder="Enter your full name" value="Akinola Saregbagi">
+            <div class="error-message" id="full-name-error">Please enter your full name</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="signup-email" class="form-label">Email</label>
+            <div class="input-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+              </svg>
+            </div>
+            <input type="email" id="signup-email" class="form-input" placeholder="Enter your email" value="bayode@gmail.com">
+            <div class="error-message" id="signup-email-error">Please enter a valid email address</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="signup-password" class="form-label">Password</label>
+            <div class="input-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <input type="password" id="signup-password" class="form-input" placeholder="Create a password" value="••••••••">
+            <button type="button" class="password-toggle" id="signup-password-toggle">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="signup-eye-icon">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+            
+            <div class="password-strength">
+              <div class="strength-segment" id="str-1"></div>
+              <div class="strength-segment" id="str-2"></div>
+              <div class="strength-segment" id="str-3"></div>
+              <div class="strength-segment" id="str-4"></div>
+            </div>
+            <div class="strength-text" id="password-strength-text">Password strength</div>
+            
+            <div class="password-requirements">
+              <div class="req-item" id="req-length">
+                <div class="req-icon invalid">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                  </svg>
+                </div>
+                At least 6 characters
+              </div>
+              <div class="req-item" id="req-number">
+                <div class="req-icon invalid">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                  </svg>
+                </div>
+                Contains a number
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="confirm-password" class="form-label">Confirm password</label>
+            <div class="input-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                <path d="M12 16v.01"></path>
+              </svg>
+            </div>
+            <input type="password" id="confirm-password" class="form-input" placeholder="Confirm your password" value="••••••••">
+            <div class="error-message" id="confirm-password-error">
+              <div class="error-message" id="confirm-password-error">Passwords do not match</div>
+          </div>
+          
+          <button type="submit" class="auth-button" id="signup-button">Create Account</button>
+        </form>
+        
+        <div class="auth-footer">
+          Already have an account? <a href="#" class="auth-link" id="to-login">Login</a>
+        </div>
+        
+        <div class="social-divider">or sign up with</div>
+        
+        <div class="social-buttons">
+          <button class="social-button">
+            <span class="social-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+            </span>
+            Sign up with GitHub
+          </button>
+          <button class="social-button">
+            <span class="social-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+            </span>
+            Sign up with Google
+          </button>
+        </div>
+      </div>
+
+      <!-- Success Page -->
+      <div id="success-page" class="success-page">
+        <div class="success-checkmark">
+          <div class="check-icon"></div>
+        </div>
+        <h2 class="success-title">Success!</h2>
+        <p class="success-message">Your account has been created successfully.</p>
+        <button class="auth-button" id="continue-button">Continue to Dashboard</button>
+        <div class="back-to-login">
+          <a href="#" class="auth-link" id="back-to-login">Back to Login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    const tabs = document.querySelectorAll('.auth-tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabId = tab.getAttribute('data-tab');
+        
+        // Remove active class from all tabs and contents
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        // Add active class to current tab and content
+        tab.classList.add('active');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+      });
+    });
+    
+    // Switch to signup tab
+    document.getElementById('to-signup').addEventListener('click', (e) => {
+      e.preventDefault();
+      tabs.forEach(t => t.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      
+      document.querySelector('[data-tab="signup"]').classList.add('active');
+      document.getElementById('signup-tab').classList.add('active');
+    });
+    
+    // Switch to login tab
+    document.getElementById('to-login').addEventListener('click', (e) => {
+      e.preventDefault();
+      tabs.forEach(t => t.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      
+      document.querySelector('[data-tab="login"]').classList.add('active');
+      document.getElementById('login-tab').classList.add('active');
+    });
+    
+    // Toggle password visibility
+    const togglePassword = (passwordField, eyeIcon) => {
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        eyeIcon.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+            <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+            <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+            <line x1="2" y1="2" x2="22" y2="22"></line>
+          </svg>
+        `;
+      } else {
+        passwordField.type = 'password';
+        eyeIcon.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        `;
+      }
+    };
+    
+    document.getElementById('login-password-toggle').addEventListener('click', () => {
+      const passwordField = document.getElementById('login-password');
+      const eyeIcon = document.getElementById('login-eye-icon');
+      togglePassword(passwordField, eyeIcon);
+    });
+    
+    document.getElementById('signup-password-toggle').addEventListener('click', () => {
+      const passwordField = document.getElementById('signup-password');
+      const eyeIcon = document.getElementById('signup-eye-icon');
+      togglePassword(passwordField, eyeIcon);
+    });
+    
+    // Password strength checker
+    const passwordInput = document.getElementById('signup-password');
+    const strengthIndicator = document.querySelectorAll('.strength-segment');
+    const strengthText = document.getElementById('password-strength-text');
+    const reqLength = document.getElementById('req-length');
+    const reqNumber = document.getElementById('req-number');
+    
+    passwordInput.addEventListener('input', () => {
+      const password = passwordInput.value;
+      let strength = 0;
+      
+      // Reset all classes
+      strengthIndicator.forEach(segment => {
+        segment.className = 'strength-segment';
+      });
+      
+      // Check requirements
+      if (password.length >= 6) {
+        reqLength.querySelector('.req-icon').className = 'req-icon valid';
+        reqLength.querySelector('.req-icon').innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"></path>
+          </svg>
+        `;
+        strength++;
+      } else {
+        reqLength.querySelector('.req-icon').className = 'req-icon invalid';
+        reqLength.querySelector('.req-icon').innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+          </svg>
+        `;
+      }
+      
+      if (/\d/.test(password)) {
+        reqNumber.querySelector('.req-icon').className = 'req-icon valid';
+        reqNumber.querySelector('.req-icon').innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"></path>
+          </svg>
+        `;
+        strength++;
+      } else {
+        reqNumber.querySelector('.req-icon').className = 'req-icon invalid';
+        reqNumber.querySelector('.req-icon').innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+          </svg>
+        `;
+      }
+      
+      // Check for uppercase letters
+      if (/[A-Z]/.test(password)) {
+        strength++;
+      }
+      
+      // Check for special characters
+      if (/[^A-Za-z0-9]/.test(password)) {
+        strength++;
+      }
+      
+      // Update strength indicator
+      for (let i = 0; i < strength; i++) {
+        strengthIndicator[i].classList.add(`active-${strength}`);
+      }
+      
+      // Update strength text
+      switch (strength) {
+        case 0:
+          strengthText.textContent = 'Password strength';
+          break;
+        case 1:
+          strengthText.textContent = 'Weak';
+          strengthText.style.color = 'var(--error)';
+          break;
+        case 2:
+          strengthText.textContent = 'Fair';
+          strengthText.style.color = '#fb923c';
+          break;
+        case 3:
+          strengthText.textContent = 'Good';
+          strengthText.style.color = '#facc15';
+          break;
+        case 4:
+          strengthText.textContent = 'Strong';
+          strengthText.style.color = 'var(--success)';
+          break;
+      }
+    });
+    
+    // Form validation
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const loginButton = document.getElementById('login-button');
+    const signupButton = document.getElementById('signup-button');
+    
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email');
+      const password = document.getElementById('login-password');
+      let isValid = true;
+      
+      // Simple email validation
+      if (!email.value || !email.value.includes('@')) {
+        document.getElementById('login-email-error').classList.add('visible');
+        email.classList.add('error');
+        isValid = false;
+      } else {
+        document.getElementById('login-email-error').classList.remove('visible');
+        email.classList.remove('error');
+      }
+      
+      // Simple password validation
+      if (!password.value || password.value.length < 6) {
+        document.getElementById('login-password-error').classList.add('visible');
+        password.classList.add('error');
+        isValid = false;
+      } else {
+        document.getElementById('login-password-error').classList.remove('visible');
+        password.classList.remove('error');
+      }
+      
+      if (isValid) {
+        // Show loading state
+        loginButton.parentElement.classList.add('loading');
+        
+        // Simulate API call
+        setTimeout(() => {
+          loginButton.parentElement.classList.remove('loading');
+          // Redirect or show success
+          window.location.href = 'dashboard.html';
+        }, 1500);
+      }
+    });
+    
+    signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fullName = document.getElementById('full-name');
+      const email = document.getElementById('signup-email');
+      const password = document.getElementById('signup-password');
+      const confirmPassword = document.getElementById('confirm-password');
+      let isValid = true;
+      
+      // Validate full name
+      if (!fullName.value) {
+        document.getElementById('full-name-error').classList.add('visible');
+        fullName.classList.add('error');
+        isValid = false;
+      } else {
+        document.getElementById('full-name-error').classList.remove('visible');
+        fullName.classList.remove('error');
+      }
+      
+      // Validate email
+      if (!email.value || !email.value.includes('@')) {
+        document.getElementById('signup-email-error').classList.add('visible');
+        email.classList.add('error');
+        isValid = false;
+      } else {
+        document.getElementById('signup-email-error').classList.remove('visible');
+        email.classList.remove('error');
+      }
+      
+      // Validate password
+      if (!password.value || password.value.length < 6 || !/\d/.test(password.value)) {
+        isValid = false;
+      }
+      
+      // Validate confirm password
+      if (password.value !== confirmPassword.value) {
+        document.getElementById('confirm-password-error').classList.add('visible');
+        confirmPassword.classList.add('error');
+        isValid = false;
+      } else {
+        document.getElementById('confirm-password-error').classList.remove('visible');
+        confirmPassword.classList.remove('error');
+      }
+      
+      if (isValid) {
+        // Show loading state
+        signupButton.parentElement.classList.add('loading');
+        
+        // Simulate API call
+        setTimeout(() => {
+          signupButton.parentElement.classList.remove('loading');
+          
+          // Show success page
+          document.getElementById('signup-tab').style.display = 'none';
+          document.getElementById('success-page').style.display = 'block';
+        }, 1500);
+      }
+    });
+    
+    // Continue button on success page
+    document.getElementById('continue-button').addEventListener('click', () => {
+      window.location.href = 'dashboard.html';
+    });
+    
+    // Back to login from success page
+    document.getElementById('back-to-login').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('success-page').style.display = 'none';
+      document.getElementById('login-tab').classList.add('active');
+      
+      tabs.forEach(t => t.classList.remove('active'));
+      document.querySelector('[data-tab="login"]').classList.add('active');
+    });
+    
+    // Trigger password strength checker for pre-filled passwords
+    if (passwordInput.value) {
+      const event = new Event('input');
+      passwordInput.dispatchEvent(event);
+    }
+  </script>
+</body>
+</html>
