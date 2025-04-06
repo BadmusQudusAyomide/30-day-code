@@ -12,8 +12,8 @@ import AuthPages from "./components/AuthPages";
 
 // Protected pages
 import Dashboard from "./pages/Dashboard";
-// import SubmitProject from "./pages/SubmitProject";
-// import MyProjects from "./pages/MyProjects";
+import SubmitProject from "./pages/SubmitProject";
+import ProjectList from "./pages/ProjectList";
 // import Leaderboard from "./pages/Leaderboard";
 // import DailyChallenge from "./pages/DailyChallenge";
 // import Resources from "./pages/Resources";
@@ -71,7 +71,7 @@ function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<HomePage />} />
-        
+
         <Route
           path="/login"
           element={
@@ -84,33 +84,33 @@ function App() {
         />
 
         {/* Protected routes */}
-        <Route 
-          path="/dashboard" 
+        <Route
+          path="/dashboard"
           element={
             <ProtectedRoute>
               <Dashboard onLogout={handleLogout} />
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        {/* <Route 
-          path="/submit-project" 
+
+        <Route
+          path="/SubmitProject"
           element={
             <ProtectedRoute>
               <SubmitProject onLogout={handleLogout} />
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        <Route 
-          path="/my-projects" 
+
+        <Route
+          path="/ProjectList"
           element={
             <ProtectedRoute>
-              <MyProjects onLogout={handleLogout} />
+              <ProjectList onLogout={handleLogout} />
             </ProtectedRoute>
-          } 
+          }
         />
-        
+        {/*         
         <Route 
           path="/leaderboard" 
           element={
@@ -157,13 +157,11 @@ function App() {
         /> */}
 
         {/* Redirect any unknown routes to home if not authenticated, otherwise to dashboard */}
-        <Route 
-          path="*" 
+        <Route
+          path="*"
           element={
-            isAuthenticated ? 
-              <Navigate to="/dashboard" /> : 
-              <Navigate to="/" />
-          } 
+            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/" />
+          }
         />
       </Routes>
     </Router>

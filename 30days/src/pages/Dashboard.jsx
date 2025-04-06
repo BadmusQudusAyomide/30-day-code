@@ -72,7 +72,7 @@ const Dashboard = () => {
         <div className="dashboard-grid">
           <div
             className="grid-item"
-            onClick={() => handleNavigation("/submit-project")}
+            onClick={() => handleNavigation("/SubmitProject")}
           >
             <div className="item-icon">📤</div>
             <div className="item-content">
@@ -83,7 +83,7 @@ const Dashboard = () => {
 
           <div
             className="grid-item"
-            onClick={() => handleNavigation("/my-projects")}
+            onClick={() => handleNavigation("/ProjectList")}
           >
             <div className="item-icon">📁</div>
             <div className="item-content">
