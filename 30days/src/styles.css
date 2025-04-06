@@ -1,0 +1,367 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #0a0a0a;
+    color: #ffffff;
+    line-height: 1.6;
+    overflow-x: hidden;
+    font-size: 16px;
+}
+
+.background-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(to right, #6633ff, #ff33cc);
+    opacity: 0.3;
+    filter: blur(10px);
+    animation: float 15s infinite ease-in-out;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) translateX(0);
+    }
+
+    25% {
+        transform: translateY(-20px) translateX(20px);
+    }
+
+    50% {
+        transform: translateY(20px) translateX(-20px);
+    }
+
+    75% {
+        transform: translateY(-10px) translateX(-15px);
+    }
+
+    100% {
+        transform: translateY(0) translateX(0);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    position: relative;
+    flex-wrap: wrap;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #ffffff;
+    text-decoration: none;
+    margin: 5px 0;
+}
+
+.logo svg {
+    margin-right: 10px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 5px 0;
+}
+
+.nav-links a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 5px;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin: 5px 0;
+}
+
+.btn {
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    margin: 5px 0;
+}
+
+.btn-outline {
+    border: 2px solid #4d61ff;
+    background: transparent;
+    color: #ffffff;
+}
+
+.btn-outline:hover {
+    background-color: rgba(77, 97, 255, 0.2);
+}
+
+.btn-primary {
+    background-color: #7b68ee;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #6a5acd;
+}
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 5%;
+    min-height: 50vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero h1 {
+    font-size: clamp(2rem, 5vw, 4rem);
+    margin-bottom: 20px;
+    background: linear-gradient(to right, #6633ff, #ff33cc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: bold;
+    word-wrap: break-word;
+}
+
+.hero h2 {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    margin-bottom: 30px;
+    color: #ffffff;
+    word-wrap: break-word;
+}
+
+.hero p {
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    max-width: 800px;
+    margin: 0 auto 40px;
+    color: #cccccc;
+    padding: 0 15px;
+    word-wrap: break-word;
+}
+
+.robot-illustration {
+    margin: 50px auto;
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    padding: 40px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background-color: #000000;
+    padding: 20px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 17px;
+    transition: all 0.3s ease;
+    height: 100%;
+    width: 100%;
+}
+
+.feature-card:hover {
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.feature-card h3 {
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-start;
+    word-wrap: break-word;
+    line-height: 1.3;
+}
+
+.feature-card h3 span {
+    margin-right: 10px;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.feature-card p {
+    color: #aaaaaa;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    word-wrap: break-word;
+}
+
+.cta-section {
+    text-align: center;
+    padding: 60px 5%;
+    background: linear-gradient(145deg, rgba(102, 51, 255, 0.1), rgba(255, 51, 204, 0.1));
+    margin: 40px 0;
+}
+
+.cta-section h2 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    margin-bottom: 20px;
+    word-wrap: break-word;
+}
+
+.cta-section p {
+    max-width: 600px;
+    margin: 0 auto 30px;
+    color: #cccccc;
+    padding: 0 15px;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    word-wrap: break-word;
+}
+
+footer {
+    padding: 40px 5%;
+    background-color: #111111;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+footer p {
+    color: #888888;
+    margin-bottom: 20px;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    word-wrap: break-word;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.social-links a {
+    color: #ffffff;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+    padding: 5px;
+}
+
+.social-links a:hover {
+    color: #7b68ee;
+}
+
+.copyright {
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    color: #666666;
+    word-wrap: break-word;
+}
+
+/* Add gradient border to feature cards */
+.feature-card {
+    position: relative;
+    background-clip: padding-box;
+    border: 1px solid transparent;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    margin: -1px;
+    border-radius: inherit;
+    background: linear-gradient(to right, #6633ff, #ff33cc);
+    opacity: 0.3;
+}
+
+/* Enhanced responsive styles */
+@media (max-width: 992px) {
+    .features {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        padding: 20px 5%;
+        gap: 10px;
+    }
+
+    .features {
+        padding: 30px 5%;
+    }
+
+    .robot-illustration {
+        height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 15px 5%;
+    }
+
+    .nav-links {
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 8px 20px;
+        font-size: 0.9rem;
+    }
+
+    .hero {
+        padding: 40px 5%;
+    }
+
+    .features {
+        gap: 20px;
+        padding: 20px 5%;
+    }
+
+    .feature-card {
+        padding: 15px;
+    }
+
+    .robot-illustration {
+        height: 200px;
+        margin: 30px auto;
+    }
+}

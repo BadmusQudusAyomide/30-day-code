@@ -1,0 +1,272 @@
+/* Dashboard.css */
+:root {
+  --dark-blue: #0d1117;
+  --light-blue: #6c7cff;
+  --card-bg: #151c28;
+  --input-bg: #1c2535;
+  --input-border: #2a3547;
+  --text-primary: #ffffff;
+  --text-secondary: #a0b3c6;
+  --button-primary: #6366f1;
+  --button-hover: #8183ff;
+  --grid-item-bg: #192334;
+  --progress-bg: #2d3748;
+  --progress-fill: #6366f1;
+}
+
+.dashboard {
+  min-height: 100vh;
+  background-color: var(--dark-blue);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header styles */
+.dashboard-header {
+  background-color: var(--card-bg);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.code-text {
+  color: var(--text-primary);
+}
+
+.days-text {
+  color: var(--light-blue);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.avatar-button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: var(--button-primary);
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.avatar-button:hover {
+  background-color: var(--button-hover);
+}
+
+/* Main content styles */
+.dashboard-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.welcome {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.progress-overview {
+  margin-bottom: 3rem;
+}
+
+.day-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.day-indicator {
+  display: flex;
+  align-items: baseline;
+}
+
+.day-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--light-blue);
+}
+
+.day-label {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 0.75rem;
+  background-color: var(--progress-bg);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--progress-fill);
+  border-radius: 1rem;
+  transition: width 0.5s ease;
+}
+
+.day-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Grid layout for dashboard items */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.grid-item {
+  background-color: var(--grid-item-bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.grid-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: var(--light-blue);
+}
+
+.item-icon {
+  width: 3rem;
+  height: 3rem;
+  background-color: rgba(99, 102, 241, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.item-content {
+  flex: 1;
+}
+
+.item-content h3 {
+  margin: 0;
+  margin-bottom: 0.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.item-content p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Logout button */
+.logout-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.logout-icon {
+  font-size: 1.1rem;
+}
+
+/* Footer styles */
+.dashboard-footer {
+  background-color: var(--card-bg);
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 1.5rem;
+  }
+  
+  .welcome {
+    font-size: 1.5rem;
+  }
+  
+  .day-number {
+    font-size: 2rem;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header {
+    padding: 1rem;
+  }
+  
+  .user-name {
+    display: none;
+  }
+}

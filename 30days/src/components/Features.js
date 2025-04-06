@@ -1,0 +1,57 @@
+import React from "react";
+
+const Features = () => {
+  const featuresList = [
+    {
+      icon: "📊",
+      title: "Challenge Overview",
+      description:
+        "The challenge spans thirty days, during which participants are expected to create and submit a diverse range of projects. These projects can include websites, web pages, coding tools, or any other relevant coding endeavor. The primary goal is to encourage consistent coding practice and innovation.",
+    },
+    {
+      icon: "📝",
+      title: "Submission Platform",
+      description:
+        "Participants will use the dedicated submission platform to upload their daily projects. This platform serves as a centralized hub for showcasing participants' work, allowing for easy navigation and exploration. Each submission will be tagged with relevant information, such as project type, coding language, and date.",
+    },
+    {
+      icon: "💬",
+      title: "Participant Interaction",
+      description:
+        "The challenge promotes a sense of community by enabling participants to view and rate each other's projects. This interaction enhances the learning experience, as participants can draw inspiration from their peers, exchange ideas, and celebrate achievements. The submission platform facilitates seamless communication among participants.",
+    },
+    {
+      icon: "⭐",
+      title: "Rating System",
+      description:
+        "Admins, representing the organizing body of the challenge, will play a crucial role in evaluating and rating the submitted projects. The rating criteria include factors such as creativity, functionality, code quality, and adherence to the daily theme or challenge prompt. Admins will provide constructive feedback to participants, fostering a learning environment.",
+    },
+    {
+      icon: "🎨",
+      title: "Daily Theme",
+      description:
+        "To add an extra layer of creativity and structure, each day of the challenge will feature a thematic prompt or focus. This can range from specific coding techniques to broader project themes. Participants are encouraged to incorporate these themes into their daily projects, adding an element of diversity to the overall challenge.",
+    },
+    {
+      icon: "⚡",
+      title: "Documentation Submission",
+      description:
+        "In addition to the daily project submissions, participants are required to submit a concise documentation file accompanying each project. This documentation should provide insights into the project's purpose, key features, and any notable challenges or learning experiences encountered during development.",
+    },
+  ];
+
+  return (
+    <section className="features" id="features">
+      {featuresList.map((feature, index) => (
+        <div className="feature-card" key={index}>
+          <h3>
+            <span>{feature.icon}</span> {feature.title}
+          </h3>
+          <p>{feature.description}</p>
+        </div>
+      ))}
+    </section>
+  );
+};
+
+export default Features;
