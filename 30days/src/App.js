@@ -14,7 +14,7 @@ import AuthPages from "./components/AuthPages";
 import Dashboard from "./pages/Dashboard";
 import SubmitProject from "./pages/SubmitProject";
 import ProjectList from "./pages/ProjectList";
-// import Leaderboard from "./pages/Leaderboard";
+import Leaderboard from "./pages/Leaderboard";
 // import DailyChallenge from "./pages/DailyChallenge";
 // import Resources from "./pages/Resources";
 // import Community from "./pages/Community";
@@ -110,16 +110,16 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/*         
-        <Route 
-          path="/leaderboard" 
+
+        <Route
+          path="/leaderboard"
           element={
             <ProtectedRoute>
               <Leaderboard onLogout={handleLogout} />
             </ProtectedRoute>
-          } 
+          }
         />
-        
+        {/* 
         <Route 
           path="/daily-challenge" 
           element={
