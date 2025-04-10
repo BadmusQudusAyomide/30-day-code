@@ -1,573 +1,473 @@
+// Leaderboard.jsx
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Leaderboard.css";
+import {
+  Users,
+  Crown,
+  Award,
+  Flame,
+  ChevronUp,
+  ChevronDown,
+  ExternalLink,
+} from "lucide-react";
 
-// Mock data for the leaderboard
-const initialUsers = [
-  {
-    id: 1,
-    name: "Alex Johnson",
-    avatar: "AJ",
-    projects: 15,
-    streak: true,
-    quality: 3,
-    totalScore: 19,
-  },
-  {
-    id: 2,
-    name: "Sarah Williams",
-    avatar: "SW",
-    projects: 14,
-    streak: true,
-    quality: 3,
-    totalScore: 18,
-  },
-  {
-    id: 3,
-    name: "Michael Chen",
-    avatar: "MC",
-    projects: 12,
-    streak: true,
-    quality: 3,
-    totalScore: 16,
-  },
-  {
-    id: 4,
-    name: "Taylor Davis",
-    avatar: "TD",
-    projects: 10,
-    streak: false,
-    quality: 3,
-    totalScore: 13,
-  },
-  {
-    id: 5,
-    name: "Jordan Smith",
-    avatar: "JS",
-    projects: 9,
-    streak: true,
-    quality: 2,
-    totalScore: 12,
-  },
-  {
-    id: 6,
-    name: "Casey Brown",
-    avatar: "CB",
-    projects: 8,
-    streak: false,
-    quality: 2,
-    totalScore: 10,
-  },
-  {
-    id: 7,
-    name: "Morgan Lee",
-    avatar: "ML",
-    projects: 7,
-    streak: false,
-    quality: 2,
-    totalScore: 9,
-  },
-  {
-    id: 8,
-    name: "Riley Johnson",
-    avatar: "RJ",
-    projects: 6,
-    streak: true,
-    quality: 1,
-    totalScore: 8,
-  },
-  {
-    id: 9,
-    name: "Jamie Wilson",
-    avatar: "JW",
-    projects: 5,
-    streak: false,
-    quality: 1,
-    totalScore: 6,
-  },
-  {
-    id: 10,
-    name: "Quinn Taylor",
-    avatar: "QT",
-    projects: 4,
-    streak: false,
-    quality: 1,
-    totalScore: 5,
-  },
-  {
-    id: 11,
-    name: "Avery Martinez",
-    avatar: "AM",
-    projects: 3,
-    streak: false,
-    quality: 0,
-    totalScore: 3,
-  },
-];
+const Leaderboard = () => {
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [sortConfig, setSortConfig] = useState({
+    key: "totalScore",
+    direction: "descending",
+  });
+  const [expanded, setExpanded] = useState(null);
+  const navigate = useNavigate();
 
-const ProjectLeaderboard = () => {
-  const [users, setUsers] = useState(initialUsers);
-  const [filteredUsers, setFilteredUsers] = useState(initialUsers);
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState("");
-  const [qualityRating, setQualityRating] = useState(0);
-  const [activeTab, setActiveTab] = useState("quality");
-  const [animationsEnabled, setAnimationsEnabled] = useState(true);
-
-  // Stats for admin dashboard
-  const stats = {
-    totalUsers: users.length,
-    totalProjects: users.reduce((sum, user) => sum + user.projects, 0),
-    avgQuality: (
-      users.reduce((sum, user) => sum + user.quality, 0) / users.length
-    ).toFixed(1),
-    activeStreaks: users.filter((user) => user.streak).length,
-  };
-
-  // Apply filters when they change
   useEffect(() => {
-    applyFilters();
-  }, [activeFilter, searchTerm, users]);
-
-  const applyFilters = () => {
-    let result = [...users];
-
-    // Apply filter buttons
-    if (activeFilter === "streak") {
-      result = result.filter((user) => user.streak);
-    } else if (activeFilter === "quality") {
-      result = result.filter((user) => user.quality >= 2);
-    } else if (activeFilter === "projects") {
-      result = [...result].sort((a, b) => b.projects - a.projects);
-    }
-
-    // Apply search
-    if (searchTerm) {
-      result = result.filter((user) =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Always sort by total score for final display
-    result = result.sort((a, b) => b.totalScore - a.totalScore);
-
-    setFilteredUsers(result);
-  };
-
-  const handleFilterClick = (filter) => {
-    setActiveFilter(filter);
-  };
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const handleUserSelect = (e) => {
-    setSelectedUser(e.target.value);
-  };
-
-  const handleQualitySelect = (e) => {
-    setQualityRating(parseInt(e.target.value));
-  };
-
-  const handleQualityUpdate = () => {
-    if (!selectedUser) return;
-
-    const updatedUsers = users.map((user) => {
-      if (user.id === parseInt(selectedUser)) {
-        // Recalculate total score: projects + streak bonus + quality
-        const streakBonus = user.streak ? 1 : 0;
-        const totalScore = user.projects + streakBonus + qualityRating;
-        return { ...user, quality: qualityRating, totalScore };
-      }
-      return user;
-    });
-
-    setUsers(updatedUsers);
-    // Reset selections
-    setSelectedUser("");
-    setQualityRating(0);
-
-    // Show success notification
-    const notification = document.createElement("div");
-    notification.className = "notification success";
-    notification.textContent = "Quality rating updated successfully!";
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-      notification.classList.add("hide");
-      setTimeout(() => document.body.removeChild(notification), 500);
-    }, 2000);
-  };
-
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
-
-  const toggleAnimations = () => {
-    setAnimationsEnabled(!animationsEnabled);
-    document.body.classList.toggle("animations-disabled", !animationsEnabled);
-  };
-
-  // Generate gradient color based on position
-  const getGradientColor = (index) => {
-    if (index === 0) return "gold-gradient";
-    if (index === 1) return "silver-gradient";
-    if (index === 2) return "bronze-gradient";
-    return "";
-  };
-
-  // Render star rating
-  const renderStars = (rating) => {
-    return (
-      <div className="star-rating">
-        {[...Array(3)].map((_, i) => (
-          <span key={i} className={`star ${i < rating ? "filled" : ""}`}>
-            {i < rating ? "★" : "☆"}
-          </span>
-        ))}
-      </div>
-    );
-  };
-
-  // Generate avatar background based on name
-  const getAvatarBackground = (name) => {
-    const colors = [
-      "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
-      "linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)",
-      "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
-      "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
-      "linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)",
-      "linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%)",
+    // Simulating data fetch
+    const mockData = [
+      {
+        id: 1,
+        name: "Alex Johnson",
+        avatar: "/api/placeholder/50/50",
+        projectsSubmitted: 24,
+        projectQuality: 92,
+        streak: 15,
+        totalScore: 131,
+        projects: [
+          {
+            id: 101,
+            name: "Task Manager App",
+            day: 12,
+            liveLink: "https://example.com/task-app",
+          },
+          {
+            id: 102,
+            name: "Weather Dashboard",
+            day: 15,
+            liveLink: "https://example.com/weather",
+          },
+          {
+            id: 103,
+            name: "Portfolio Website",
+            day: 19,
+            liveLink: "https://example.com/portfolio",
+          },
+        ],
+      },
+      {
+        id: 2,
+        name: "Sarah Miller",
+        avatar: "/api/placeholder/50/50",
+        projectsSubmitted: 19,
+        projectQuality: 97,
+        streak: 21,
+        totalScore: 137,
+        projects: [
+          {
+            id: 104,
+            name: "Recipe Finder",
+            day: 8,
+            liveLink: "https://example.com/recipe",
+          },
+          {
+            id: 105,
+            name: "Movie Database",
+            day: 14,
+            liveLink: "https://example.com/movies",
+          },
+        ],
+      },
+      {
+        id: 3,
+        name: "David Chen",
+        avatar: "/api/placeholder/50/50",
+        projectsSubmitted: 31,
+        projectQuality: 85,
+        streak: 7,
+        totalScore: 123,
+        projects: [
+          {
+            id: 106,
+            name: "Chat Application",
+            day: 5,
+            liveLink: "https://example.com/chat",
+          },
+          {
+            id: 107,
+            name: "E-commerce Store",
+            day: 10,
+            liveLink: "https://example.com/store",
+          },
+          {
+            id: 108,
+            name: "Blog Platform",
+            day: 21,
+            liveLink: "https://example.com/blog",
+          },
+        ],
+      },
+      {
+        id: 4,
+        name: "Maria Rodriguez",
+        avatar: "/api/placeholder/50/50",
+        projectsSubmitted: 26,
+        projectQuality: 91,
+        streak: 19,
+        totalScore: 136,
+        projects: [
+          {
+            id: 109,
+            name: "Quiz App",
+            day: 7,
+            liveLink: "https://example.com/quiz",
+          },
+          {
+            id: 110,
+            name: "Fitness Tracker",
+            day: 16,
+            liveLink: "https://example.com/fitness",
+          },
+        ],
+      },
+      {
+        id: 5,
+        name: "James Wilson",
+        avatar: "/api/placeholder/50/50",
+        projectsSubmitted: 17,
+        projectQuality: 88,
+        streak: 12,
+        totalScore: 117,
+        projects: [
+          {
+            id: 111,
+            name: "Budget Calculator",
+            day: 9,
+            liveLink: "https://example.com/budget",
+          },
+          {
+            id: 112,
+            name: "News Aggregator",
+            day: 18,
+            liveLink: "https://example.com/news",
+          },
+        ],
+      },
+      {
+        id: 6,
+        name: "Emma Thompson",
+        avatar: "/api/placeholder/50/50",
+        projectsSubmitted: 23,
+        projectQuality: 94,
+        streak: 25,
+        totalScore: 142,
+        projects: [
+          {
+            id: 113,
+            name: "Social Media Dashboard",
+            day: 6,
+            liveLink: "https://example.com/social",
+          },
+          {
+            id: 114,
+            name: "Music Player",
+            day: 11,
+            liveLink: "https://example.com/music",
+          },
+          {
+            id: 115,
+            name: "Note Taking App",
+            day: 20,
+            liveLink: "https://example.com/notes",
+          },
+        ],
+      },
+      {
+        id: 7,
+        name: "Michael Davis",
+        avatar: "/api/placeholder/50/50",
+        projectsSubmitted: 21,
+        projectQuality: 87,
+        streak: 14,
+        totalScore: 122,
+        projects: [
+          {
+            id: 116,
+            name: "Calendar App",
+            day: 13,
+            liveLink: "https://example.com/calendar",
+          },
+          {
+            id: 117,
+            name: "Todo List",
+            day: 17,
+            liveLink: "https://example.com/todo",
+          },
+        ],
+      },
+      {
+        id: 8,
+        name: "Sophia Park",
+        avatar: "/api/placeholder/50/50",
+        projectsSubmitted: 29,
+        projectQuality: 90,
+        streak: 10,
+        totalScore: 129,
+        projects: [
+          {
+            id: 118,
+            name: "Password Generator",
+            day: 4,
+            liveLink: "https://example.com/password",
+          },
+          {
+            id: 119,
+            name: "Drawing App",
+            day: 22,
+            liveLink: "https://example.com/draw",
+          },
+        ],
+      },
     ];
-    const index = name.charCodeAt(0) % colors.length;
-    return colors[index];
+
+    // Sort the data based on total score by default
+    const sortedData = [...mockData].sort(
+      (a, b) => b.totalScore - a.totalScore
+    );
+    setLeaderboardData(sortedData);
+  }, []);
+
+  const requestSort = (key) => {
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
+
+    setLeaderboardData((prevData) => {
+      return [...prevData].sort((a, b) => {
+        if (a[key] < b[key]) {
+          return direction === "ascending" ? -1 : 1;
+        }
+        if (a[key] > b[key]) {
+          return direction === "ascending" ? 1 : -1;
+        }
+        return 0;
+      });
+    });
+  };
+
+  const toggleExpand = (id) => {
+    setExpanded(expanded === id ? null : id);
+  };
+
+  const viewProject = (projectId) => {
+    navigate(`/project/${projectId}`);
+  };
+
+  const getScoreColor = (score) => {
+    if (score >= 90) return "text-green-500";
+    if (score >= 75) return "text-blue-500";
+    if (score >= 60) return "text-yellow-500";
+    return "text-red-500";
+  };
+
+  const getRankIcon = (index) => {
+    if (index === 0) return <Crown className="text-yellow-500" size={20} />;
+    if (index === 1) return <Award className="text-gray-400" size={20} />;
+    if (index === 2) return <Award className="text-amber-600" size={20} />;
+    return <span className="font-bold text-gray-500">{index + 1}</span>;
   };
 
   return (
-    <div
-      className={`leaderboard-container ${
-        animationsEnabled ? "animations-enabled" : ""
-      }`}
-    >
-      <div className="backdrop-blur"></div>
-
-      <header className="leaderboard-header">
-        <div className="header-content">
-          <h1>
-            <span className="trophy-icon">🏆</span>
-            Project Leaderboard
-          </h1>
-          <p className="subtitle">Track performance, celebrate excellence</p>
-        </div>
-        <div className="badge">Elite Performance Tracker</div>
-      </header>
-
-      <div className="stats-overview">
-        <div className="stat-card">
-          <div className="stat-icon">📊</div>
-          <div className="stat-content">
-            <h3>Projects</h3>
-            <p>
-              Projects are the core of your performance. Each submitted project
-              counts as 1 point towards your total score.
-            </p>
+    <div className="leaderboard-container">
+      <div className="leaderboard-header">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="go-home-button"
+        >
+          ← Back to Home
+        </button>
+        <h1 className="leaderboard-title">Project Leaderboard</h1>
+        <div className="leaderboard-stats">
+          <div className="stat-item">
+            <Users size={20} />
+            <span>{leaderboardData.length} Participants</span>
           </div>
-          <div className="stat-bg"></div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🔥</div>
-          <div className="stat-content">
-            <h3>Streak</h3>
-            <p>
-              Maintain consistent performance by submitting projects regularly.
-              Active streaks earn you a bonus point!
-            </p>
-          </div>
-          <div className="stat-bg"></div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">⭐</div>
-          <div className="stat-content">
-            <h3>Quality</h3>
-            <p>
-              Quality matters! Each project is rated by admins on a scale of 0-3
-              stars, adding to your total score.
-            </p>
-          </div>
-          <div className="stat-bg"></div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon">🏆</div>
-          <div className="stat-content">
-            <h3>Total Score</h3>
-            <p>
-              Your total score combines projects, streak bonus, and quality
-              ratings. Aim for the top of the leaderboard!
-            </p>
-          </div>
-          <div className="stat-bg"></div>
         </div>
       </div>
 
-      <div className="filter-controls">
-        <div className="filter-buttons">
-          <button
-            className={`filter-btn ${activeFilter === "all" ? "active" : ""}`}
-            onClick={() => handleFilterClick("all")}
-          >
-            <span className="filter-icon">📋</span>
-            <span>All</span>
-          </button>
-          <button
-            className={`filter-btn ${
-              activeFilter === "streak" ? "active" : ""
-            }`}
-            onClick={() => handleFilterClick("streak")}
-          >
-            <span className="filter-icon">🔥</span>
-            <span>Active Streak</span>
-          </button>
-          <button
-            className={`filter-btn ${
-              activeFilter === "quality" ? "active" : ""
-            }`}
-            onClick={() => handleFilterClick("quality")}
-          >
-            <span className="filter-icon">⭐</span>
-            <span>High Quality</span>
-          </button>
-          <button
-            className={`filter-btn ${
-              activeFilter === "projects" ? "active" : ""
-            }`}
-            onClick={() => handleFilterClick("projects")}
-          >
-            <span className="filter-icon">📊</span>
-            <span>Most Projects</span>
-          </button>
-        </div>
-
-        <div className="search-bar">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-        </div>
+      <div className="leaderboard-controls">
+        <button
+          className={`sort-button ${
+            sortConfig.key === "totalScore" ? "active" : ""
+          }`}
+          onClick={() => requestSort("totalScore")}
+        >
+          Total Score{" "}
+          {sortConfig.key === "totalScore" &&
+            (sortConfig.direction === "ascending" ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            ))}
+        </button>
+        <button
+          className={`sort-button ${
+            sortConfig.key === "projectsSubmitted" ? "active" : ""
+          }`}
+          onClick={() => requestSort("projectsSubmitted")}
+        >
+          Projects{" "}
+          {sortConfig.key === "projectsSubmitted" &&
+            (sortConfig.direction === "ascending" ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            ))}
+        </button>
+        <button
+          className={`sort-button ${
+            sortConfig.key === "projectQuality" ? "active" : ""
+          }`}
+          onClick={() => requestSort("projectQuality")}
+        >
+          Quality{" "}
+          {sortConfig.key === "projectQuality" &&
+            (sortConfig.direction === "ascending" ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            ))}
+        </button>
+        <button
+          className={`sort-button ${
+            sortConfig.key === "streak" ? "active" : ""
+          }`}
+          onClick={() => requestSort("streak")}
+        >
+          Streak{" "}
+          {sortConfig.key === "streak" &&
+            (sortConfig.direction === "ascending" ? (
+              <ChevronUp size={16} />
+            ) : (
+              <ChevronDown size={16} />
+            ))}
+        </button>
       </div>
 
-      <div className="leaderboard">
-        <div className="leaderboard-header-row">
-          <div className="column-header">Rank</div>
-          <div className="column-header">User</div>
-          <div className="column-header">Projects</div>
-          <div className="column-header">Streak</div>
-          <div className="column-header">Quality</div>
-          <div className="column-header">Total Score</div>
-        </div>
-
-        <ul className="leaderboard-list">
-          {filteredUsers.map((user, index) => (
-            <li
-              key={user.id}
-              className={`leaderboard-item ${getGradientColor(index)}`}
+      <div className="leaderboard-list">
+        {leaderboardData.map((user, index) => (
+          <div
+            key={user.id}
+            className={`leaderboard-item ${
+              expanded === user.id ? "expanded" : ""
+            } ${index < 3 ? "top-rank" : ""}`}
+          >
+            <div
+              className="leaderboard-main"
+              onClick={() => toggleExpand(user.id)}
             >
-              <div className="rank">
-                {index < 3 ? (
-                  <div className={`crown-icon position-${index + 1}`}>
-                    {index === 0 ? "👑" : index === 1 ? "🥈" : "🥉"}
-                  </div>
-                ) : (
-                  <span>{index + 1}</span>
-                )}
+              <div className="rank">{getRankIcon(index)}</div>
+              <div className="avatar">
+                <img src={user.avatar} alt={user.name} />
               </div>
-              <div className="user">
-                <div
-                  className="avatar"
-                  style={{ background: getAvatarBackground(user.name) }}
-                >
-                  {user.avatar}
-                </div>
-                <div className="user-info">
-                  <div className="name">{user.name}</div>
-                  <div
-                    className={`status ${user.streak ? "active" : "inactive"}`}
+              <div className="user-info">
+                <h3>{user.name}</h3>
+                <div className="score-summary">
+                  <span
+                    className={`total-score ${getScoreColor(user.totalScore)}`}
                   >
-                    {user.streak ? "🔥 Active Streak" : "Inactive"}
+                    {user.totalScore} pts
+                  </span>
+                </div>
+              </div>
+              <div className="quick-stats">
+                <div className="stat">
+                  <span className="value">{user.projectsSubmitted}</span>
+                  <span className="label">Projects</span>
+                </div>
+                <div className="stat">
+                  <span
+                    className={`value ${getScoreColor(user.projectQuality)}`}
+                  >
+                    {user.projectQuality}
+                  </span>
+                  <span className="label">Quality</span>
+                </div>
+                <div className="stat">
+                  <span className="value streak">
+                    {user.streak} <Flame size={14} className="streak-icon" />
+                  </span>
+                  <span className="label">Streak</span>
+                </div>
+              </div>
+            </div>
+            {expanded === user.id && (
+              <div className="extended-info">
+                <div className="detailed-stats">
+                  <div className="stat-bar">
+                    <span className="stat-label">Projects Submitted</span>
+                    <div className="progress-container">
+                      <div
+                        className="progress-bar projects"
+                        style={{
+                          width: `${(user.projectsSubmitted / 35) * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+                    <span className="stat-value">{user.projectsSubmitted}</span>
+                  </div>
+                  <div className="stat-bar">
+                    <span className="stat-label">Quality Score</span>
+                    <div className="progress-container">
+                      <div
+                        className={`progress-bar quality ${getScoreColor(
+                          user.projectQuality
+                        )}`}
+                        style={{ width: `${user.projectQuality}%` }}
+                      ></div>
+                    </div>
+                    <span className="stat-value">{user.projectQuality}%</span>
+                  </div>
+                  <div className="stat-bar">
+                    <span className="stat-label">Current Streak</span>
+                    <div className="progress-container">
+                      <div
+                        className="progress-bar streak"
+                        style={{ width: `${(user.streak / 30) * 100}%` }}
+                      ></div>
+                    </div>
+                    <span className="stat-value">{user.streak} days</span>
+                  </div>
+                </div>
+
+                <div className="user-projects">
+                  <h4>Recent Projects</h4>
+                  <div className="projects-list">
+                    {user.projects.map((project) => (
+                      <div
+                        key={project.id}
+                        className="project-item"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          viewProject(project.id);
+                        }}
+                      >
+                        <div className="project-info">
+                          <span className="project-name">{project.name}</span>
+                          <span className="project-day">Day {project.day}</span>
+                        </div>
+                        <ExternalLink size={16} className="view-project-icon" />
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-              <div className="projects">
-                <div className="metric-container">
-                  <span className="value">{user.projects}</span>
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ width: `${(user.projects / 15) * 100}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-              <div className="streak">
-                <div
-                  className={`streak-badge ${
-                    user.streak ? "active-streak" : "inactive-streak"
-                  }`}
-                >
-                  {user.streak ? "🔥" : "⊗"}
-                </div>
-              </div>
-              <div className="quality">{renderStars(user.quality)}</div>
-              <div className="total-score">
-                <div className="score-badge">{user.totalScore}</div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="admin-controls">
-        <div className="admin-header">
-          <h2>
-            <span className="admin-icon">👤</span> Admin Dashboard
-          </h2>
-          <div className="admin-tabs">
-            <div
-              className={`admin-tab ${activeTab === "quality" ? "active" : ""}`}
-              onClick={() => handleTabClick("quality")}
-            >
-              <span className="tab-icon">⭐</span>
-              Quality Control
-            </div>
-            <div
-              className={`admin-tab ${activeTab === "stats" ? "active" : ""}`}
-              onClick={() => handleTabClick("stats")}
-            >
-              <span className="tab-icon">📊</span>
-              Statistics
-            </div>
+            )}
           </div>
-        </div>
-
-        {activeTab === "quality" ? (
-          <div className="quality-control">
-            <div className="form-group">
-              <label>Select User</label>
-              <select
-                className="admin-select"
-                value={selectedUser}
-                onChange={handleUserSelect}
-              >
-                <option value="">Choose a user...</option>
-                {users.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Quality Rating</label>
-              <select
-                className="admin-select"
-                value={qualityRating}
-                onChange={handleQualitySelect}
-              >
-                <option value="0">0 - Needs Improvement</option>
-                <option value="1">1 - Satisfactory</option>
-                <option value="2">2 - Good Performance</option>
-                <option value="3">3 - Outstanding Work</option>
-              </select>
-            </div>
-
-            <button
-              className="admin-btn"
-              onClick={handleQualityUpdate}
-              disabled={!selectedUser}
-            >
-              <span className="btn-icon">💾</span>
-              Update Rating
-            </button>
-          </div>
-        ) : (
-          <div className="admin-stats">
-            <div className="admin-stat">
-              <div className="stat-icon-wrapper">
-                <span className="stat-icon">👥</span>
-              </div>
-              <div className="value">{stats.totalUsers}</div>
-              <div className="label">Total Users</div>
-              <div className="stat-bg"></div>
-            </div>
-            <div className="admin-stat">
-              <div className="stat-icon-wrapper">
-                <span className="stat-icon">📊</span>
-              </div>
-              <div className="value">{stats.totalProjects}</div>
-              <div className="label">Total Projects</div>
-              <div className="stat-bg"></div>
-            </div>
-            <div className="admin-stat">
-              <div className="stat-icon-wrapper">
-                <span className="stat-icon">⭐</span>
-              </div>
-              <div className="value">{stats.avgQuality}</div>
-              <div className="label">Avg Quality</div>
-              <div className="stat-bg"></div>
-            </div>
-            <div className="admin-stat">
-              <div className="stat-icon-wrapper">
-                <span className="stat-icon">🔥</span>
-              </div>
-              <div className="value">{stats.activeStreaks}</div>
-              <div className="label">Active Streaks</div>
-              <div className="stat-bg"></div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <button className="submit-project-btn pulse">
-        <span className="btn-icon">➕</span>
-        Submit Project
-      </button>
-
-      <button className="animation-toggle" onClick={toggleAnimations}>
-        <span>{animationsEnabled ? "✨" : "⚡"}</span>
-      </button>
-
-      <div className="floating-elements">
-        <div
-          className="floating-element"
-          style={{ top: "10%", left: "5%", animationDelay: "0s" }}
-        >
-          🏆
-        </div>
-        <div
-          className="floating-element"
-          style={{ top: "30%", right: "8%", animationDelay: "1.5s" }}
-        >
-          ⭐
-        </div>
-        <div
-          className="floating-element"
-          style={{ bottom: "20%", left: "15%", animationDelay: "3s" }}
-        >
-          🔥
-        </div>
-        <div
-          className="floating-element"
-          style={{ bottom: "40%", right: "15%", animationDelay: "4.5s" }}
-        >
-          📊
-        </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default ProjectLeaderboard;
+export default Leaderboard;

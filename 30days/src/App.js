@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import SubmitProject from "./pages/SubmitProject";
 import ProjectList from "./pages/ProjectList";
 import Leaderboard from "./pages/Leaderboard";
+import ProjectRating from "./pages/ProjectRating"; // 🆕 Add this
 // import DailyChallenge from "./pages/DailyChallenge";
 // import Resources from "./pages/Resources";
 // import Community from "./pages/Community";
@@ -119,6 +120,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/project/:projectId"
+          element={
+            <ProtectedRoute>
+              <ProjectRating onLogout={handleLogout} />
+            </ProtectedRoute>
+          }
+        />
+
         {/* 
         <Route 
           path="/daily-challenge" 
