@@ -16,6 +16,8 @@ import SubmitProject from "./pages/SubmitProject";
 import ProjectList from "./pages/ProjectList";
 import Leaderboard from "./pages/Leaderboard";
 import ProjectRating from "./pages/ProjectRating"; // 🆕 Add this
+import UserProfile from "./pages/UserProfile"; // Make sure the path is correct
+
 // import DailyChallenge from "./pages/DailyChallenge";
 // import Resources from "./pages/Resources";
 // import Community from "./pages/Community";
@@ -128,6 +130,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/profile"
+  element={
+    <ProtectedRoute>
+      <UserProfile />
+    </ProtectedRoute>
+  }
+/>
+
+        
 
         {/* 
         <Route 

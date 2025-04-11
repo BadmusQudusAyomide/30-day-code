@@ -27,7 +27,8 @@ const Leaderboard = () => {
       {
         id: 1,
         name: "Alex Johnson",
-        avatar: "/api/placeholder/50/50",
+        avatar:
+          "https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
         projectsSubmitted: 24,
         projectQuality: 92,
         streak: 15,
@@ -56,7 +57,7 @@ const Leaderboard = () => {
       {
         id: 2,
         name: "Sarah Miller",
-        avatar: "/api/placeholder/50/50",
+        avatar: "https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744304003/IMG-20241127-WA0097_3_fjwtbx.jpg",
         projectsSubmitted: 19,
         projectQuality: 97,
         streak: 21,
@@ -79,7 +80,7 @@ const Leaderboard = () => {
       {
         id: 3,
         name: "David Chen",
-        avatar: "/api/placeholder/50/50",
+        avatar: "https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
         projectsSubmitted: 31,
         projectQuality: 85,
         streak: 7,
@@ -108,7 +109,7 @@ const Leaderboard = () => {
       {
         id: 4,
         name: "Maria Rodriguez",
-        avatar: "/api/placeholder/50/50",
+        avatar: "https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
         projectsSubmitted: 26,
         projectQuality: 91,
         streak: 19,
@@ -131,7 +132,7 @@ const Leaderboard = () => {
       {
         id: 5,
         name: "James Wilson",
-        avatar: "/api/placeholder/50/50",
+        avatar: "https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744304003/IMG-20241127-WA0097_3_fjwtbx.jpg",
         projectsSubmitted: 17,
         projectQuality: 88,
         streak: 12,
@@ -154,7 +155,7 @@ const Leaderboard = () => {
       {
         id: 6,
         name: "Emma Thompson",
-        avatar: "/api/placeholder/50/50",
+        avatar: "https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
         projectsSubmitted: 23,
         projectQuality: 94,
         streak: 25,
@@ -183,7 +184,7 @@ const Leaderboard = () => {
       {
         id: 7,
         name: "Michael Davis",
-        avatar: "/api/placeholder/50/50",
+        avatar: "https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
         projectsSubmitted: 21,
         projectQuality: 87,
         streak: 14,
@@ -206,7 +207,7 @@ const Leaderboard = () => {
       {
         id: 8,
         name: "Sophia Park",
-        avatar: "/api/placeholder/50/50",
+        avatar: "https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
         projectsSubmitted: 29,
         projectQuality: 90,
         streak: 10,
