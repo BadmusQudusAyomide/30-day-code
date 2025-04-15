@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./ProjectList.css";
+import { useNavigate } from "react-router-dom";
+
+// Assuming you're using React Router for navigation
+// If you're using React Router v6:
+// import { useNavigate } from "react-router-dom";
 
 const ProjectList = () => {
-  // Sample data - in a real application, this would come from an API
+  // If using React Router v6, uncomment this:
+  // const navigate = useNavigate();
+
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState({
@@ -11,7 +18,7 @@ const ProjectList = () => {
     language: "all",
   });
   const [expandedProject, setExpandedProject] = useState(null);
-
+const navigate = useNavigate();
   // Mock data for demonstration
   useEffect(() => {
     // Simulating API call
@@ -28,7 +35,7 @@ const ProjectList = () => {
           frameworks: "React, Material UI",
           languages: "JavaScript, HTML, CSS",
           imageUrl:
-            "https://www.gettyimages.com/detail/news-photo/die-weltmeisterin-marita-koch-unterh%C3%A4lt-sich-mit-ihrem-news-photo/957265586",
+            "https://images.unsplash.com/photo-1592210454359-9043f067919b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
           submittedAt: "2025-03-27T14:23:00",
           author: "Akinola Saregbagi",
         },
@@ -42,7 +49,8 @@ const ProjectList = () => {
           day: 15,
           frameworks: "React, Redux, Styled Components",
           languages: "TypeScript, HTML, CSS",
-          imageUrl: "/api/placeholder/400/200",
+          imageUrl:
+            "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
           submittedAt: "2025-03-30T09:15:00",
           author: "Akinola Saregbagi",
         },
@@ -56,7 +64,8 @@ const ProjectList = () => {
           day: 19,
           frameworks: "Next.js, Framer Motion",
           languages: "JavaScript, HTML, CSS",
-          imageUrl: "/api/placeholder/400/200",
+          imageUrl:
+            "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
           submittedAt: "2025-04-05T16:45:00",
           author: "Akinola Saregbagi",
         },
@@ -70,7 +79,8 @@ const ProjectList = () => {
           day: 19,
           frameworks: "React, Firebase, CodeMirror",
           languages: "JavaScript, HTML, CSS",
-          imageUrl: "/api/placeholder/400/200",
+          imageUrl:
+            "https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
           submittedAt: "2025-04-05T20:12:00",
           author: "Akinola Saregbagi",
         },
@@ -84,7 +94,8 @@ const ProjectList = () => {
           day: 8,
           frameworks: "Vue.js, Vuetify",
           languages: "JavaScript, HTML, CSS",
-          imageUrl: "/api/placeholder/400/200",
+          imageUrl:
+            "https://images.unsplash.com/photo-1485846234645-a62644f84728?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
           submittedAt: "2025-03-20T11:30:00",
           author: "Akinola Saregbagi",
         },
@@ -163,8 +174,33 @@ const ProjectList = () => {
     }
   };
 
+  // Function to handle image loading errors
+  const handleImageError = (e) => {
+    // Fallback to a placeholder if the image fails to load
+    e.target.src =
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+  };
+
+  // Navigation function - for demo purposes
+  // In a real app with React Router you would use navigate("/dashboard")
+  const navigateToDashboard = () => {
+    console.log("Navigating to dashboard");
+    // If you're using React Router v6, uncomment this:
+    // navigate("/dashboard");
+  };
+
   return (
     <div className="project-list-container">
+      {/* Back navigation button - matching the style you provided */}
+      <div className="back-navigation">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="go-home-button"
+        >
+          ← Back to Home
+        </button>
+      </div>
+
       <div className="project-list-header">
         <h2>Submitted Projects</h2>
         <p className="subtitle">Browse through all the amazing submissions</p>
@@ -281,7 +317,11 @@ const ProjectList = () => {
                     onClick={() => toggleProjectExpansion(project.id)}
                   >
                     <div className="project-image">
-                      <img src={project.imageUrl} alt={project.projectName} />
+                      <img
+                        src={project.imageUrl}
+                        alt={project.projectName}
+                        onError={handleImageError}
+                      />
                     </div>
 
                     <div className="project-info">

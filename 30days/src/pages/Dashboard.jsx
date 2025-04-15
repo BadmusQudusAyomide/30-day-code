@@ -11,15 +11,12 @@ const Dashboard = () => {
     totalDays: 30,
     rank: 42,
     totalParticipants: 1204,
-    avatarColor: "#6366f1", // Default color for avatar
+    avatarColor: "#6366f1",
   });
 
-  // Simulate loading user data
-  useEffect(() => {
-    // In a real app, this would be a fetch call to your API
-    console.log("Dashboard loaded - would fetch user data here");
+  const [darkMode, setDarkMode] = useState(true);
 
-    // Generate a random color for avatar based on username
+  useEffect(() => {
     const generateColorFromName = (name) => {
       let hash = 0;
       for (let i = 0; i < name.length; i++) {
@@ -37,7 +34,6 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    // Add confirmation for better UX
     if (window.confirm("Are you sure you want to logout?")) {
       localStorage.removeItem("isAuthenticated");
       navigate("/login");
@@ -48,8 +44,12 @@ const Dashboard = () => {
     return (userData.currentDay / userData.totalDays) * 100;
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode(prev => !prev);
+  };
+
   return (
-    <div className="dashboard">
+    <div className={`dashboard neo ${darkMode ? 'dark' : 'light'}`}>
       <header className="dashboard-header">
         <div className="brand">
           <div className="logo">
@@ -57,17 +57,31 @@ const Dashboard = () => {
             <span className="days-text">&lt;30&gt;</span>
           </div>
         </div>
-        <div className="user-info">
-          <div className="user-name">{userData.name}</div>
-          <button
-            className="avatar-button"
-            onClick={() => handleNavigation("/profile")}
-            style={{ backgroundColor: userData.avatarColor }}
-            aria-label="View profile"
-            title="View and edit your profile"
-          >
-            {userData.name.charAt(0)}
-          </button>
+        <div className="header-controls">
+          <div className="dark-mode-toggle">
+            <input 
+              type="checkbox" 
+              id="darkmode-toggle" 
+              checked={darkMode}
+              onChange={toggleDarkMode}
+            />
+            <label htmlFor="darkmode-toggle" className="toggle-label">
+              <span className="toggle-icon moon">🌙</span>
+              <span className="toggle-icon sun">☀️</span>
+            </label>
+          </div>
+          <div className="user-info">
+            <div className="user-name">{userData.name}</div>
+            <button
+              className="avatar-button"
+              onClick={() => handleNavigation("/profile")}
+              style={{ backgroundColor: userData.avatarColor }}
+              aria-label="View profile"
+              title="View and edit your profile"
+            >
+              {userData.name.charAt(0)}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -90,6 +104,10 @@ const Dashboard = () => {
                 className="progress-bar"
                 style={{
                   width: `${calculateProgressPercentage()}%`,
+                  background: `linear-gradient(90deg, ${userData.avatarColor}, ${adjustColor(userData.avatarColor, 20)})`,
+                  boxShadow: darkMode 
+                    ? `0 4px 8px rgba(0, 0, 0, 0.3), 0 -4px 8px rgba(255, 255, 255, 0.05)`
+                    : `0 4px 8px rgba(163, 177, 198, 0.6), 0 -4px 8px rgba(255, 255, 255, 0.8)`
                 }}
               ></div>
             </div>
@@ -103,79 +121,12 @@ const Dashboard = () => {
         </div>
 
         <div className="dashboard-grid">
-          <div
-            className="grid-item submit-project"
-            onClick={() => handleNavigation("/SubmitProject")}
-          >
-            <div className="item-icon">📤</div>
-            <div className="item-content">
-              <h3>Submit Project</h3>
-              <p>Upload today's challenge</p>
-            </div>
-            <div className="item-action">→</div>
-          </div>
-
-          <div
-            className="grid-item my-projects"
-            onClick={() => handleNavigation("/ProjectList")}
-          >
-            <div className="item-icon">📁</div>
-            <div className="item-content">
-              <h3>My Projects</h3>
-              <p>{userData.projectsSubmitted} submitted</p>
-            </div>
-            <div className="item-action">→</div>
-          </div>
-
-          <div
-            className="grid-item leaderboard"
-            onClick={() => handleNavigation("/leaderboard")}
-          >
-            <div className="item-icon">🏆</div>
-            <div className="item-content">
-              <h3>Leaderboard</h3>
-              <p>
-                Rank: #{userData.rank} of {userData.totalParticipants}
-              </p>
-            </div>
-            <div className="item-action">→</div>
-          </div>
-
-          <div
-            className="grid-item daily-challenge"
-            onClick={() => handleNavigation("/daily-challenge")}
-          >
-            <div className="item-icon">📝</div>
-            <div className="item-content">
-              <h3>Daily Challenge</h3>
-              <p>View Day {userData.currentDay} task</p>
-            </div>
-            <div className="item-action">→</div>
-          </div>
-
-          <div
-            className="grid-item resources"
-            onClick={() => handleNavigation("/resources")}
-          >
-            <div className="item-icon">📚</div>
-            <div className="item-content">
-              <h3>Resources</h3>
-              <p>Helpful materials</p>
-            </div>
-            <div className="item-action">→</div>
-          </div>
-
-          <div
-            className="grid-item community"
-            onClick={() => handleNavigation("/community")}
-          >
-            <div className="item-icon">👥</div>
-            <div className="item-content">
-              <h3>Community</h3>
-              <p>{userData.totalParticipants} participants</p>
-            </div>
-            <div className="item-action">→</div>
-          </div>
+          {renderGridItem("📤", "Submit Project", "Upload today's challenge", "/SubmitProject")}
+          {renderGridItem("📁", "My Projects", `${userData.projectsSubmitted} submitted`, "/ProjectList")}
+          {renderGridItem("🏆", "Leaderboard", `Rank: #${userData.rank} of ${userData.totalParticipants}`, "/leaderboard")}
+          {renderGridItem("📝", "Daily Challenge", `View Day ${userData.currentDay} task`, "/daily-challenge")}
+          {renderGridItem("📚", "Resources", "Helpful materials", "/resources")}
+          {renderGridItem("👥", "Community", `${userData.totalParticipants} participants`, "/community")}
         </div>
 
         <div className="logout-container">
@@ -200,6 +151,38 @@ const Dashboard = () => {
       </footer>
     </div>
   );
+
+  function renderGridItem(emoji, title, description, path) {
+    return (
+      <div
+        className="grid-item"
+        onClick={() => handleNavigation(path)}
+        data-type={title.toLowerCase().replace(' ', '-')}
+      >
+        <div className="item-icon">{emoji}</div>
+        <div className="item-content">
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </div>
+        <div className="item-action">→</div>
+      </div>
+    );
+  }
+
+  function adjustColor(color, amount) {
+    // Simple color adjustment for demo purposes
+    let col = color.startsWith('#') ? color.slice(1) : color;
+    let num = parseInt(col, 16);
+    let r = (num >> 16) + amount;
+    let g = (num & 0x0000FF) + amount;
+    let b = ((num >> 8) & 0x00FF) + amount;
+    
+    r = Math.max(Math.min(255, r), 0).toString(16).padStart(2, '0');
+    g = Math.max(Math.min(255, g), 0).toString(16).padStart(2, '0');
+    b = Math.max(Math.min(255, b), 0).toString(16).padStart(2, '0');
+    
+    return `#${r}${g}${b}`;
+  }
 };
 
 export default Dashboard;

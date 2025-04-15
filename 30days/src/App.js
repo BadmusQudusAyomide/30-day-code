@@ -18,7 +18,7 @@ import Leaderboard from "./pages/Leaderboard";
 import ProjectRating from "./pages/ProjectRating"; // 🆕 Add this
 import UserProfile from "./pages/UserProfile"; // Make sure the path is correct
 
-// import DailyChallenge from "./pages/DailyChallenge";
+import DailyChallenge from "./pages/DailyChallenge";
 // import Resources from "./pages/Resources";
 // import Community from "./pages/Community";
 // import Profile from "./pages/Profile";
@@ -131,26 +131,23 @@ function App() {
           }
         />
         <Route
-  path="/profile"
-  element={
-    <ProtectedRoute>
-      <UserProfile />
-    </ProtectedRoute>
-  }
-/>
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
 
-        
-
-        {/* 
-        <Route 
-          path="/daily-challenge" 
+        <Route
+          path="/daily-challenge"
           element={
             <ProtectedRoute>
               <DailyChallenge onLogout={handleLogout} />
             </ProtectedRoute>
-          } 
+          }
         />
-        
+        {/* 
         <Route 
           path="/resources" 
           element={
