@@ -722,3 +722,208 @@
     font-size: 1rem;
   }
 }
+
+/* Add these styles at the end of your existing Dashboard.css file */
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Logout Modal */
+.logout-modal {
+  width: 320px;
+  border-radius: 16px;
+  animation: zoomIn 0.3s ease;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.logout-modal.light {
+  background: var(--bg-primary);
+  box-shadow: 8px 8px 16px var(--neo-shadow-dark), 
+              -8px -8px 16px var(--neo-shadow-light);
+  color: var(--text-primary);
+}
+
+.logout-modal.dark {
+  background: var(--dark-bg-primary);
+  box-shadow: 8px 8px 16px var(--dark-neo-shadow-dark), 
+              -8px -8px 16px var(--dark-neo-shadow-light);
+  color: var(--dark-text-primary);
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Modal Header */
+.modal-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid;
+  transition: var(--transition);
+}
+
+.logout-modal.light .modal-header {
+  border-color: var(--border-color);
+}
+
+.logout-modal.dark .modal-header {
+  border-color: var(--dark-border-color);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.logout-modal.light .close-button {
+  color: var(--text-secondary);
+}
+
+.logout-modal.dark .close-button {
+  color: var(--dark-text-secondary);
+}
+
+.close-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.logout-modal.dark .close-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Modal Content */
+.modal-content {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.modal-content p {
+  margin: 0 0 1.5rem;
+  font-size: 1.1rem;
+}
+
+.modal-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Modal Actions */
+.modal-actions {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 0.75rem 0;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+}
+
+.cancel-button {
+  transition: var(--transition);
+}
+
+.logout-modal.light .cancel-button {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: 3px 3px 6px var(--neo-shadow-dark), 
+              -3px -3px 6px var(--neo-shadow-light);
+}
+
+.logout-modal.dark .cancel-button {
+  background: var(--dark-bg-primary);
+  color: var(--dark-text-primary);
+  box-shadow: 3px 3px 6px var(--dark-neo-shadow-dark), 
+              -3px -3px 6px var(--dark-neo-shadow-light);
+}
+
+.cancel-button:hover {
+  transform: translateY(-3px);
+}
+
+.logout-modal.light .cancel-button:hover {
+  box-shadow: 5px 5px 10px var(--neo-shadow-dark), 
+              -5px -5px 10px var(--neo-shadow-light);
+}
+
+.logout-modal.dark .cancel-button:hover {
+  box-shadow: 5px 5px 10px var(--dark-neo-shadow-dark), 
+              -5px -5px 10px var(--dark-neo-shadow-light);
+}
+
+.confirm-button {
+  background: linear-gradient(145deg, #ff5252, #e53935);
+  color: white;
+  transition: var(--transition);
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.confirm-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile Responsiveness for Modal */
+@media (max-width: 480px) {
+  .logout-modal {
+    width: 90%;
+    max-width: 320px;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .modal-actions button {
+    width: 100%;
+  }
+}

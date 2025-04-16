@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 
-const Dashboard = () => {
+const Dashboard = ({ onLogout }) => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({
     name: "Akinola Saregbagi",
@@ -15,6 +15,7 @@ const Dashboard = () => {
   });
 
   const [darkMode, setDarkMode] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const generateColorFromName = (name) => {
@@ -33,11 +34,24 @@ const Dashboard = () => {
     navigate(path);
   };
 
-  const handleLogout = () => {
-    if (window.confirm("Are you sure you want to logout?")) {
-      localStorage.removeItem("isAuthenticated");
+  const openLogoutModal = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = () => {
+    if (onLogout) {
+      // Call the parent's logout handler that was passed as a prop
+      onLogout();
+    } else {
+      // Fallback if onLogout is not provided
+      localStorage.setItem("isAuthenticated", "false");
       navigate("/login");
     }
+    setShowLogoutModal(false);
+  };
+
+  const handleCancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   const calculateProgressPercentage = () => {
@@ -45,11 +59,11 @@ const Dashboard = () => {
   };
 
   const toggleDarkMode = () => {
-    setDarkMode(prev => !prev);
+    setDarkMode((prev) => !prev);
   };
 
   return (
-    <div className={`dashboard neo ${darkMode ? 'dark' : 'light'}`}>
+    <div className={`dashboard neo ${darkMode ? "dark" : "light"}`}>
       <header className="dashboard-header">
         <div className="brand">
           <div className="logo">
@@ -59,9 +73,9 @@ const Dashboard = () => {
         </div>
         <div className="header-controls">
           <div className="dark-mode-toggle">
-            <input 
-              type="checkbox" 
-              id="darkmode-toggle" 
+            <input
+              type="checkbox"
+              id="darkmode-toggle"
               checked={darkMode}
               onChange={toggleDarkMode}
             />
@@ -104,10 +118,12 @@ const Dashboard = () => {
                 className="progress-bar"
                 style={{
                   width: `${calculateProgressPercentage()}%`,
-                  background: `linear-gradient(90deg, ${userData.avatarColor}, ${adjustColor(userData.avatarColor, 20)})`,
-                  boxShadow: darkMode 
+                  background: `linear-gradient(90deg, ${
+                    userData.avatarColor
+                  }, ${adjustColor(userData.avatarColor, 20)})`,
+                  boxShadow: darkMode
                     ? `0 4px 8px rgba(0, 0, 0, 0.3), 0 -4px 8px rgba(255, 255, 255, 0.05)`
-                    : `0 4px 8px rgba(163, 177, 198, 0.6), 0 -4px 8px rgba(255, 255, 255, 0.8)`
+                    : `0 4px 8px rgba(163, 177, 198, 0.6), 0 -4px 8px rgba(255, 255, 255, 0.8)`,
                 }}
               ></div>
             </div>
@@ -121,16 +137,41 @@ const Dashboard = () => {
         </div>
 
         <div className="dashboard-grid">
-          {renderGridItem("📤", "Submit Project", "Upload today's challenge", "/SubmitProject")}
-          {renderGridItem("📁", "My Projects", `${userData.projectsSubmitted} submitted`, "/ProjectList")}
-          {renderGridItem("🏆", "Leaderboard", `Rank: #${userData.rank} of ${userData.totalParticipants}`, "/leaderboard")}
-          {renderGridItem("📝", "Daily Challenge", `View Day ${userData.currentDay} task`, "/daily-challenge")}
+          {renderGridItem(
+            "📤",
+            "Submit Project",
+            "Upload today's challenge",
+            "/SubmitProject"
+          )}
+          {renderGridItem(
+            "📁",
+            "My Projects",
+            `${userData.projectsSubmitted} submitted`,
+            "/ProjectList"
+          )}
+          {renderGridItem(
+            "🏆",
+            "Leaderboard",
+            `Rank: #${userData.rank} of ${userData.totalParticipants}`,
+            "/leaderboard"
+          )}
+          {renderGridItem(
+            "📝",
+            "Daily Challenge",
+            `View Day ${userData.currentDay} task`,
+            "/daily-challenge"
+          )}
           {renderGridItem("📚", "Resources", "Helpful materials", "/resources")}
-          {renderGridItem("👥", "Community", `${userData.totalParticipants} participants`, "/community")}
+          {renderGridItem(
+            "👥",
+            "Community",
+            `${userData.totalParticipants} participants`,
+            "/community"
+          )}
         </div>
 
         <div className="logout-container">
-          <button className="logout-button" onClick={handleLogout}>
+          <button className="logout-button" onClick={openLogoutModal}>
             <span className="logout-icon">🚪</span>
             Logout
           </button>
@@ -149,6 +190,38 @@ const Dashboard = () => {
           </a>
         </p>
       </footer>
+
+      {/* Custom Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="modal-overlay">
+          <div className={`logout-modal ${darkMode ? "dark" : "light"}`}>
+            <div className="modal-header">
+              <h3>Confirm Logout</h3>
+              <button className="close-button" onClick={handleCancelLogout}>
+                ×
+              </button>
+            </div>
+            <div className="modal-content">
+              <p>Are you sure you want to logout?</p>
+              <div className="modal-icon">🔒</div>
+            </div>
+            <div className="modal-actions">
+              <button 
+                className="cancel-button" 
+                onClick={handleCancelLogout}
+              >
+                Cancel
+              </button>
+              <button 
+                className="confirm-button" 
+                onClick={handleConfirmLogout}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -157,7 +230,7 @@ const Dashboard = () => {
       <div
         className="grid-item"
         onClick={() => handleNavigation(path)}
-        data-type={title.toLowerCase().replace(' ', '-')}
+        data-type={title.toLowerCase().replace(" ", "-")}
       >
         <div className="item-icon">{emoji}</div>
         <div className="item-content">
@@ -171,16 +244,16 @@ const Dashboard = () => {
 
   function adjustColor(color, amount) {
     // Simple color adjustment for demo purposes
-    let col = color.startsWith('#') ? color.slice(1) : color;
+    let col = color.startsWith("#") ? color.slice(1) : color;
     let num = parseInt(col, 16);
     let r = (num >> 16) + amount;
-    let g = (num & 0x0000FF) + amount;
-    let b = ((num >> 8) & 0x00FF) + amount;
-    
-    r = Math.max(Math.min(255, r), 0).toString(16).padStart(2, '0');
-    g = Math.max(Math.min(255, g), 0).toString(16).padStart(2, '0');
-    b = Math.max(Math.min(255, b), 0).toString(16).padStart(2, '0');
-    
+    let g = (num & 0x0000ff) + amount;
+    let b = ((num >> 8) & 0x00ff) + amount;
+
+    r = Math.max(Math.min(255, r), 0).toString(16).padStart(2, "0");
+    g = Math.max(Math.min(255, g), 0).toString(16).padStart(2, "0");
+    b = Math.max(Math.min(255, b), 0).toString(16).padStart(2, "0");
+
     return `#${r}${g}${b}`;
   }
 };

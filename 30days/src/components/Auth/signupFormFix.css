@@ -1,0 +1,74 @@
+/* Fix for signup form header visibility */
+.auth-container,
+.neumorphic-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+.auth-card.neumorphic-card {
+  background: #1e293b;
+  padding: 2.5rem 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  color: white;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make sure header is always visible */
+.auth-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-top: 0.5rem;
+}
+
+.auth-header h2 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.auth-header p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+/* Ensure form is properly contained */
+form {
+  width: 100%;
+}
+
+/* Fix spacing and sizing */
+@media screen and (max-height: 700px) {
+  .auth-container,
+  .neumorphic-container {
+    align-items: flex-start;
+    padding-top: 1rem;
+  }
+  
+  .auth-card.neumorphic-card {
+    padding: 1.5rem 1.5rem;
+  }
+  
+  .auth-header {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Ensure proper vertical spacing on mobile */
+@media screen and (max-width: 480px) {
+  .auth-card.neumorphic-card {
+    padding: 1.5rem 1rem;
+  }
+}

@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 
 // Public components
 import Header from "./components/Header";
@@ -8,58 +13,95 @@ import Features from "./components/Features";
 import CtaSection from "./components/CtaSection";
 import Footer from "./components/Footer";
 import BackgroundAnimation from "./components/BackgroundAnimation";
-import AuthPages from "./components/AuthPages";
+import Login from "./components/Auth/Login";
+import Signup from "./components/Auth/Signup";
 
-// Protected pages
+// Protected pages (user)
 import Dashboard from "./pages/Dashboard";
 import SubmitProject from "./pages/SubmitProject";
 import ProjectList from "./pages/ProjectList";
 import Leaderboard from "./pages/Leaderboard";
-import ProjectRating from "./pages/ProjectRating"; // 🆕 Add this
-import UserProfile from "./pages/UserProfile"; // Make sure the path is correct
-
+import ProjectRating from "./pages/ProjectRating";
+import UserProfile from "./pages/UserProfile";
 import DailyChallenge from "./pages/DailyChallenge";
-// import Resources from "./pages/Resources";
-// import Community from "./pages/Community";
-// import Profile from "./pages/Profile";
+
+// Admin components
+import AdminLogin from "./admin/components/Auth/Login";
+import AdminSignup from "./admin/components/Auth/Signup";
+import AdminDashboard from "./admin/AdminDashboard"; // renamed from admin/App.js
 
 import "./styles.css";
 
 function App() {
-  // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+
   useEffect(() => {
-    // Check if user is authenticated on app load
-    const authStatus = localStorage.getItem("isAuthenticated") === "true";
-    setIsAuthenticated(authStatus);
+    const checkAuthStatus = () => {
+      const authStatus = localStorage.getItem("isAuthenticated") === "true";
+      const adminAuthStatus =
+        localStorage.getItem("isAdminAuthenticated") === "true";
+
+      if (authStatus && adminAuthStatus) {
+        localStorage.setItem("isAdminAuthenticated", "false");
+        setIsAdminAuthenticated(false);
+      }
+
+      setIsAuthenticated(authStatus);
+      setIsAdminAuthenticated(adminAuthStatus);
+    };
+
+    checkAuthStatus();
+    window.addEventListener("storage", checkAuthStatus);
+    return () => window.removeEventListener("storage", checkAuthStatus);
   }, []);
 
-  // Function to handle successful login
+  // Regular user login
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
+    setIsAdminAuthenticated(false);
     localStorage.setItem("isAuthenticated", "true");
+    localStorage.setItem("isAdminAuthenticated", "false");
   };
 
-  // Function to handle logout
+  // Admin login
+  const handleAdminLoginSuccess = () => {
+    setIsAdminAuthenticated(true);
+    setIsAuthenticated(false);
+    localStorage.setItem("isAdminAuthenticated", "true");
+    localStorage.setItem("isAuthenticated", "false");
+  };
+
+  // Regular user logout
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.setItem("isAuthenticated", "false");
   };
 
-  // Protected route component
+  // Admin logout
+  const handleAdminLogout = () => {
+    setIsAdminAuthenticated(false);
+    localStorage.setItem("isAdminAuthenticated", "false");
+  };
+
+  // Protected route wrapper
   const ProtectedRoute = ({ children }) => {
-    if (!isAuthenticated) {
-      return <Navigate to="/login" />;
-    }
+    if (!isAuthenticated) return <Navigate to="/login" replace />;
     return children;
   };
 
-  // Homepage component with your existing structure
+  const AdminProtectedRoute = ({ children }) => {
+    if (!isAdminAuthenticated) return <Navigate to="/admin/login" replace />;
+    return children;
+  };
+
   const HomePage = () => (
     <div className="app">
       <BackgroundAnimation />
-      <Header isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+      <Header
+        isAuthenticated={isAuthenticated || isAdminAuthenticated}
+        onLogout={isAdminAuthenticated ? handleAdminLogout : handleLogout}
+      />
       <main>
         <Hero />
         <Features />
@@ -72,21 +114,75 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public routes */}
+        {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
 
         <Route
           path="/login"
           element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" />
+            isAuthenticated || isAdminAuthenticated ? (
+              <Navigate
+                to={isAdminAuthenticated ? "/admin/leaderboard" : "/dashboard"}
+                replace
+              />
             ) : (
-              <AuthPages onLoginSuccess={handleLoginSuccess} />
+              <Login onLoginSuccess={handleLoginSuccess} />
             )
           }
         />
 
-        {/* Protected routes */}
+        <Route
+          path="/signup"
+          element={
+            isAuthenticated || isAdminAuthenticated ? (
+              <Navigate
+                to={isAdminAuthenticated ? "/admin/leaderboard" : "/dashboard"}
+                replace
+              />
+            ) : (
+              <Signup onLoginSuccess={handleLoginSuccess} />
+            )
+          }
+        />
+
+        {/* Admin Auth Routes */}
+        <Route
+          path="/admin/login"
+          element={
+            isAdminAuthenticated ? (
+              <Navigate to="/admin/leaderboard" replace />
+            ) : isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <AdminLogin setAuthenticated={handleAdminLoginSuccess} />
+            )
+          }
+        />
+
+        <Route
+          path="/admin/signup"
+          element={
+            isAdminAuthenticated ? (
+              <Navigate to="/admin/leaderboard" replace />
+            ) : isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <AdminSignup setAuthenticated={handleAdminLoginSuccess} />
+            )
+          }
+        />
+
+        {/* Admin Dashboard Routes */}
+        <Route
+          path="/admin/*"
+          element={
+            <AdminProtectedRoute>
+              <AdminDashboard onLogout={handleAdminLogout} />
+            </AdminProtectedRoute>
+          }
+        />
+
+        {/* Regular User Routes */}
         <Route
           path="/dashboard"
           element={
@@ -95,7 +191,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/SubmitProject"
           element={
@@ -104,7 +199,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/ProjectList"
           element={
@@ -113,7 +207,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/leaderboard"
           element={
@@ -134,11 +227,10 @@ function App() {
           path="/profile"
           element={
             <ProtectedRoute>
-              <UserProfile />
+              <UserProfile onLogout={handleLogout} />
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/daily-challenge"
           element={
@@ -147,39 +239,18 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* 
-        <Route 
-          path="/resources" 
-          element={
-            <ProtectedRoute>
-              <Resources onLogout={handleLogout} />
-            </ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/community" 
-          element={
-            <ProtectedRoute>
-              <Community onLogout={handleLogout} />
-            </ProtectedRoute>
-          } 
-        />
-        
-        <Route 
-          path="/profile" 
-          element={
-            <ProtectedRoute>
-              <Profile onLogout={handleLogout} />
-            </ProtectedRoute>
-          } 
-        /> */}
 
-        {/* Redirect any unknown routes to home if not authenticated, otherwise to dashboard */}
+        {/* Catch-all Route */}
         <Route
           path="*"
           element={
-            isAuthenticated ? <Navigate to="/dashboard" /> : <Navigate to="/" />
+            isAdminAuthenticated ? (
+              <Navigate to="/admin/leaderboard" replace />
+            ) : isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Navigate to="/" replace />
+            )
           }
         />
       </Routes>

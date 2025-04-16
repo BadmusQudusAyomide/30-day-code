@@ -1,0 +1,646 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
+import './Auth.css';
+
+const Login = ({ onLoginSuccess }) => {
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Simulated login
+    setTimeout(() => {
+      localStorage.setItem('isAuthenticated', 'true');
+      onLoginSuccess();
+      navigate('/dashboard');
+    }, 1500);
+  };
+
+  return (
+    <div className="auth-container">
+      <form className="auth-box" onSubmit={handleLogin}>
+        <h2>Welcome Back</h2>
+        <p className="subtitle">Login to continue your coding challenge</p>
+
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          placeholder="name@example.com"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Password</label>
+        <div className="password-input">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <button
+            type="button"
+            className="toggle-password"
+            onClick={() => setShowPassword((prev) => !prev)}
+            aria-label="Toggle password visibility"
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
+
+        <div className="forgot-password">
+          <Link to="/forgot">Forgot password?</Link>
+        </div>
+
+        <button type="submit" className="login-btn" disabled={isLoading}>
+          {isLoading ? 'Logging in...' : 'Login'}
+        </button>
+
+        <div className="divider">or continue with</div>
+
+        <div className="oauth-buttons">
+          <button className="oauth-button github">
+            <FaGithub />
+            GitHub
+          </button>
+          <button className="oauth-button google">
+            <FaGoogle />
+            Google
+          </button>
+        </div>
+
+        <p className="switch-auth">
+          Don’t have an account? <Link to="/signup">Sign Up</Link>
+        </p>
+        <p className="admin-login">
+          Admin? <Link to="/admin">Login here</Link>
+        </p>
+      </form>
+    </div>
+  );
+};
+
+export default Login;
+
+:root {
+  --bg-color: #f0f2f5;
+  --primary-color: #4a6cf7;
+  --primary-light: #6a8aff;
+  --text-color: #1a202c;
+  --text-light: #4a5568;
+  --error-color: #f44336;
+  --shadow-light: #ffffff;
+  --shadow-dark: #d1d9e6;
+}
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #0e1629;
+}
+
+.auth-box {
+  background: var(--bg-color);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 9px 9px 16px var(--shadow-dark),
+              -9px -9px 16px var(--shadow-light);
+  text-align: center;
+}
+
+h2 {
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-light);
+  font-size: 14px;
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin: 10px 0 5px;
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+input {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 10px;
+  background: #1a2238;
+  color: #f0f2f5;
+  margin-bottom: 10px;
+  box-shadow: inset 3px 3px 6px #0e1324, inset -3px -3px 6px #202944;
+}
+
+.password-input {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: 1rem;
+  font-size: 13px;
+}
+
+.forgot-password a {
+  color: var(--primary-light);
+  text-decoration: none;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 3px 3px 8px #b1b1b1, -3px -3px 8px #ffffff;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.login-btn:disabled {
+  background: #9eb0f7;
+  cursor: not-allowed;
+}
+
+.divider {
+  font-size: 13px;
+  color: #999;
+  margin: 1rem 0;
+}
+
+.oauth-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.oauth-button {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 10px;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.github {
+  background: #24292e;
+}
+
+.google {
+  background: #db4437;
+}
+
+.switch-auth, .admin-login {
+  font-size: 13px;
+  margin-top: 1rem;
+}
+
+.switch-auth a,
+.admin-login a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash, FaGithub, FaGoogle } from "react-icons/fa";
+import "./Signup.css";
+
+
+const Signup = ({ onLoginSuccess }) => {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [passwordStrength, setPasswordStrength] = useState({
+    strength: "weak",
+    hasMinChars: false,
+    hasNumber: false,
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === "password") {
+      checkPasswordStrength(value);
+    }
+  };
+
+  const checkPasswordStrength = (password) => {
+    const hasMinChars = password.length >= 6;
+    const hasNumber = /\d/.test(password);
+
+    let strength = "weak";
+    if (hasMinChars && hasNumber) strength = "strong";
+    else if (hasMinChars || hasNumber) strength = "fair";
+
+    setPasswordStrength({ strength, hasMinChars, hasNumber });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords don't match!");
+      return;
+    }
+
+    console.log("User signed up:", formData);
+    localStorage.setItem("isAuthenticated", "true");
+    onLoginSuccess();
+    navigate("/dashboard");
+  };
+
+  const handleOAuthLogin = (provider) => {
+    console.log(`Signing up with ${provider}`);
+    alert(
+      `Signing up with ${provider} - this would redirect to OAuth in a real app`
+    );
+  };
+
+  return (
+    <div className="auth-container neumorphic-container">
+      <div className="auth-card neumorphic-card">
+        <div className="auth-header">
+          <h2>Create Account</h2>
+          <p>Join the 30-day coding challenge</p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Full Name</label>
+            <div className="input-group neumorphic-inset">
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Enter your full name"
+                value={formData.fullName}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Email</label>
+            <div className="input-group neumorphic-inset">
+              <input
+                type="email"
+                name="email"
+                placeholder="name@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Password</label>
+            <div className="input-group neumorphic-inset">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+
+            <div className="password-strength">
+              <div className="strength-bar">
+                <div
+                  className={`strength-indicator ${passwordStrength.strength}`}
+                ></div>
+              </div>
+              <div className="strength-text">
+                {passwordStrength.strength} password
+              </div>
+              <div className="password-requirements">
+                <div
+                  className={`requirement ${
+                    passwordStrength.hasMinChars ? "met" : ""
+                  }`}
+                >
+                  ✓ At least 6 characters
+                </div>
+                <div
+                  className={`requirement ${
+                    passwordStrength.hasNumber ? "met" : ""
+                  }`}
+                >
+                  ✓ Contains a number
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <div className="input-group neumorphic-inset">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="••••••••"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="auth-button neumorphic-button primary"
+          >
+            Create Account
+          </button>
+        </form>
+
+        <div className="oauth-section">
+          <div className="divider">
+            <span>or sign up with</span>
+          </div>
+
+          <div className="oauth-buttons">
+            <button
+              type="button"
+              className="oauth-button neumorphic-button github"
+              onClick={() => handleOAuthLogin("GitHub")}
+            >
+              <FaGithub style={{ marginRight: "0.5rem" }} /> GitHub
+            </button>
+            <button
+              type="button"
+              className="oauth-button neumorphic-button google"
+              onClick={() => handleOAuthLogin("Google")}
+            >
+              <FaGoogle style={{ marginRight: "0.5rem" }} /> Google
+            </button>
+          </div>
+        </div>
+
+        <div className="auth-footer">
+          <p>
+            Already have an account? <Link to="/login">Login</Link>
+          </p>
+          <p className="admin-link">
+            Admin? <Link to="/admin/login">Login here</Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Signup;
+/* Signup.css */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  padding: 2rem;
+}
+
+.neumorphic-card {
+  background: #1e293b;
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 9px 9px 16px #0a0a0a, -9px -9px 16px #2f2f2f;
+  color: white;
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-header h2 {
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+.auth-header p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+label {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  display: block;
+  color: #cbd5e1;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  outline: none;
+  background: #1e293b;
+  color: white;
+  box-shadow: inset 3px 3px 6px #141a2a, inset -3px -3px 6px #2e3b55;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.auth-button.primary {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  color: white;
+  font-weight: bold;
+  box-shadow: 6px 6px 12px #1e293b, -6px -6px 12px #334155;
+  transition: all 0.2s ease-in-out;
+}
+
+.auth-button.primary:hover {
+  filter: brightness(1.1);
+}
+
+.oauth-section {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.divider {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 1rem 0;
+}
+
+.oauth-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.oauth-button {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  color: white;
+}
+
+.oauth-button.github {
+  background: #111827;
+}
+
+.oauth-button.google {
+  background: #ef4444;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.auth-footer a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.password-strength {
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  color: #94a3b8;
+}
+
+.strength-bar {
+  height: 5px;
+  border-radius: 5px;
+  background: #e2e8f0;
+  margin: 0.25rem 0;
+  overflow: hidden;
+}
+
+.strength-indicator {
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+}
+
+.strength-indicator.weak {
+  width: 33%;
+  background: #ef4444;
+}
+
+.strength-indicator.fair {
+  width: 66%;
+  background: #f59e0b;
+}
+
+.strength-indicator.strong {
+  width: 100%;
+  background: #10b981;
+}
+
+.requirement {
+  font-size: 0.75rem;
+  opacity: 0.5;
+}
+
+.requirement.met {
+  opacity: 1;
+  color: #10b981;
+}

@@ -1,0 +1,249 @@
+/* Signup.css */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  padding: 2rem;
+}
+
+.neumorphic-card {
+  background: #1e293b;
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  box-shadow: 9px 9px 16px #0a0a0a, -9px -9px 16px #2f2f2f;
+  color: white;
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-header h2 {
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+.auth-header p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+label {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  display: block;
+  color: #cbd5e1;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  outline: none;
+  background: #1e293b;
+  color: white;
+  box-shadow: inset 3px 3px 6px #141a2a, inset -3px -3px 6px #2e3b55;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.auth-button.primary {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  color: white;
+  font-weight: bold;
+  box-shadow: 6px 6px 12px #1e293b, -6px -6px 12px #334155;
+  transition: all 0.2s ease-in-out;
+}
+
+.auth-button.primary:hover {
+  filter: brightness(1.1);
+}
+
+.oauth-section {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.divider {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 1rem 0;
+}
+
+.oauth-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.oauth-button {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  color: white;
+}
+
+.oauth-button.github {
+  background: #111827;
+}
+
+.oauth-button.google {
+  background: #ef4444;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.auth-footer a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.password-strength {
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  color: #94a3b8;
+}
+
+.strength-bar {
+  height: 5px;
+  border-radius: 5px;
+  background: #e2e8f0;
+  margin: 0.25rem 0;
+  overflow: hidden;
+}
+
+.strength-indicator {
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+}
+
+.strength-indicator.weak {
+  width: 33%;
+  background: #ef4444;
+}
+
+.strength-indicator.fair {
+  width: 66%;
+  background: #f59e0b;
+}
+
+.strength-indicator.strong {
+  width: 100%;
+  background: #10b981;
+}
+
+.requirement {
+  font-size: 0.75rem;
+  opacity: 0.5;
+}
+
+.requirement.met {
+  opacity: 1;
+  color: #10b981;
+}
+
+.auth-card.neumorphic-card {
+  background: #1e293b;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  color: white;
+  width: 100%;
+  max-width: 420px;
+  margin: 2rem auto;
+  overflow: visible;
+  position: relative;
+}
+
+/* Improve header visibility */
+.auth-header h2 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.auth-header p {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+/* Fix container scrolling */
+.neumorphic-container {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Improve form field visibility */
+.input-group input {
+  color: #ffffff;
+}
+
+.input-group input::placeholder {
+  color: #94a3b8;
+  opacity: 0.7;
+}
+
+/* Improve password strength indicator visibility */
+.password-strength {
+  color: #94a3b8;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Make sure the form stays contained within viewport */
+@media screen and (max-height: 800px) {
+  .auth-container,
+  .neumorphic-container {
+    align-items: flex-start;
+    padding-top: 1rem;
+  }
+  
+  .auth-box,
+  .auth-card.neumorphic-card {
+    margin: 1rem auto;
+  }
+}
