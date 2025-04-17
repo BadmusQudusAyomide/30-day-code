@@ -1,8 +1,11 @@
 import React from "react";
 
-const TopNav = () => {
+const TopNav = ({ onLogout, toggleSidebar }) => {
   return (
     <div className="top-nav glass-card">
+      <button className="sidebar-toggle" onClick={toggleSidebar}>
+        <i className="fas fa-bars"></i>
+      </button>
       <div className="search-bar">
         <input type="text" placeholder="Search..." className="input-field" />
       </div>
@@ -17,7 +20,7 @@ const TopNav = () => {
             alt="Admin"
             className="user-avatar"
           />
-          <span>Admin</span>
+          <span className="username">Admin</span>
           <i className="fas fa-chevron-down"></i>
         </div>
       </div>

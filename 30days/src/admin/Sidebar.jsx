@@ -1,49 +1,45 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const Sidebar = ({ activeView, setActiveView }) => {
+const Sidebar = ({ currentPath, isOpen }) => {
   return (
-    <div className="sidebar glass-card">
+    <div className={`sidebar glass-card ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-logo neumorphic">
         <i className="fas fa-code"></i>
         <span>CampusCush</span>
       </div>
       <ul className="sidebar-menu">
         <li>
-          <Link
+          <Link 
             to="/admin/leaderboard"
-            className={activeView === "leaderboard" ? "active" : ""}
-            onClick={() => setActiveView("leaderboard")}
+            className={currentPath.includes("leaderboard") ? "active" : ""}
           >
             <i className="fas fa-trophy"></i>
             <span>Leaderboard</span>
           </Link>
         </li>
         <li>
-          <Link
+          <Link 
             to="/admin/submissions"
-            className={activeView === "submissions" ? "active" : ""}
-            onClick={() => setActiveView("submissions")}
+            className={currentPath.includes("submissions") ? "active" : ""}
           >
             <i className="fas fa-inbox"></i>
             <span>Submissions</span>
           </Link>
         </li>
         <li>
-          <Link
+          <Link 
             to="/admin/users"
-            className={activeView === "users" ? "active" : ""}
-            onClick={() => setActiveView("users")}
+            className={currentPath.includes("users") ? "active" : ""}
           >
             <i className="fas fa-users"></i>
             <span>Users</span>
           </Link>
         </li>
         <li>
-          <Link
+          <Link 
             to="/admin/settings"
-            className={activeView === "settings" ? "active" : ""}
-            onClick={() => setActiveView("settings")}
+            className={currentPath.includes("settings") ? "active" : ""}
           >
             <i className="fas fa-cog"></i>
             <span>Settings</span>
