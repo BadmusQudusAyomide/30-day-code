@@ -47,7 +47,14 @@ const Login = ({ setAuthenticated }) => {
         </form>
         
         <div className="auth-footer">
-          Don't have an account? <Link to="/signup" className="auth-link">Sign up</Link>
+          <div style={{ marginBottom: '10px' }}>
+            <Link to="/login" className="auth-link">
+              <i className="fas fa-arrow-left"></i> Back to User Page
+            </Link>
+          </div>
+          <div>
+            Don't have an account? <Link to="/signup" className="auth-link">Sign up</Link>
+          </div>
         </div>
       </div>
     </div>

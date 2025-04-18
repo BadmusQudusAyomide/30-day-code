@@ -3,7 +3,7 @@ import React from "react";
 const TopNav = ({ onLogout, toggleSidebar }) => {
   return (
     <div className="top-nav glass-card">
-      <button className="sidebar-toggle" onClick={toggleSidebar}>
+      <button className="sidebar-toggle mobile-only" onClick={toggleSidebar}>
         <i className="fas fa-bars"></i>
       </button>
       <div className="search-bar">
