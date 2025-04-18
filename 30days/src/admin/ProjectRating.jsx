@@ -17,7 +17,7 @@ const ProjectRating = () => {
     design: 0,
     creativity: 0,
     codeQuality: 0,
-    usability: 0
+    usability: 0,
   });
   const [validationError, setValidationError] = useState("");
 
@@ -30,14 +30,16 @@ const ProjectRating = () => {
           const mockProject = {
             id: projectId,
             title: "Weather Dashboard",
-            description: "A comprehensive weather application with real-time updates and 5-day forecasts.",
+            description:
+              "A comprehensive weather application with real-time updates and 5-day forecasts.",
             studentName: "Alex Johnson",
             studentAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
             submissionDate: "2023-06-15",
             technologies: ["React", "Node.js", "MongoDB"],
             githubUrl: "https://github.com/example/weather-app",
             liveUrl: "https://weather-app.example.com",
-            screenshot: "https://images.unsplash.com/photo-1580193769210-b8d1c049a7d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+            screenshot:
+              "https://images.unsplash.com/photo-1580193769210-b8d1c049a7d9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
           };
           setProject(mockProject);
           setLoading(false);
@@ -58,38 +60,41 @@ const ProjectRating = () => {
   const handleCriteriaChange = (criterion, value) => {
     setCriteria({
       ...criteria,
-      [criterion]: value
+      [criterion]: value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate at least one criteria is rated
-    if (Object.values(criteria).every(val => val === 0)) {
+    if (Object.values(criteria).every((val) => val === 0)) {
       setValidationError("Please rate at least one criteria");
       return;
     }
 
     // Calculate average rating if not explicitly set
-    const finalRating = rating > 0 ? rating : 
-      Object.values(criteria).reduce((a, b) => a + b, 0) / Object.keys(criteria).length;
+    const finalRating =
+      rating > 0
+        ? rating
+        : Object.values(criteria).reduce((a, b) => a + b, 0) /
+          Object.keys(criteria).length;
 
     const ratingData = {
       projectId,
       rating: finalRating,
       criteria,
       feedback,
-      ratedAt: new Date().toISOString()
+      ratedAt: new Date().toISOString(),
     };
 
     try {
       // In a real app, you would POST this to your API
       console.log("Submitting rating:", ratingData);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       setSubmitted(true);
       setTimeout(() => navigate("/admin/submissions"), 2000);
     } catch (error) {
@@ -99,17 +104,21 @@ const ProjectRating = () => {
   };
 
   const renderStars = (count, active, size = 20, onClick = null) => {
-    return Array(5).fill(0).map((_, i) => (
-      <Star
-        key={i}
-        size={size}
-        className={`star ${i < count ? 'filled' : ''} ${onClick ? 'clickable' : ''}`}
-        onClick={() => onClick && onClick(i + 1)}
-        onMouseEnter={() => active && setHover(i + 1)}
-        onMouseLeave={() => active && setHover(0)}
-        fill={i < count ? 'currentColor' : 'none'}
-      />
-    ));
+    return Array(5)
+      .fill(0)
+      .map((_, i) => (
+        <Star
+          key={i}
+          size={size}
+          className={`star ${i < count ? "filled" : ""} ${
+            onClick ? "clickable" : ""
+          }`}
+          onClick={() => onClick && onClick(i + 1)}
+          onMouseEnter={() => active && setHover(i + 1)}
+          onMouseLeave={() => active && setHover(0)}
+          fill={i < count ? "currentColor" : "none"}
+        />
+      ));
   };
 
   if (loading) {
@@ -127,7 +136,10 @@ const ProjectRating = () => {
         <XCircle size={48} className="error-icon" />
         <h2>Project Not Found</h2>
         <p>The requested project could not be loaded.</p>
-        <button onClick={() => navigate("/admin/submissions")} className="btn btn-neumorphic">
+        <button
+          onClick={() => navigate("/admin/submissions")}
+          className="btn btn-neumorphic"
+        >
           <ArrowLeft size={16} /> Back to Submissions
         </button>
       </div>
@@ -148,7 +160,10 @@ const ProjectRating = () => {
   return (
     <div className="rating-container glass-card">
       <div className="rating-header">
-        <button onClick={() => navigate("/admin/submissions")} className="btn btn-neumorphic">
+        <button
+          onClick={() => navigate("/admin/submissions")}
+          className="btn btn-neumorphic"
+        >
           <ArrowLeft size={16} /> Back to Submissions
         </button>
         <h1>Rate Project</h1>
@@ -167,17 +182,28 @@ const ProjectRating = () => {
           <p className="project-description">{project.description}</p>
           <div className="project-meta">
             <div className="meta-item">
-              <strong>Submitted:</strong> {new Date(project.submissionDate).toLocaleDateString()}
+              <strong>Submitted:</strong>{" "}
+              {new Date(project.submissionDate).toLocaleDateString()}
             </div>
             <div className="meta-item">
               <strong>Technologies:</strong> {project.technologies.join(", ")}
             </div>
           </div>
           <div className="project-links">
-            <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="btn btn-neumorphic">
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-neumorphic"
+            >
               View Code
             </a>
-            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+            >
               Live Demo
             </a>
           </div>
@@ -186,7 +212,7 @@ const ProjectRating = () => {
 
       <div className="rating-form">
         <h2>Project Evaluation</h2>
-        
+
         <div className="overall-rating">
           <h3>Overall Rating</h3>
           <div className="stars-container">
@@ -208,12 +234,14 @@ const ProjectRating = () => {
             design: "Design & UI",
             creativity: "Creativity",
             codeQuality: "Code Quality",
-            usability: "Usability"
+            usability: "Usability",
           }).map(([key, label]) => (
             <div key={key} className="criteria-item">
               <label>{label}</label>
               <div className="stars-container">
-                {renderStars(hover[key] || criteria[key], true, 20, (value) => handleCriteriaChange(key, value))}
+                {renderStars(hover[key] || criteria[key], true, 20, (value) =>
+                  handleCriteriaChange(key, value)
+                )}
               </div>
             </div>
           ))}
@@ -235,11 +263,11 @@ const ProjectRating = () => {
           </div>
         )}
 
-        <button 
-          type="button" 
+        <button
+          type="button"
           onClick={handleSubmit}
           className="btn btn-primary submit-rating"
-          disabled={Object.values(criteria).every(val => val === 0)}
+          disabled={Object.values(criteria).every((val) => val === 0)}
         >
           Submit Rating
         </button>

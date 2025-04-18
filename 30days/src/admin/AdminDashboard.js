@@ -55,6 +55,7 @@ function AdminDashboard({ onLogout }) {
             <Route path="users" element={<Users />} />
             <Route path="settings" element={<Settings />} />
             <Route path="rate-project/:projectId" element={<ProjectRating />} />
+            <Route path="users/:userId/projects" element={<ProjectList />} />
           </Routes>
         </div>
       </div>
