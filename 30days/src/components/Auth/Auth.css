@@ -194,3 +194,60 @@ input::placeholder {
   color: #94a3b8;
   opacity: 0.7;
 }
+
+@media screen and (max-height: 800px) {
+  .auth-container {
+    align-items: flex-start !important;
+    padding-top: 2rem !important;
+  }
+
+  .auth-box {
+    margin-top: 2rem;
+  }
+}
+
+/* Validation Styles */
+.error {
+  border: 1px solid var(--error-color) !important;
+  box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2) !important;
+}
+
+.error-text {
+  color: var(--error-color);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
+  text-align: left;
+}
+
+.password-hints {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.password-hints span {
+  color: #94a3b8;
+}
+
+.password-hints span.valid {
+  color: #4ade80;
+}
+
+.error-message {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--error-color);
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

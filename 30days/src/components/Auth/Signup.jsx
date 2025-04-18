@@ -1,215 +1,268 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { FaEye, FaEyeSlash, FaGithub, FaGoogle } from "react-icons/fa";
-import "./Signup.css";
-import "./signupFormFix.css"; 
-
+import { useNavigate, Link } from "react-router-dom";
+import { FaGithub, FaGoogle } from "react-icons/fa";
+import "./Auth.css";
 
 const Signup = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
     fullName: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
-
-  const [passwordStrength, setPasswordStrength] = useState({
-    strength: "weak",
-    hasMinChars: false,
-    hasNumber: false,
+  const [errors, setErrors] = useState({
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
+
+  const validateField = (name, value) => {
+    let error = "";
+
+    switch (name) {
+      case "fullName":
+        if (!value.trim()) error = "Full name is required";
+        else if (value.length < 2) error = "Name too short";
+        else if (!/^[a-zA-Z\s'-]+$/.test(value)) error = "Invalid characters";
+        break;
+
+      case "username":
+        if (value && !/^[a-zA-Z0-9_]+$/.test(value)) {
+          error = "Only letters, numbers and underscores";
+        }
+        break;
+
+      case "email":
+        if (!value) error = "Email is required";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = "Invalid email format";
+        }
+        break;
+
+      case "password":
+        if (!value) error = "Password is required";
+        else if (value.length < 8) error = "Minimum 8 characters";
+        else if (!/[A-Z]/.test(value)) error = "Need at least 1 uppercase";
+        else if (!/[a-z]/.test(value)) error = "Need at least 1 lowercase";
+        else if (!/[0-9]/.test(value)) error = "Need at least 1 number";
+        else if (!/[^A-Za-z0-9]/.test(value)) error = "Need at least 1 symbol";
+        break;
+
+      case "confirmPassword":
+        if (value !== formData.password) error = "Passwords must match";
+        break;
+
+      default:
+        break;
+    }
+
+    return error;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if (name === "password") {
-      checkPasswordStrength(value);
+    // Validate on change only after first blur
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
     }
   };
 
-  const checkPasswordStrength = (password) => {
-    const hasMinChars = password.length >= 6;
-    const hasNumber = /\d/.test(password);
-
-    let strength = "weak";
-    if (hasMinChars && hasNumber) strength = "strong";
-    else if (hasMinChars || hasNumber) strength = "fair";
-
-    setPasswordStrength({ strength, hasMinChars, hasNumber });
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    Object.keys(formData).forEach((key) => {
+      if (key !== "username") {
+        // username is optional
+        const error = validateField(key, formData[key]);
+        newErrors[key] = error;
+        if (error) isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!");
-      return;
+    setApiError("");
+
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          username: formData.username || undefined,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Signup failed");
+      }
+
+      localStorage.setItem("token", data.user.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      onLoginSuccess();
+      navigate("/dashboard");
+    } catch (err) {
+      setApiError(err.message);
+    } finally {
+      setIsLoading(false);
     }
-
-    console.log("User signed up:", formData);
-    localStorage.setItem("isAuthenticated", "true");
-    onLoginSuccess();
-    navigate("/dashboard");
-  };
-
-  const handleOAuthLogin = (provider) => {
-    console.log(`Signing up with ${provider}`);
-    alert(
-      `Signing up with ${provider} - this would redirect to OAuth in a real app`
-    );
   };
 
   return (
-    <div className="auth-container neumorphic-container">
-      <div className="auth-card neumorphic-card">
-        <div className="auth-header">
-          <h2>Create Account</h2>
-          <p>Join the 30-day coding challenge</p>
+    <div className="auth-container">
+      <form className="auth-box" onSubmit={handleSubmit} noValidate>
+        <h2>Create Account</h2>
+        <p className="subtitle">Join our coding community</p>
+
+        {apiError && <div className="error-message">{apiError}</div>}
+
+        <div className="form-group">
+          <label>Full Name *</label>
+          <input
+            type="text"
+            name="fullName"
+            placeholder="John Doe"
+            value={formData.fullName}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+            className={errors.fullName ? "error" : ""}
+          />
+          {errors.fullName && (
+            <span className="error-text">{errors.fullName}</span>
+          )}
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Full Name</label>
-            <div className="input-group neumorphic-inset">
-              <input
-                type="text"
-                name="fullName"
-                placeholder="Enter your full name"
-                value={formData.fullName}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
+        <div className="form-group">
+          <label>Username (optional)</label>
+          <input
+            type="text"
+            name="username"
+            placeholder="coder123"
+            value={formData.username}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={errors.username ? "error" : ""}
+          />
+          {errors.username && (
+            <span className="error-text">{errors.username}</span>
+          )}
+        </div>
 
-          <div className="form-group">
-            <label>Email</label>
-            <div className="input-group neumorphic-inset">
-              <input
-                type="email"
-                name="email"
-                placeholder="name@example.com"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
+        <div className="form-group">
+          <label>Email *</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="name@example.com"
+            value={formData.email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+            className={errors.email ? "error" : ""}
+          />
+          {errors.email && <span className="error-text">{errors.email}</span>}
+        </div>
 
-          <div className="form-group">
-            <label>Password</label>
-            <div className="input-group neumorphic-inset">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-              <button
-                type="button"
-                className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
+        <div className="form-group">
+          <label>Password *</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+            className={errors.password ? "error" : ""}
+          />
+          {errors.password && (
+            <div className="password-hints">
+              <span className={formData.password.length >= 8 ? "valid" : ""}>
+                • 8+ characters
+              </span>
+              <span className={/[A-Z]/.test(formData.password) ? "valid" : ""}>
+                • Uppercase
+              </span>
+              <span className={/[0-9]/.test(formData.password) ? "valid" : ""}>
+                • Number
+              </span>
+              <span
+                className={
+                  /[^A-Za-z0-9]/.test(formData.password) ? "valid" : ""
+                }
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
+                • Symbol
+              </span>
             </div>
+          )}
+        </div>
 
-            <div className="password-strength">
-              <div className="strength-bar">
-                <div
-                  className={`strength-indicator ${passwordStrength.strength}`}
-                ></div>
-              </div>
-              <div className="strength-text">
-                {passwordStrength.strength} password
-              </div>
-              <div className="password-requirements">
-                <div
-                  className={`requirement ${
-                    passwordStrength.hasMinChars ? "met" : ""
-                  }`}
-                >
-                  ✓ At least 6 characters
-                </div>
-                <div
-                  className={`requirement ${
-                    passwordStrength.hasNumber ? "met" : ""
-                  }`}
-                >
-                  ✓ Contains a number
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="form-group">
+          <label>Confirm Password *</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="••••••••"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+            className={errors.confirmPassword ? "error" : ""}
+          />
+          {errors.confirmPassword && (
+            <span className="error-text">{errors.confirmPassword}</span>
+          )}
+        </div>
 
-          <div className="form-group">
-            <label>Confirm Password</label>
-            <div className="input-group neumorphic-inset">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-              />
-              <button
-                type="button"
-                className="toggle-password"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
-          </div>
+        <button type="submit" className="login-btn" disabled={isLoading}>
+          {isLoading ? "Creating account..." : "Sign Up"}
+        </button>
 
-          <button
-            type="submit"
-            className="auth-button neumorphic-button primary"
-          >
-            Create Account
+        <div className="divider">or continue with</div>
+
+        <div className="oauth-buttons">
+          <button type="button" className="oauth-button github">
+            <FaGithub />
+            GitHub
           </button>
-        </form>
-
-        <div className="oauth-section">
-          <div className="divider">
-            <span>or sign up with</span>
-          </div>
-
-          <div className="oauth-buttons">
-            <button
-              type="button"
-              className="oauth-button neumorphic-button github"
-              onClick={() => handleOAuthLogin("GitHub")}
-            >
-              <FaGithub style={{ marginRight: "0.5rem" }} /> GitHub
-            </button>
-            <button
-              type="button"
-              className="oauth-button neumorphic-button google"
-              onClick={() => handleOAuthLogin("Google")}
-            >
-              <FaGoogle style={{ marginRight: "0.5rem" }} /> Google
-            </button>
-          </div>
+          <button type="button" className="oauth-button google">
+            <FaGoogle />
+            Google
+          </button>
         </div>
 
-        <div className="auth-footer">
-          <p>
-            Already have an account? <Link to="/login">Login</Link>
-          </p>
-          <p className="admin-link">
-            Admin? <Link to="/admin/login">Login here</Link>
-          </p>
-        </div>
-      </div>
+        <p className="switch-auth">
+          Already have an account? <Link to="/login">Log In</Link>
+        </p>
+      </form>
     </div>
   );
 };
