@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./SubmitProject.css";
 
 const SubmitProject = () => {
@@ -10,11 +11,13 @@ const SubmitProject = () => {
     day: "19",
     frameworks: "",
     languages: "",
-    projectImage: null,
   });
 
+  const [projectImage, setProjectImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const days = Array.from({ length: 30 }, (_, i) => i + 1);
 
@@ -29,12 +32,13 @@ const SubmitProject = () => {
     if (file) {
       // Check file size (2MB max)
       if (file.size > 2 * 1024 * 1024) {
-        alert("File size exceeds 2MB limit. Please choose a smaller image.");
+        setError("File size exceeds 2MB limit. Please choose a smaller image.");
         e.target.value = null;
         return;
       }
 
-      setFormData((prev) => ({ ...prev, projectImage: file }));
+      setProjectImage(file);
+      setError(null);
 
       // Create preview
       const reader = new FileReader();
@@ -45,27 +49,88 @@ const SubmitProject = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted project data:", formData);
-    // Here you would typically send the data to your backend
-    setSubmitted(true);
+    setLoading(true);
+    setError(null);
 
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setFormData({
-        projectName: "",
-        liveLink: "",
-        repoLink: "",
-        description: "",
-        day: "19",
-        frameworks: "",
-        languages: "",
-        projectImage: null,
-      });
-      setImagePreview(null);
-      setSubmitted(false);
-    }, 3000);
+    try {
+      // First upload the image
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("You must be logged in to submit a project");
+      }
+
+      // Create form data for image upload
+      const imageFormData = new FormData();
+      imageFormData.append("projectImage", projectImage);
+
+      console.log(
+        "Uploading image to:",
+        `${process.env.REACT_APP_API_URL}/api/uploads/project-image`
+      );
+
+      // Upload the image - FIXED URL
+      const imageUploadResponse = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/uploads/project-image`,
+        imageFormData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const imageUrl = imageUploadResponse.data.imageUrl;
+
+      console.log(
+        "Submitting project to:",
+        `${process.env.REACT_APP_API_URL}/api/projects`
+      );
+
+      // Submit the project with the image URL - FIXED URL
+      const projectResponse = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/projects`,
+        {
+          ...formData,
+          imageUrl,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Project submitted successfully:", projectResponse.data);
+      setSubmitted(true);
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({
+          projectName: "",
+          liveLink: "",
+          repoLink: "",
+          description: "",
+          day: "19",
+          frameworks: "",
+          languages: "",
+        });
+        setProjectImage(null);
+        setImagePreview(null);
+        setSubmitted(false);
+      }, 3000);
+    } catch (err) {
+      console.error("Error submitting project:", err);
+      setError(
+        err.response?.data?.message || err.message || "Failed to submit project"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -73,6 +138,8 @@ const SubmitProject = () => {
       <div className="submit-project-card">
         <h2>Submit Your Project</h2>
         <p className="subtitle">Day {formData.day} Challenge Submission</p>
+
+        {error && <div className="error-message">{error}</div>}
 
         {submitted ? (
           <div className="success-message">
@@ -193,14 +260,18 @@ const SubmitProject = () => {
                   name="projectImage"
                   onChange={handleImageChange}
                   accept="image/*"
-                  required
                   className="file-input"
+                  style={{ opacity: 0, position: "absolute", zIndex: -1 }} // Hide the actual input
                 />
-                <div className="file-input-button">Choose File</div>
+                <label
+                  htmlFor="projectImage"
+                  className="file-input-button"
+                  style={{ cursor: "pointer" }} // Make it clear this is clickable
+                >
+                  Choose File
+                </label>
                 <span className="file-name">
-                  {formData.projectImage
-                    ? formData.projectImage.name
-                    : "No file chosen"}
+                  {projectImage ? projectImage.name : "No file chosen"}
                 </span>
               </div>
             </div>
@@ -212,8 +283,12 @@ const SubmitProject = () => {
             )}
 
             <div className="form-actions">
-              <button type="submit" className="submit-button">
-                Submit Project
+              <button
+                type="submit"
+                className="submit-button"
+                disabled={loading}
+              >
+                {loading ? "Submitting..." : "Submit Project"}
               </button>
             </div>
           </form>

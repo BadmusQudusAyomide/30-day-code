@@ -1,24 +1,120 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Save, Camera, X, Edit2, ArrowLeft } from "lucide-react";
+import axios from "axios"; // You'll need to install axios
 import "./UserProfile.css";
 
-export default function UserProfile() {
-  const [userData, setUserData] = useState({
-    name: "Alex Johnson",
-    email: "alex.johnson@example.com",
-    bio: "Frontend developer passionate about creating intuitive user experiences.",
-    location: "San Francisco, CA",
-    website: "alexjohnson.dev",
-    theme: "light",
-    notifications: {
-      email: true,
-      push: true,
-      newsletter: false,
-    },
+// Create a custom hook for authentication
+export const useAuth = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Load user data from localStorage on component mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error("Failed to parse stored user data", err);
+      }
+    }
+    setLoading(false);
+  }, []);
+
+  // Set up axios with authentication header
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
   });
 
+  // Add auth token to all requests
+  api.interceptors.request.use((config) => {
+    const token = user?.token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  // Login function
+  const login = async (emailOrUsername, password) => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${
+          process.env.REACT_APP_API_URL || "http://localhost:5000/api"
+        }/auth/login`,
+        { emailOrUsername, password }
+      );
+      const userData = response.data.user;
+
+      // Store in state and localStorage
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      return userData;
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Logout function
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+  };
+
+  // Update user profile
+  const updateProfile = async (userData) => {
+    try {
+      setLoading(true);
+      const response = await api.put("/auth/profile", userData);
+      const updatedUser = response.data.user;
+
+      // Update state and localStorage with new user data
+      setUser({ ...user, ...updatedUser });
+      localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUser }));
+      return updatedUser;
+    } catch (err) {
+      setError(err.response?.data?.message || "Profile update failed");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { user, loading, error, login, logout, updateProfile, api };
+};
+
+export default function UserProfile() {
+  const { user, loading, error, updateProfile } = useAuth();
   const [editMode, setEditMode] = useState(false);
-  const [tempData, setTempData] = useState(userData);
+  const [tempData, setTempData] = useState({});
+  const [updateError, setUpdateError] = useState(null);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+
+  // Set initial profile data when user data is loaded
+  useEffect(() => {
+    if (user) {
+      setTempData({
+        fullName: user.fullName || "",
+        email: user.email || "",
+        username: user.username || "",
+        bio: user.bio || "",
+        location: user.location || "",
+        website: user.website || "",
+        theme: user.theme || "light",
+        notifications: {
+          email: user.notifications?.email !== false,
+          push: user.notifications?.push !== false,
+          newsletter: user.notifications?.newsletter || false,
+        },
+      });
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -40,15 +136,74 @@ export default function UserProfile() {
     }
   };
 
-  const handleSave = () => {
-    setUserData(tempData);
-    setEditMode(false);
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfileImage(e.target.files[0]);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      setUpdateError(null);
+      setUpdateSuccess(false);
+
+      // Create a FormData instance if there's an image to upload
+      if (profileImage) {
+        const formData = new FormData();
+        formData.append("profileImage", profileImage);
+
+        // Upload the image first, then update the profile with the image URL
+        // Adjust this API endpoint to match your backend
+        // const imageResponse = await axios.post("/api/uploads/profile-image", formData, {
+        //   headers: {
+        //     "Content-Type": "multipart/form-data",
+        //     Authorization: `Bearer ${user.token}`
+        //   }
+        // });
+        // const imageUrl = imageResponse.data.url;
+        // await updateProfile({ ...tempData, profileImage: imageUrl });
+      } else {
+        // Just update the profile without image
+        await updateProfile(tempData);
+      }
+
+      setUpdateSuccess(true);
+      setEditMode(false);
+    } catch (err) {
+      setUpdateError(err.response?.data?.message || "Failed to update profile");
+      console.error("Profile update failed", err);
+    }
   };
 
   const handleCancel = () => {
-    setTempData(userData);
+    // Reset tempData to current user data
+    if (user) {
+      setTempData({
+        fullName: user.fullName || "",
+        email: user.email || "",
+        username: user.username || "",
+        bio: user.bio || "",
+        location: user.location || "",
+        website: user.website || "",
+        theme: user.theme || "light",
+        notifications: {
+          email: user.notifications?.email !== false,
+          push: user.notifications?.push !== false,
+          newsletter: user.notifications?.newsletter || false,
+        },
+      });
+    }
+    setProfileImage(null);
     setEditMode(false);
   };
+
+  if (loading) {
+    return <div className="loading">Loading profile...</div>;
+  }
+
+  if (!user) {
+    return <div className="error">Please log in to view your profile.</div>;
+  }
 
   return (
     <div className="profile-container">
@@ -79,25 +234,58 @@ export default function UserProfile() {
         )}
       </div>
 
+      {updateError && (
+        <div className="error-alert">
+          {updateError}
+          <button onClick={() => setUpdateError(null)}>
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      {updateSuccess && (
+        <div className="success-alert">
+          Profile updated successfully!
+          <button onClick={() => setUpdateSuccess(false)}>
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       <div className="profile-grid">
         {/* Profile Photo Section */}
         <div className="profile-sidebar">
           <div className="photo-container">
             <div className="profile-photo">
               <img
-                src="https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744304003/IMG-20241127-WA0097_3_fjwtbx.jpg"
+                src={user.profileImage || "/default-avatar.png"}
                 alt="Profile"
                 className="photo-image"
               />
             </div>
             {editMode && (
-              <button className="photo-edit-button">
-                <Camera size={18} />
-              </button>
+              <div className="photo-edit-section">
+                <label
+                  htmlFor="profile-photo-upload"
+                  className="photo-edit-button"
+                >
+                  <Camera size={18} />
+                </label>
+                <input
+                  id="profile-photo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ display: "none" }}
+                />
+                {profileImage && (
+                  <span className="photo-filename">{profileImage.name}</span>
+                )}
+              </div>
             )}
           </div>
-          <h2 className="sidebar-name">{userData.name}</h2>
-          <p className="sidebar-email">{userData.email}</p>
+          <h2 className="sidebar-name">{user.fullName || user.username}</h2>
+          <p className="sidebar-email">{user.email}</p>
         </div>
 
         {/* Main Content */}
@@ -106,17 +294,32 @@ export default function UserProfile() {
             <h2 className="section-title">Personal Information</h2>
             <div className="profile-fields">
               <div className="field-group">
-                <label className="field-label">Name</label>
+                <label className="field-label">Full Name</label>
                 {editMode ? (
                   <input
                     type="text"
-                    name="name"
-                    value={tempData.name}
+                    name="fullName"
+                    value={tempData.fullName}
                     onChange={handleInputChange}
                     className="field-input"
                   />
                 ) : (
-                  <p className="field-value">{userData.name}</p>
+                  <p className="field-value">{user.fullName}</p>
+                )}
+              </div>
+
+              <div className="field-group">
+                <label className="field-label">Username</label>
+                {editMode ? (
+                  <input
+                    type="text"
+                    name="username"
+                    value={tempData.username}
+                    onChange={handleInputChange}
+                    className="field-input"
+                  />
+                ) : (
+                  <p className="field-value">{user.username}</p>
                 )}
               </div>
 
@@ -129,9 +332,10 @@ export default function UserProfile() {
                     value={tempData.email}
                     onChange={handleInputChange}
                     className="field-input"
+                    disabled // Email should not be editable for security reasons
                   />
                 ) : (
-                  <p className="field-value">{userData.email}</p>
+                  <p className="field-value">{user.email}</p>
                 )}
               </div>
 
@@ -146,7 +350,9 @@ export default function UserProfile() {
                     className="field-textarea"
                   />
                 ) : (
-                  <p className="field-value">{userData.bio}</p>
+                  <p className="field-value">
+                    {user.bio || "No bio added yet."}
+                  </p>
                 )}
               </div>
 
@@ -161,7 +367,9 @@ export default function UserProfile() {
                     className="field-input"
                   />
                 ) : (
-                  <p className="field-value">{userData.location}</p>
+                  <p className="field-value">
+                    {user.location || "Not specified"}
+                  </p>
                 )}
               </div>
 
@@ -176,7 +384,23 @@ export default function UserProfile() {
                     className="field-input"
                   />
                 ) : (
-                  <p className="field-value">{userData.website}</p>
+                  <p className="field-value">
+                    {user.website ? (
+                      <a
+                        href={
+                          user.website.startsWith("http")
+                            ? user.website
+                            : `https://${user.website}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {user.website}
+                      </a>
+                    ) : (
+                      "Not specified"
+                    )}
+                  </p>
                 )}
               </div>
             </div>
@@ -198,7 +422,9 @@ export default function UserProfile() {
                       <option value="system">System Default</option>
                     </select>
                   ) : (
-                    <p className="field-value capitalize">{userData.theme}</p>
+                    <p className="field-value capitalize">
+                      {user.theme || "Light"}
+                    </p>
                   )}
                 </div>
 
@@ -211,7 +437,7 @@ export default function UserProfile() {
                           type="checkbox"
                           id="email-notifications"
                           name="notifications.email"
-                          checked={tempData.notifications.email}
+                          checked={tempData.notifications?.email}
                           onChange={handleInputChange}
                           className="checkbox-input"
                         />
@@ -227,7 +453,7 @@ export default function UserProfile() {
                           type="checkbox"
                           id="push-notifications"
                           name="notifications.push"
-                          checked={tempData.notifications.push}
+                          checked={tempData.notifications?.push}
                           onChange={handleInputChange}
                           className="checkbox-input"
                         />
@@ -243,7 +469,7 @@ export default function UserProfile() {
                           type="checkbox"
                           id="newsletter"
                           name="notifications.newsletter"
-                          checked={tempData.notifications.newsletter}
+                          checked={tempData.notifications?.newsletter}
                           onChange={handleInputChange}
                           className="checkbox-input"
                         />
@@ -256,15 +482,19 @@ export default function UserProfile() {
                     <div className="notification-status">
                       <p className="field-value">
                         Email Notifications:{" "}
-                        {userData.notifications.email ? "Enabled" : "Disabled"}
+                        {user.notifications?.email !== false
+                          ? "Enabled"
+                          : "Disabled"}
                       </p>
                       <p className="field-value">
                         Push Notifications:{" "}
-                        {userData.notifications.push ? "Enabled" : "Disabled"}
+                        {user.notifications?.push !== false
+                          ? "Enabled"
+                          : "Disabled"}
                       </p>
                       <p className="field-value">
                         Newsletter:{" "}
-                        {userData.notifications.newsletter
+                        {user.notifications?.newsletter
                           ? "Subscribed"
                           : "Unsubscribed"}
                       </p>

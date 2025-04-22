@@ -5,30 +5,77 @@ import "./Dashboard.css";
 const Dashboard = ({ onLogout }) => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({
-    name: "Akinola Saregbagi",
-    projectsSubmitted: 18,
-    currentDay: 19,
+    name: "",
+    projectsSubmitted: 0,
+    currentDay: 0,
     totalDays: 30,
-    rank: 42,
-    totalParticipants: 1204,
+    rank: 0,
+    totalParticipants: 0,
     avatarColor: "#6366f1",
   });
-
   const [darkMode, setDarkMode] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const generateColorFromName = (name) => {
-      let hash = 0;
-      for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const response = await fetch("http://localhost:5000/api/auth/me", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+
+        const data = await response.json();
+
+        const avatarColor = generateColorFromName(
+          data.user.username || data.user.email
+        );
+
+        setUserData({
+          name:
+            data.user.fullName ||
+            data.user.username ||
+            data.user.email.split("@")[0],
+          projectsSubmitted: data.stats?.projectsSubmitted || 0,
+          currentDay: data.stats?.currentDay || 1,
+          totalDays: 30,
+          rank: data.stats?.rank || 0,
+          totalParticipants: data.stats?.totalParticipants || 1000,
+          avatarColor,
+        });
+      } catch (err) {
+        console.error("Dashboard error:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-      const color = `hsl(${hash % 360}, 70%, 60%)`;
-      setUserData((prev) => ({ ...prev, avatarColor: color }));
     };
 
-    generateColorFromName(userData.name);
-  }, [userData.name]);
+    fetchUserData();
+  }, [navigate]);
+
+  const generateColorFromName = (name) => {
+    if (!name) return "#6366f1";
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return `hsl(${hash % 360}, 70%, 60%)`;
+  };
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -39,12 +86,11 @@ const Dashboard = ({ onLogout }) => {
   };
 
   const handleConfirmLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     if (onLogout) {
-      // Call the parent's logout handler that was passed as a prop
       onLogout();
     } else {
-      // Fallback if onLogout is not provided
-      localStorage.setItem("isAuthenticated", "false");
       navigate("/login");
     }
     setShowLogoutModal(false);
@@ -62,11 +108,52 @@ const Dashboard = ({ onLogout }) => {
     setDarkMode((prev) => !prev);
   };
 
+  const adjustColor = (color, amount) => {
+    // Simple color adjustment for gradient
+    let col = color.startsWith("#") ? color.slice(1) : color;
+    if (col.startsWith("hsl")) {
+      // Handle HSL color format
+      const values = col.match(/\d+/g);
+      if (values && values.length >= 3) {
+        const h = parseInt(values[0]);
+        const s = parseInt(values[1]);
+        const l = Math.min(100, parseInt(values[2]) + amount);
+        return `hsl(${h}, ${s}%, ${l}%)`;
+      }
+    }
+    return color;
+  };
+
+  if (loading) {
+    return (
+      <div className={`dashboard-loading ${darkMode ? "dark" : "light"}`}>
+        <div className="loading-spinner"></div>
+        <p>Loading your dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`dashboard-error ${darkMode ? "dark" : "light"}`}>
+        <div className="error-icon">⚠️</div>
+        <h3>Error Loading Dashboard</h3>
+        <p>{error}</p>
+        <button
+          className="retry-button"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={`dashboard neo ${darkMode ? "dark" : "light"}`}>
       <header className="dashboard-header">
         <div className="brand">
-          <div className="logo">
+          <div className="logo" onClick={() => navigate("/")}>
             <span className="code-text">Code</span>
             <span className="days-text">&lt;30&gt;</span>
           </div>
@@ -93,7 +180,7 @@ const Dashboard = ({ onLogout }) => {
               aria-label="View profile"
               title="View and edit your profile"
             >
-              {userData.name.charAt(0)}
+              {userData.name.charAt(0).toUpperCase()}
             </button>
           </div>
         </div>
@@ -101,9 +188,13 @@ const Dashboard = ({ onLogout }) => {
 
       <main className="dashboard-content">
         <div className="dashboard-header-section">
-          <h1 className="welcome">Welcome to the 30 Days Challenge!</h1>
+          <h1 className="welcome">
+            Welcome back, {userData.name.split(" ")[0]}!
+          </h1>
           <p className="welcome-subtitle">
-            Keep going! You're making great progress.
+            {userData.projectsSubmitted > 0
+              ? `You've submitted ${userData.projectsSubmitted} projects so far!`
+              : "Ready to start your coding challenge?"}
           </p>
         </div>
 
@@ -137,6 +228,7 @@ const Dashboard = ({ onLogout }) => {
         </div>
 
         <div className="dashboard-grid">
+          {/* In Dashboard.jsx, update your renderGridItem calls: */}
           {renderGridItem(
             "📤",
             "Submit Project",
@@ -148,12 +240,6 @@ const Dashboard = ({ onLogout }) => {
             "My Projects",
             `${userData.projectsSubmitted} submitted`,
             "/ProjectList"
-          )}
-          {renderGridItem(
-            "🏆",
-            "Leaderboard",
-            `Rank: #${userData.rank} of ${userData.totalParticipants}`,
-            "/leaderboard"
           )}
           {renderGridItem(
             "📝",
@@ -180,7 +266,7 @@ const Dashboard = ({ onLogout }) => {
 
       <footer className="dashboard-footer">
         <p>
-          Code&lt;30&gt; Challenge © 2025 |{" "}
+          Code&lt;30&gt; Challenge © {new Date().getFullYear()} |{" "}
           <a href="#" className="footer-link">
             Terms
           </a>{" "}
@@ -191,7 +277,6 @@ const Dashboard = ({ onLogout }) => {
         </p>
       </footer>
 
-      {/* Custom Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="modal-overlay">
           <div className={`logout-modal ${darkMode ? "dark" : "light"}`}>
@@ -206,16 +291,10 @@ const Dashboard = ({ onLogout }) => {
               <div className="modal-icon">🔒</div>
             </div>
             <div className="modal-actions">
-              <button 
-                className="cancel-button" 
-                onClick={handleCancelLogout}
-              >
+              <button className="cancel-button" onClick={handleCancelLogout}>
                 Cancel
               </button>
-              <button 
-                className="confirm-button" 
-                onClick={handleConfirmLogout}
-              >
+              <button className="confirm-button" onClick={handleConfirmLogout}>
                 Logout
               </button>
             </div>
@@ -240,21 +319,6 @@ const Dashboard = ({ onLogout }) => {
         <div className="item-action">→</div>
       </div>
     );
-  }
-
-  function adjustColor(color, amount) {
-    // Simple color adjustment for demo purposes
-    let col = color.startsWith("#") ? color.slice(1) : color;
-    let num = parseInt(col, 16);
-    let r = (num >> 16) + amount;
-    let g = (num & 0x0000ff) + amount;
-    let b = ((num >> 8) & 0x00ff) + amount;
-
-    r = Math.max(Math.min(255, r), 0).toString(16).padStart(2, "0");
-    g = Math.max(Math.min(255, g), 0).toString(16).padStart(2, "0");
-    b = Math.max(Math.min(255, b), 0).toString(16).padStart(2, "0");
-
-    return `#${r}${g}${b}`;
   }
 };
 
