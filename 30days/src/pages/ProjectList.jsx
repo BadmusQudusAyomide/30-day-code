@@ -1,114 +1,77 @@
 import React, { useState, useEffect } from "react";
 import "./ProjectList.css";
 import { useNavigate } from "react-router-dom";
-
-// Assuming you're using React Router for navigation
-// If you're using React Router v6:
-// import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Make sure you have axios installed
 
 const ProjectList = () => {
-  // If using React Router v6, uncomment this:
-  // const navigate = useNavigate();
-
+  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState({
     day: "all",
     search: "",
     language: "all",
   });
   const [expandedProject, setExpandedProject] = useState(null);
-const navigate = useNavigate();
-  // Mock data for demonstration
+
+  // Define base URL from environment variable or default
+  const API_URL = process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+
   useEffect(() => {
-    // Simulating API call
-    setTimeout(() => {
-      const mockProjects = [
-        {
-          id: 1,
-          projectName: "Weather Dashboard",
-          liveLink: "https://weather-dashboard.vercel.app",
-          repoLink: "https://github.com/akinola/weather-dashboard",
-          description:
-            "A weather application that shows current and forecasted weather using OpenWeatherMap API. Built with responsive design for all device sizes.",
-          day: 12,
-          frameworks: "React, Material UI",
-          languages: "JavaScript, HTML, CSS",
-          imageUrl:
-            "https://images.unsplash.com/photo-1592210454359-9043f067919b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-          submittedAt: "2025-03-27T14:23:00",
-          author: "Akinola Saregbagi",
-        },
-        {
-          id: 2,
-          projectName: "Task Manager",
-          liveLink: "https://task-manager-pro.netlify.app",
-          repoLink: "https://github.com/akinola/task-manager",
-          description:
-            "A comprehensive task management application with features like drag-and-drop, priority setting, due dates, and categories.",
-          day: 15,
-          frameworks: "React, Redux, Styled Components",
-          languages: "TypeScript, HTML, CSS",
-          imageUrl:
-            "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-          submittedAt: "2025-03-30T09:15:00",
-          author: "Akinola Saregbagi",
-        },
-        {
-          id: 3,
-          projectName: "Personal Portfolio",
-          liveLink: "https://akinola-portfolio.dev",
-          repoLink: "https://github.com/akinola/portfolio",
-          description:
-            "My personal developer portfolio showcasing projects, skills, and experience. Features dark/light mode and animated transitions.",
-          day: 19,
-          frameworks: "Next.js, Framer Motion",
-          languages: "JavaScript, HTML, CSS",
-          imageUrl:
-            "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-          submittedAt: "2025-04-05T16:45:00",
-          author: "Akinola Saregbagi",
-        },
-        {
-          id: 4,
-          projectName: "Code Snippet Manager",
-          liveLink: "https://snippets-vault.app",
-          repoLink: "https://github.com/akinola/code-snippets",
-          description:
-            "An application for saving and organizing code snippets with syntax highlighting, tags, and search functionality.",
-          day: 19,
-          frameworks: "React, Firebase, CodeMirror",
-          languages: "JavaScript, HTML, CSS",
-          imageUrl:
-            "https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-          submittedAt: "2025-04-05T20:12:00",
-          author: "Akinola Saregbagi",
-        },
-        {
-          id: 5,
-          projectName: "Movie Explorer",
-          liveLink: "https://movie-explorer-app.vercel.app",
-          repoLink: "https://github.com/akinola/movie-explorer",
-          description:
-            "An app that allows users to browse movies, view details, search, and create watchlists using the TMDB API.",
-          day: 8,
-          frameworks: "Vue.js, Vuetify",
-          languages: "JavaScript, HTML, CSS",
-          imageUrl:
-            "https://images.unsplash.com/photo-1485846234645-a62644f84728?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-          submittedAt: "2025-03-20T11:30:00",
-          author: "Akinola Saregbagi",
-        },
-      ];
-      setProjects(mockProjects);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+
+        // Get the token from localStorage
+        const token = localStorage.getItem("userToken");
+
+        if (!token) {
+          // If no token, redirect to login
+          navigate("/login", { state: { from: "/projects" } });
+          return;
+        }
+
+        // Fetch projects from API with authorization header
+        const response = await axios.get(
+          `${API_URL}/api/projects/my-projects`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.data.success) {
+          setProjects(response.data.projects);
+        } else {
+          setError("Failed to fetch projects");
+        }
+      } catch (err) {
+        console.error("Error fetching projects:", err);
+
+        // Check for unauthorized error
+        if (err.response && err.response.status === 401) {
+          // Token expired or invalid, redirect to login
+          localStorage.removeItem("userToken");
+          navigate("/login", { state: { from: "/projects" } });
+          return;
+        }
+
+        setError("An error occurred while fetching projects");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, [navigate, API_URL]);
 
   // Get unique days and languages for filters
   const days = Array.from(new Set(projects.map((project) => project.day))).sort(
     (a, b) => a - b
   );
+
   const languages = Array.from(
     new Set(
       projects.flatMap((project) =>
@@ -132,10 +95,11 @@ const navigate = useNavigate();
   const filteredProjects = projects.filter((project) => {
     const matchesDay =
       filter.day === "all" || project.day === parseInt(filter.day);
+
     const matchesSearch =
       project.projectName.toLowerCase().includes(filter.search.toLowerCase()) ||
-      project.description.toLowerCase().includes(filter.search.toLowerCase()) ||
-      project.author.toLowerCase().includes(filter.search.toLowerCase());
+      project.description.toLowerCase().includes(filter.search.toLowerCase());
+
     const matchesLanguage =
       filter.language === "all" ||
       project.languages.toLowerCase().includes(filter.language.toLowerCase());
@@ -181,17 +145,9 @@ const navigate = useNavigate();
       "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
   };
 
-  // Navigation function - for demo purposes
-  // In a real app with React Router you would use navigate("/dashboard")
-  const navigateToDashboard = () => {
-    console.log("Navigating to dashboard");
-    // If you're using React Router v6, uncomment this:
-    // navigate("/dashboard");
-  };
-
   return (
     <div className="project-list-container">
-      {/* Back navigation button - matching the style you provided */}
+      {/* Back navigation button */}
       <div className="back-navigation">
         <button
           onClick={() => navigate("/dashboard")}
@@ -203,7 +159,9 @@ const navigate = useNavigate();
 
       <div className="project-list-header">
         <h2>Submitted Projects</h2>
-        <p className="subtitle">Browse through all the amazing submissions</p>
+        <p className="subtitle">
+          Browse through all your 30-day challenge submissions
+        </p>
       </div>
 
       <div className="filter-section">
@@ -273,6 +231,28 @@ const navigate = useNavigate();
           <div className="loader"></div>
           <p>Loading projects...</p>
         </div>
+      ) : error ? (
+        <div className="error-container">
+          <div className="error-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h3>Error Loading Projects</h3>
+          <p>{error}</p>
+        </div>
       ) : filteredProjects.length === 0 ? (
         <div className="no-results">
           <div className="no-results-icon">
@@ -310,11 +290,11 @@ const navigate = useNavigate();
               <div className="projects-grid">
                 {projectsByDay[day].map((project) => (
                   <div
-                    key={project.id}
+                    key={project._id}
                     className={`project-card ${
-                      expandedProject === project.id ? "expanded" : ""
+                      expandedProject === project._id ? "expanded" : ""
                     }`}
-                    onClick={() => toggleProjectExpansion(project.id)}
+                    onClick={() => toggleProjectExpansion(project._id)}
                   >
                     <div className="project-image">
                       <img
@@ -326,7 +306,6 @@ const navigate = useNavigate();
 
                     <div className="project-info">
                       <h4>{project.projectName}</h4>
-                      <p className="project-author">by {project.author}</p>
 
                       <div className="project-tags">
                         {project.languages.split(",").map((lang, index) => (
@@ -334,17 +313,18 @@ const navigate = useNavigate();
                             {lang.trim()}
                           </span>
                         ))}
-                        {project.frameworks
-                          .split(",")
-                          .map((framework, index) => (
-                            <span key={index} className="tag framework-tag">
-                              {framework.trim()}
-                            </span>
-                          ))}
+                        {project.frameworks &&
+                          project.frameworks
+                            .split(",")
+                            .map((framework, index) => (
+                              <span key={index} className="tag framework-tag">
+                                {framework.trim()}
+                              </span>
+                            ))}
                       </div>
 
                       <p className="project-description">
-                        {expandedProject === project.id
+                        {expandedProject === project._id
                           ? project.description
                           : project.description.length > 120
                           ? `${project.description.substring(0, 120)}...`
@@ -367,7 +347,9 @@ const navigate = useNavigate();
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12 6 12 12 16 14"></polyline>
                           </svg>
-                          {formatDate(project.submittedAt)}
+                          {formatDate(
+                            project.submissionDate || project.createdAt
+                          )}
                         </span>
                       </div>
 
