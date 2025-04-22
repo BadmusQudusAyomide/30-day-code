@@ -1,10 +1,6 @@
+// App.js
 import React, { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // Public components
 import Header from "./components/Header";
@@ -56,7 +52,6 @@ function App() {
     return () => window.removeEventListener("storage", checkAuthStatus);
   }, []);
 
-  // Regular user login
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
     setIsAdminAuthenticated(false);
@@ -64,7 +59,6 @@ function App() {
     localStorage.setItem("isAdminAuthenticated", "false");
   };
 
-  // Admin login
   const handleAdminLoginSuccess = () => {
     setIsAdminAuthenticated(true);
     setIsAuthenticated(false);
@@ -72,19 +66,16 @@ function App() {
     localStorage.setItem("isAuthenticated", "false");
   };
 
-  // Regular user logout
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.setItem("isAuthenticated", "false");
   };
 
-  // Admin logout
   const handleAdminLogout = () => {
     setIsAdminAuthenticated(false);
     localStorage.setItem("isAdminAuthenticated", "false");
   };
 
-  // Protected route wrapper
   const ProtectedRoute = ({ children }) => {
     if (!isAuthenticated) return <Navigate to="/login" replace />;
     return children;
@@ -112,149 +103,147 @@ function App() {
   );
 
   return (
-    <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<HomePage />} />
 
-        <Route
-          path="/login"
-          element={
-            isAuthenticated || isAdminAuthenticated ? (
-              <Navigate
-                to={isAdminAuthenticated ? "/admin/leaderboard" : "/dashboard"}
-                replace
-              />
-            ) : (
-              <Login onLoginSuccess={handleLoginSuccess} />
-            )
-          }
-        />
+      <Route
+        path="/login"
+        element={
+          isAuthenticated || isAdminAuthenticated ? (
+            <Navigate
+              to={isAdminAuthenticated ? "/admin/leaderboard" : "/dashboard"}
+              replace
+            />
+          ) : (
+            <Login onLoginSuccess={handleLoginSuccess} />
+          )
+        }
+      />
 
-        <Route
-          path="/signup"
-          element={
-            isAuthenticated || isAdminAuthenticated ? (
-              <Navigate
-                to={isAdminAuthenticated ? "/admin/leaderboard" : "/dashboard"}
-                replace
-              />
-            ) : (
-              <Signup onLoginSuccess={handleLoginSuccess} />
-            )
-          }
-        />
+      <Route
+        path="/signup"
+        element={
+          isAuthenticated || isAdminAuthenticated ? (
+            <Navigate
+              to={isAdminAuthenticated ? "/admin/leaderboard" : "/dashboard"}
+              replace
+            />
+          ) : (
+            <Signup onLoginSuccess={handleLoginSuccess} />
+          )
+        }
+      />
 
-        {/* Admin Auth Routes */}
-        <Route
-          path="/admin/login"
-          element={
-            isAdminAuthenticated ? (
-              <Navigate to="/admin/leaderboard" replace />
-            ) : isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <AdminLogin setAuthenticated={handleAdminLoginSuccess} />
-            )
-          }
-        />
+      {/* Admin Auth Routes */}
+      <Route
+        path="/admin/login"
+        element={
+          isAdminAuthenticated ? (
+            <Navigate to="/admin/leaderboard" replace />
+          ) : isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <AdminLogin setAuthenticated={handleAdminLoginSuccess} />
+          )
+        }
+      />
 
-        <Route
-          path="/admin/signup"
-          element={
-            isAdminAuthenticated ? (
-              <Navigate to="/admin/leaderboard" replace />
-            ) : isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <AdminSignup setAuthenticated={handleAdminLoginSuccess} />
-            )
-          }
-        />
+      <Route
+        path="/admin/signup"
+        element={
+          isAdminAuthenticated ? (
+            <Navigate to="/admin/leaderboard" replace />
+          ) : isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <AdminSignup setAuthenticated={handleAdminLoginSuccess} />
+          )
+        }
+      />
 
-        {/* Admin Dashboard Routes */}
-        <Route
-          path="/admin/*"
-          element={
-            <AdminProtectedRoute>
-              <AdminDashboard onLogout={handleAdminLogout} />
-            </AdminProtectedRoute>
-          }
-        />
+      {/* Admin Dashboard */}
+      <Route
+        path="/admin/*"
+        element={
+          <AdminProtectedRoute>
+            <AdminDashboard onLogout={handleAdminLogout} />
+          </AdminProtectedRoute>
+        }
+      />
 
-        {/* Regular User Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/SubmitProject"
-          element={
-            <ProtectedRoute>
-              <SubmitProject onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ProjectList"
-          element={
-            <ProtectedRoute>
-              <ProjectList onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/leaderboard"
-          element={
-            <ProtectedRoute>
-              <Leaderboard onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/project/:projectId"
-          element={
-            <ProtectedRoute>
-              <ProjectRating onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <UserProfile onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/daily-challenge"
-          element={
-            <ProtectedRoute>
-              <DailyChallenge onLogout={handleLogout} />
-            </ProtectedRoute>
-          }
-        />
+      {/* Regular User Routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/SubmitProject"
+        element={
+          <ProtectedRoute>
+            <SubmitProject onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ProjectList"
+        element={
+          <ProtectedRoute>
+            <ProjectList onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/leaderboard"
+        element={
+          <ProtectedRoute>
+            <Leaderboard onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/project/:projectId"
+        element={
+          <ProtectedRoute>
+            <ProjectRating onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <UserProfile onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/daily-challenge"
+        element={
+          <ProtectedRoute>
+            <DailyChallenge onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Catch-all Route */}
-        <Route
-          path="*"
-          element={
-            isAdminAuthenticated ? (
-              <Navigate to="/admin/leaderboard" replace />
-            ) : isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-      </Routes>
-    </Router>
+      {/* Catch-all */}
+      <Route
+        path="*"
+        element={
+          isAdminAuthenticated ? (
+            <Navigate to="/admin/leaderboard" replace />
+          ) : isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+    </Routes>
   );
 }
 
