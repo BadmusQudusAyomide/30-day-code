@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import axios from "axios";
+
+// Components
 import Sidebar from "./Sidebar";
 import TopNav from "./TopNav";
 import StatsCards from "./StatsCards";
@@ -7,16 +10,62 @@ import Leaderboard from "./Leaderboard";
 import Submissions from "./Submissions";
 import Users from "./Users";
 import Settings from "./Settings";
-import ProjectList from "./ProjectList";
+import AdminProjectList from "./AdminProjectList";
 import ProjectRating from "./ProjectRating";
 import "./styles.css";
 
 function AdminDashboard({ onLogout }) {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [adminUser, setAdminUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      try {
+        const token = localStorage.getItem("adminToken");
+        if (!token) {
+          // If no token, redirect to login will happen via protected route
+          onLogout();
+          return;
+        }
+
+        // Set auth header
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+        // Verify admin status and get user data
+        const response = await axios.get("/api/auth/me");
+
+        if (!response.data.user?.isAdmin) {
+          console.error("Not an admin account");
+          onLogout();
+          return;
+        }
+
+        setAdminUser(response.data.user);
+      } catch (error) {
+        console.error("Admin verification failed:", error);
+        onLogout();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdminData();
+  }, [onLogout]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleLogout = () => {
+    // Clear admin data
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminUser");
+    delete axios.defaults.headers.common["Authorization"];
+
+    // Call the parent logout function
+    onLogout();
   };
 
   // Close sidebar when clicking outside on mobile
@@ -37,25 +86,44 @@ function AdminDashboard({ onLogout }) {
     };
   }, [sidebarOpen]);
 
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading admin dashboard...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
       <Sidebar
         currentPath={location.pathname}
         isOpen={sidebarOpen}
-        onLogout={onLogout}
+        onLogout={handleLogout}
         toggleSidebar={toggleSidebar}
+        user={adminUser}
       />
       <div className={`main-content ${sidebarOpen ? "sidebar-open" : ""}`}>
-        <TopNav onLogout={onLogout} toggleSidebar={toggleSidebar} />
+        <TopNav
+          onLogout={handleLogout}
+          toggleSidebar={toggleSidebar}
+          user={adminUser}
+        />
         <StatsCards />
         <div className="content-area">
           <Routes>
+            <Route index element={<Navigate to="leaderboard" replace />} />
             <Route path="leaderboard" element={<Leaderboard />} />
             <Route path="submissions" element={<Submissions />} />
             <Route path="users" element={<Users />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="settings" element={<Settings user={adminUser} />} />
             <Route path="rate-project/:projectId" element={<ProjectRating />} />
-            <Route path="users/:userId/projects" element={<ProjectList />} />
+            <Route
+              path="users/:userId/projects"
+              element={<AdminProjectList />}
+            />
+            <Route path="users/:userId/projects/:projectId/rate" element={<ProjectRating />} />
           </Routes>
         </div>
       </div>

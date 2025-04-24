@@ -1768,3 +1768,5 @@ input:checked + .toggle-slider:before {
   padding: 6px 12px; /* More compact button */
   font-size: 13px;
 }
+
+

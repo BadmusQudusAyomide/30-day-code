@@ -1,0 +1,1193 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
+import './Auth.css';
+import './AuthSuccess.jsx';
+
+
+const Login = ({ onLoginSuccess }) => {
+  const [formData, setFormData] = useState({
+    emailOrUsername: '',
+    password: ''
+  });
+  const [errors, setErrors] = useState({
+    emailOrUsername: '',
+    password: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
+  const navigate = useNavigate();
+
+  const validateField = (name, value) => {
+    let error = '';
+    
+    switch (name) {
+      case 'emailOrUsername':
+        if (!value.trim()) error = 'Email or username is required';
+        break;
+        
+      case 'password':
+        if (!value) error = 'Password is required';
+        break;
+        
+      default:
+        break;
+    }
+    
+    return error;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+    
+    Object.keys(formData).forEach(key => {
+      const error = validateField(key, formData[key]);
+      newErrors[key] = error;
+      if (error) isValid = false;
+    });
+    
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setApiError('');
+    
+    if (!validateForm()) return;
+    
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      localStorage.setItem('token', data.user.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      onLoginSuccess();
+      navigate('/dashboard');
+    } catch (err) {
+      setApiError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <form className="auth-box" onSubmit={handleLogin} noValidate>
+        <h2>Welcome Back</h2>
+        <p className="subtitle">Login to continue your coding challenge</p>
+
+        {apiError && <div className="error-message">{apiError}</div>}
+
+        <div className="form-group">
+          <label>Email or Username</label>
+          <input
+            type="text"
+            name="emailOrUsername"
+            placeholder="name@example.com or username"
+            value={formData.emailOrUsername}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+            className={errors.emailOrUsername ? "error" : ""}
+          />
+          {errors.emailOrUsername && (
+            <span className="error-text">{errors.emailOrUsername}</span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label>Password</label>
+          <div className="password-input">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              required
+              className={errors.password ? "error" : ""}
+            />
+            <button
+              type="button"
+              className="toggle-password"
+              onClick={() => setShowPassword((prev) => !prev)}
+              aria-label="Toggle password visibility"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
+          {errors.password && (
+            <span className="error-text">{errors.password}</span>
+          )}
+        </div>
+
+        <div className="forgot-password">
+          <Link to="/forgot">Forgot password?</Link>
+        </div>
+
+        <button type="submit" className="login-btn" disabled={isLoading}>
+          {isLoading ? "Logging in..." : "Login"}
+        </button>
+
+        <div className="divider">or continue with</div>
+
+        <div className="oauth-buttons">
+          <button type="button" className="oauth-button github">
+            <FaGithub />
+            GitHub
+          </button>
+
+<button
+  type="button"
+  className="oauth-button google"
+  onClick={() => {
+    // Always redirect to dashboard after Google auth
+    const redirectPath = '/dashboard';
+    
+    // Clear any existing tokens
+    localStorage.removeItem('token');
+    
+    // Make sure this URL matches your backend route
+    window.location.href = `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
+  }}
+>
+  <FaGoogle /> Continue with Google
+</button>
+        </div>
+
+        <p className="switch-auth">
+          Don't have an account? <Link to="/signup">Sign Up</Link>
+        </p>
+        <p className="admin-login">
+          Admin? <Link to="/admin">Login here</Link>
+        </p>
+      </form>
+    </div>
+  );
+};
+
+
+export default Login;
+
+
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { FaGithub, FaGoogle } from "react-icons/fa";
+import "./Auth.css";
+
+const Signup = ({ onLoginSuccess }) => {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState({
+    fullName: "",
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
+  const navigate = useNavigate();
+
+  const validateField = (name, value) => {
+    let error = "";
+
+    switch (name) {
+      case "fullName":
+        if (!value.trim()) error = "Full name is required";
+        else if (value.length < 2) error = "Name too short";
+        else if (!/^[a-zA-Z\s'-]+$/.test(value)) error = "Invalid characters";
+        break;
+
+      case "username":
+        if (value && !/^[a-zA-Z0-9_]+$/.test(value)) {
+          error = "Only letters, numbers and underscores";
+        }
+        break;
+
+      case "email":
+        if (!value) error = "Email is required";
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = "Invalid email format";
+        }
+        break;
+
+      case "password":
+        if (!value) error = "Password is required";
+        else if (value.length < 8) error = "Minimum 8 characters";
+        else if (!/[A-Z]/.test(value)) error = "Need at least 1 uppercase";
+        else if (!/[a-z]/.test(value)) error = "Need at least 1 lowercase";
+        else if (!/[0-9]/.test(value)) error = "Need at least 1 number";
+        else if (!/[^A-Za-z0-9]/.test(value)) error = "Need at least 1 symbol";
+        break;
+
+      case "confirmPassword":
+        if (value !== formData.password) error = "Passwords must match";
+        break;
+
+      default:
+        break;
+    }
+
+    return error;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Validate on change only after first blur
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    Object.keys(formData).forEach((key) => {
+      if (key !== "username") {
+        // username is optional
+        const error = validateField(key, formData[key]);
+        newErrors[key] = error;
+        if (error) isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setApiError("");
+
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          username: formData.username || undefined,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Signup failed");
+      }
+
+      localStorage.setItem("token", data.user.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      onLoginSuccess();
+      setFormData({
+        fullName: "",
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+
+      navigate("/dashboard");
+    } catch (err) {
+      setApiError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <form className="auth-box" onSubmit={handleSubmit} noValidate>
+        <h2>Create Account</h2>
+        <p className="subtitle">Join our coding community</p>
+
+        {apiError && <div className="error-message">{apiError}</div>}
+
+        <div className="form-group">
+          <label>Full Name *</label>
+          <input
+            type="text"
+            name="fullName"
+            placeholder="John Doe"
+            value={formData.fullName}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+            className={errors.fullName ? "error" : ""}
+          />
+          {errors.fullName && (
+            <span className="error-text">{errors.fullName}</span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label>Username (optional)</label>
+          <input
+            type="text"
+            name="username"
+            placeholder="coder123"
+            value={formData.username}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={errors.username ? "error" : ""}
+          />
+          {errors.username && (
+            <span className="error-text">{errors.username}</span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label>Email *</label>
+          <input
+            type="email"
+            name="email"
+            placeholder="name@example.com"
+            value={formData.email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+            className={errors.email ? "error" : ""}
+          />
+          {errors.email && <span className="error-text">{errors.email}</span>}
+        </div>
+
+        <div className="form-group">
+          <label>Password *</label>
+          <input
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+            className={errors.password ? "error" : ""}
+          />
+          {errors.password && (
+            <div className="password-hints">
+              <span className={formData.password.length >= 8 ? "valid" : ""}>
+                • 8+ characters
+              </span>
+              <span className={/[A-Z]/.test(formData.password) ? "valid" : ""}>
+                • Uppercase
+              </span>
+              <span className={/[a-z]/.test(formData.password) ? "valid" : ""}>
+                • Lowercase
+              </span>
+              <span className={/[0-9]/.test(formData.password) ? "valid" : ""}>
+                • Number
+              </span>
+              <span
+                className={
+                  /[^A-Za-z0-9]/.test(formData.password) ? "valid" : ""
+                }
+              >
+                • Symbol
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label>Confirm Password *</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="••••••••"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            required
+            className={errors.confirmPassword ? "error" : ""}
+          />
+          {errors.confirmPassword && (
+            <span className="error-text">{errors.confirmPassword}</span>
+          )}
+        </div>
+
+        <button type="submit" className="login-btn" disabled={isLoading}>
+          {isLoading ? "Creating account..." : "Sign Up"}
+        </button>
+
+        <div className="divider">or continue with</div>
+
+        <div className="oauth-buttons">
+          <button type="button" className="oauth-button github">
+            <FaGithub />
+            GitHub
+          </button>
+          <button
+            type="button"
+            className="oauth-button google"
+            onClick={() => {
+              // Always redirect to dashboard after Google auth
+              const redirectPath = "/dashboard";
+
+              // Clear any existing tokens
+              localStorage.removeItem("token");
+
+              // Make sure this URL matches your backend route
+              window.location.href = `${
+                process.env.REACT_APP_API_URL || "http://localhost:5000"
+              }/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
+            }}
+          >
+            <FaGoogle /> Continue with Google
+          </button>
+        </div>
+        <p className="switch-auth">
+          Already have an account? <Link to="/login">Log In</Link>
+        </p>
+      </form>
+    </div>
+  );
+};
+
+export default Signup;
+
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Add this import
+import "./Dashboard.css";
+
+const Dashboard = ({ onLogout }) => {
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState({
+    name: "",
+    projectsSubmitted: 0,
+    currentDay: 0,
+    totalDays: 30,
+    rank: 0,
+    totalParticipants: 0,
+    avatarColor: "#6366f1",
+  });
+  // Add these state declarations
+  const [darkMode, setDarkMode] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const response = await axios.get("http://localhost:5000/api/auth/me", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+
+const data = response.data;
+
+        const avatarColor = generateColorFromName(
+          data.user.username || data.user.email
+        );
+
+        setUserData({
+          name:
+            data.user.fullName ||
+            data.user.username ||
+            data.user.email.split("@")[0],
+          projectsSubmitted: data.stats?.projectsSubmitted || 0,
+          currentDay: data.stats?.currentDay || 1,
+          totalDays: 30,
+          rank: data.stats?.rank || 0,
+          totalParticipants: data.stats?.totalParticipants || 1000,
+          avatarColor,
+        });
+      } catch (err) {
+        console.error("Dashboard error:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
+
+  const generateColorFromName = (name) => {
+    if (!name) return "#6366f1";
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return `hsl(${hash % 360}, 70%, 60%)`;
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
+  const openLogoutModal = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    if (onLogout) {
+      onLogout();
+    } else {
+      navigate("/login");
+    }
+    setShowLogoutModal(false);
+  };
+
+  const handleCancelLogout = () => {
+    setShowLogoutModal(false);
+  };
+
+  const calculateProgressPercentage = () => {
+    return (userData.currentDay / userData.totalDays) * 100;
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => !prev);
+  };
+
+  const adjustColor = (color, amount) => {
+    // Simple color adjustment for gradient
+    let col = color.startsWith("#") ? color.slice(1) : color;
+    if (col.startsWith("hsl")) {
+      // Handle HSL color format
+      const values = col.match(/\d+/g);
+      if (values && values.length >= 3) {
+        const h = parseInt(values[0]);
+        const s = parseInt(values[1]);
+        const l = Math.min(100, parseInt(values[2]) + amount);
+        return `hsl(${h}, ${s}%, ${l}%)`;
+      }
+    }
+    return color;
+  };
+
+  if (loading) {
+    return (
+      <div className={`dashboard-loading ${darkMode ? "dark" : "light"}`}>
+        <div className="loading-spinner"></div>
+        <p>Loading your dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`dashboard-error ${darkMode ? "dark" : "light"}`}>
+        <div className="error-icon">⚠️</div>
+        <h3>Error Loading Dashboard</h3>
+        <p>{error}</p>
+        <button
+          className="retry-button"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`dashboard neo ${darkMode ? "dark" : "light"}`}>
+      <header className="dashboard-header">
+        <div className="brand">
+          <div className="logo" onClick={() => navigate("/")}>
+            <span className="code-text">Code</span>
+            <span className="days-text">&lt;30&gt;</span>
+          </div>
+        </div>
+        <div className="header-controls">
+          <div className="dark-mode-toggle">
+            <input
+              type="checkbox"
+              id="darkmode-toggle"
+              checked={darkMode}
+              onChange={toggleDarkMode}
+            />
+            <label htmlFor="darkmode-toggle" className="toggle-label">
+              <span className="toggle-icon moon">🌙</span>
+              <span className="toggle-icon sun">☀️</span>
+            </label>
+          </div>
+          <div className="user-info">
+            <div className="user-name">{userData.name}</div>
+            <button
+              className="avatar-button"
+              onClick={() => handleNavigation("/profile")}
+              style={{ backgroundColor: userData.avatarColor }}
+              aria-label="View profile"
+              title="View and edit your profile"
+            >
+              {userData.name.charAt(0).toUpperCase()}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="dashboard-content">
+        <div className="dashboard-header-section">
+          <h1 className="welcome">
+            Welcome back, {userData.name.split(" ")[0]}!
+          </h1>
+          <p className="welcome-subtitle">
+            {userData.projectsSubmitted > 0
+              ? `You've submitted ${userData.projectsSubmitted} projects so far!`
+              : "Ready to start your coding challenge?"}
+          </p>
+        </div>
+
+        <div className="progress-overview">
+          <div className="day-progress">
+            <div className="day-indicator">
+              <span className="day-number">{userData.currentDay}</span>
+              <span className="day-label">/ {userData.totalDays}</span>
+            </div>
+            <div className="progress-bar-container">
+              <div
+                className="progress-bar"
+                style={{
+                  width: `${calculateProgressPercentage()}%`,
+                  background: `linear-gradient(90deg, ${
+                    userData.avatarColor
+                  }, ${adjustColor(userData.avatarColor, 20)})`,
+                  boxShadow: darkMode
+                    ? `0 4px 8px rgba(0, 0, 0, 0.3), 0 -4px 8px rgba(255, 255, 255, 0.05)`
+                    : `0 4px 8px rgba(163, 177, 198, 0.6), 0 -4px 8px rgba(255, 255, 255, 0.8)`,
+                }}
+              ></div>
+            </div>
+            <div className="progress-stats">
+              <div className="day-text">Day {userData.currentDay}</div>
+              <div className="percentage-text">
+                {Math.round(calculateProgressPercentage())}% complete
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="dashboard-grid">
+          {renderGridItem(
+            "📤",
+            "Submit Project",
+            "Upload today's challenge",
+            "/SubmitProject"
+          )}
+          {renderGridItem(
+            "📁",
+            "My Projects",
+            `${userData.projectsSubmitted} submitted`,
+            "/ProjectList"
+          )}
+          {renderGridItem(
+            "📝",
+            "Daily Challenge",
+            `View Day ${userData.currentDay} task`,
+            "/daily-challenge"
+          )}
+          {renderGridItem("📚", "Resources", "Helpful materials", "/resources")}
+          {renderGridItem(
+            "👥",
+            "Community",
+            `${userData.totalParticipants} participants`,
+            "/community"
+          )}
+        </div>
+
+        <div className="logout-container">
+          <button className="logout-button" onClick={openLogoutModal}>
+            <span className="logout-icon">🚪</span>
+            Logout
+          </button>
+        </div>
+      </main>
+
+      <footer className="dashboard-footer">
+        <p>
+          Code&lt;30&gt; Challenge © {new Date().getFullYear()} |{" "}
+          <a href="#" className="footer-link">
+            Terms
+          </a>{" "}
+          |{" "}
+          <a href="#" className="footer-link">
+            Privacy
+          </a>
+        </p>
+      </footer>
+
+      {showLogoutModal && (
+        <div className="modal-overlay">
+          <div className={`logout-modal ${darkMode ? "dark" : "light"}`}>
+            <div className="modal-header">
+              <h3>Confirm Logout</h3>
+              <button className="close-button" onClick={handleCancelLogout}>
+                ×
+              </button>
+            </div>
+            <div className="modal-content">
+              <p>Are you sure you want to logout?</p>
+              <div className="modal-icon">🔒</div>
+            </div>
+            <div className="modal-actions">
+              <button className="cancel-button" onClick={handleCancelLogout}>
+                Cancel
+              </button>
+              <button className="confirm-button" onClick={handleConfirmLogout}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  function renderGridItem(emoji, title, description, path) {
+    return (
+      <div
+        className="grid-item"
+        onClick={() => handleNavigation(path)}
+        data-type={title.toLowerCase().replace(" ", "-")}
+      >
+        <div className="item-icon">{emoji}</div>
+        <div className="item-content">
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </div>
+        <div className="item-action">→</div>
+      </div>
+    );
+  }
+};
+
+export default Dashboard;
+
+
+// src/components/Auth/AuthSuccess.jsx
+import { useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import axios from 'axios';
+
+const AuthSuccess = ({ onLoginSuccess }) => {
+const navigate = useNavigate();
+const [searchParams] = useSearchParams();
+
+useEffect(() => {
+const completeAuth = async () => {
+try {
+const token = searchParams.get('token');
+const redirect = searchParams.get('redirect') || '/dashboard';
+
+if (!token) {
+throw new Error('Missing authentication token');
+}
+
+// Verify token and get user data
+const response = await axios.get('/api/auth/me', {
+headers: { Authorization: `Bearer ${token}` }
+});
+
+if (!response.data.success) {
+throw new Error(response.data.message || 'Authentication failed');
+}
+
+// Complete login process
+onLoginSuccess(token, response.data.user);
+navigate(redirect);
+} catch (err) {
+console.error('Authentication error:', err);
+navigate(`/login?error=${encodeURIComponent(err.message)}`);
+}
+};
+
+completeAuth();
+}, [navigate, searchParams, onLoginSuccess]);
+
+return (
+<div className="auth-loading">
+  <h2>Completing Authentication</h2>
+  <p>Please wait while we prepare your dashboard...</p>
+</div>
+);
+};
+
+export default AuthSuccess;
+
+
+// App.js
+import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import axios from "axios";
+
+// Public components
+import Header from "./components/Header";
+import Hero from "./components/Hero";
+import Features from "./components/Features";
+import CtaSection from "./components/CtaSection";
+import Footer from "./components/Footer";
+import BackgroundAnimation from "./components/BackgroundAnimation";
+import Login from "./components/Auth/Login";
+import Signup from "./components/Auth/Signup";
+import AuthSuccess from './components/Auth/AuthSuccess'; 
+
+
+// Protected pages (user)
+import Dashboard from "./pages/Dashboard";
+import SubmitProject from "./pages/SubmitProject";
+import ProjectList from "./pages/ProjectList";
+import Leaderboard from "./pages/Leaderboard";
+import ProjectRating from "./pages/ProjectRating";
+import UserProfile from "./pages/UserProfile";
+import DailyChallenge from "./pages/DailyChallenge";
+
+// Admin components
+import AdminLogin from "./admin/components/Auth/Login";
+import AdminSignup from "./admin/components/Auth/Signup";
+import AdminDashboard from "./admin/AdminDashboard"; // renamed from admin/App.js
+
+import "./styles.css";
+
+// Configure axios defaults
+axios.defaults.baseURL =
+  process.env.REACT_APP_API_URL || "http://localhost:5000";
+
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // In App.js
+    const checkAuthStatus = async () => {
+      const userToken = localStorage.getItem("token");
+      const adminToken = localStorage.getItem("adminToken");
+
+      setLoading(true);
+
+      try {
+        if (userToken) {
+          const response = await axios.get("/api/auth/me", {
+            headers: { Authorization: `Bearer ${userToken}` },
+          });
+
+          if (response.data.success) {
+            setIsAuthenticated(true);
+            setIsAdminAuthenticated(false);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+          } else {
+            throw new Error(response.data.message || "Authentication failed");
+          }
+        } else if (adminToken) {
+          const response = await axios.get("/api/auth/me", {
+            headers: { Authorization: `Bearer ${adminToken}` },
+          });
+
+          if (response.data.success && response.data.user?.isAdmin) {
+            setIsAdminAuthenticated(true);
+            setIsAuthenticated(false);
+          } else {
+            throw new Error("Admin authentication failed");
+          }
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+        localStorage.removeItem("token");
+        localStorage.removeItem("adminToken");
+        localStorage.removeItem("user");
+        delete axios.defaults.headers.common["Authorization"];
+        setIsAuthenticated(false);
+        setIsAdminAuthenticated(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuthStatus();
+
+    // Listen for storage events (for when other tabs change auth state)
+    window.addEventListener("storage", checkAuthStatus);
+    return () => window.removeEventListener("storage", checkAuthStatus);
+  }, []);
+
+  const handleLoginSuccess = (token, userData) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("isAuthenticated", "true");
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminUser");
+    localStorage.removeItem("isAdminAuthenticated");
+
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    setIsAuthenticated(true);
+    setIsAdminAuthenticated(false);
+  };
+
+  const handleAdminLoginSuccess = () => {
+    // Token and user data are stored in the AdminLogin component directly
+    localStorage.setItem("isAdminAuthenticated", "true");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("isAuthenticated");
+
+    setIsAdminAuthenticated(true);
+    setIsAuthenticated(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.setItem("isAuthenticated", "false");
+    delete axios.defaults.headers.common["Authorization"];
+
+    setIsAuthenticated(false);
+  };
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminUser");
+    localStorage.setItem("isAdminAuthenticated", "false");
+    delete axios.defaults.headers.common["Authorization"];
+
+    setIsAdminAuthenticated(false);
+  };
+
+  const ProtectedRoute = ({ children }) => {
+    if (loading) {
+      return <div className="loading">Loading...</div>;
+    }
+    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    return children;
+  };
+
+  const AdminProtectedRoute = ({ children }) => {
+    if (loading) {
+      return <div className="loading">Loading...</div>;
+    }
+    if (!isAdminAuthenticated) return <Navigate to="/admin/login" replace />;
+    return children;
+  };
+
+  const HomePage = () => (
+    <div className="app">
+      <BackgroundAnimation />
+      <Header
+        isAuthenticated={isAuthenticated || isAdminAuthenticated}
+        onLogout={isAdminAuthenticated ? handleAdminLogout : handleLogout}
+      />
+      <main>
+        <Hero />
+        <Features />
+        <CtaSection />
+      </main>
+      <Footer />
+    </div>
+  );
+
+  if (loading) {
+    return <div className="loading">Loading application...</div>;
+  }
+
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<HomePage />} />
+
+      <Route
+        path="/login"
+        element={
+          isAuthenticated || isAdminAuthenticated ? (
+            <Navigate
+              to={isAdminAuthenticated ? "/admin/leaderboard" : "/dashboard"}
+              replace
+            />
+          ) : (
+            <Login onLoginSuccess={handleLoginSuccess} />
+          )
+        }
+      />
+      <Route path="/auth/success" element={<AuthSuccess onLoginSuccess={handleLoginSuccess} />} />
+
+
+      <Route
+        path="/signup"
+        element={
+          isAuthenticated || isAdminAuthenticated ? (
+            <Navigate
+              to={isAdminAuthenticated ? "/admin/leaderboard" : "/dashboard"}
+              replace
+            />
+          ) : (
+            <Signup onLoginSuccess={handleLoginSuccess} />
+          )
+        }
+      />
+
+      {/* Admin Auth Routes */}
+      <Route
+        path="/admin/login"
+        element={
+          isAdminAuthenticated ? (
+            <Navigate to="/admin/leaderboard" replace />
+          ) : isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <AdminLogin setAuthenticated={handleAdminLoginSuccess} />
+          )
+        }
+      />
+
+      <Route
+        path="/admin/signup"
+        element={
+          isAdminAuthenticated ? (
+            <Navigate to="/admin/leaderboard" replace />
+          ) : isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <AdminSignup setAuthenticated={handleAdminLoginSuccess} />
+          )
+        }
+      />
+
+      {/* Admin Dashboard */}
+      <Route
+        path="/admin/*"
+        element={
+          <AdminProtectedRoute>
+            <AdminDashboard onLogout={handleAdminLogout} />
+          </AdminProtectedRoute>
+        }
+      />
+
+      {/* Regular User Routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/SubmitProject"
+        element={
+          <ProtectedRoute>
+            <SubmitProject onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/ProjectList"
+        element={
+          <ProtectedRoute>
+            <ProjectList onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/leaderboard"
+        element={
+          <ProtectedRoute>
+            <Leaderboard onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/project/:projectId"
+        element={
+          <ProtectedRoute>
+            <ProjectRating onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <UserProfile onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/daily-challenge"
+        element={
+          <ProtectedRoute>
+            <DailyChallenge onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch-all */}
+      <Route
+        path="*"
+        element={
+          isAdminAuthenticated ? (
+            <Navigate to="/admin/leaderboard" replace />
+          ) : isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+    </Routes>
+  );
+}
+
+export default App;
+

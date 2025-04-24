@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
 import './Auth.css';
+import './AuthSuccess.jsx';
+
 
 const Login = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
@@ -73,23 +75,30 @@ const Login = ({ onLoginSuccess }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://my-backend-pkhd.onrender.com/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("https://my-backend-pkhd.onrender.com/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || "Login failed");
       }
 
-      localStorage.setItem('token', data.user.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
+      localStorage.setItem("token", data.user.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
       onLoginSuccess();
-      navigate('/dashboard');
+     
+      console.log("Login successful, token stored:", data.user.token);
+      localStorage.setItem("token", data.user.token);
+      console.log(
+        "Token in localStorage after setting:",
+        localStorage.getItem("token")
+      );
+      navigate("/dashboard");
     } catch (err) {
       setApiError(err.message);
     } finally {
@@ -115,34 +124,38 @@ const Login = ({ onLoginSuccess }) => {
             onChange={handleChange}
             onBlur={handleBlur}
             required
-            className={errors.emailOrUsername ? 'error' : ''}
+            className={errors.emailOrUsername ? "error" : ""}
           />
-          {errors.emailOrUsername && <span className="error-text">{errors.emailOrUsername}</span>}
+          {errors.emailOrUsername && (
+            <span className="error-text">{errors.emailOrUsername}</span>
+          )}
         </div>
 
         <div className="form-group">
           <label>Password</label>
           <div className="password-input">
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               name="password"
               placeholder="••••••••"
               value={formData.password}
               onChange={handleChange}
               onBlur={handleBlur}
               required
-              className={errors.password ? 'error' : ''}
+              className={errors.password ? "error" : ""}
             />
             <button
               type="button"
               className="toggle-password"
-              onClick={() => setShowPassword(prev => !prev)}
+              onClick={() => setShowPassword((prev) => !prev)}
               aria-label="Toggle password visibility"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
-          {errors.password && <span className="error-text">{errors.password}</span>}
+          {errors.password && (
+            <span className="error-text">{errors.password}</span>
+          )}
         </div>
 
         <div className="forgot-password">
@@ -150,7 +163,7 @@ const Login = ({ onLoginSuccess }) => {
         </div>
 
         <button type="submit" className="login-btn" disabled={isLoading}>
-          {isLoading ? 'Logging in...' : 'Login'}
+          {isLoading ? "Logging in..." : "Login"}
         </button>
 
         <div className="divider">or continue with</div>
@@ -160,10 +173,23 @@ const Login = ({ onLoginSuccess }) => {
             <FaGithub />
             GitHub
           </button>
-          <button type="button" className="oauth-button google">
-            <FaGoogle />
-            Google
-          </button>
+
+<button
+  type="button"
+  className="oauth-button google"
+  onClick={() => {
+    // Always redirect to dashboard after Google auth
+    const redirectPath = '/dashboard';
+    
+    // Clear any existing tokens
+    localStorage.removeItem('token');
+    
+    // Make sure this URL matches your backend route
+    window.location.href = `${process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com"}/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
+  }}
+>
+  <FaGoogle /> Continue with Google
+</button>
         </div>
 
         <p className="switch-auth">

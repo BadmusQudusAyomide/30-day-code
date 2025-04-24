@@ -1,6 +1,7 @@
 // App.js
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import axios from "axios";
 
 // Public components
 import Header from "./components/Header";
@@ -11,6 +12,8 @@ import Footer from "./components/Footer";
 import BackgroundAnimation from "./components/BackgroundAnimation";
 import Login from "./components/Auth/Login";
 import Signup from "./components/Auth/Signup";
+import AuthSuccess from './components/Auth/AuthSuccess'; 
+
 
 // Protected pages (user)
 import Dashboard from "./pages/Dashboard";
@@ -28,60 +31,123 @@ import AdminDashboard from "./admin/AdminDashboard"; // renamed from admin/App.j
 
 import "./styles.css";
 
+// Configure axios defaults
+axios.defaults.baseURL =
+  process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAuthStatus = () => {
-      const authStatus = localStorage.getItem("isAuthenticated") === "true";
-      const adminAuthStatus =
-        localStorage.getItem("isAdminAuthenticated") === "true";
+    // In App.js
+    const checkAuthStatus = async () => {
+      const userToken = localStorage.getItem("token");
+      const adminToken = localStorage.getItem("adminToken");
 
-      if (authStatus && adminAuthStatus) {
-        localStorage.setItem("isAdminAuthenticated", "false");
+      setLoading(true);
+
+      try {
+        if (userToken) {
+          const response = await axios.get("/api/auth/me", {
+            headers: { Authorization: `Bearer ${userToken}` },
+          });
+
+          if (response.data.success) {
+            setIsAuthenticated(true);
+            setIsAdminAuthenticated(false);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
+          } else {
+            throw new Error(response.data.message || "Authentication failed");
+          }
+        } else if (adminToken) {
+          const response = await axios.get("/api/auth/me", {
+            headers: { Authorization: `Bearer ${adminToken}` },
+          });
+
+          if (response.data.success && response.data.user?.isAdmin) {
+            setIsAdminAuthenticated(true);
+            setIsAuthenticated(false);
+          } else {
+            throw new Error("Admin authentication failed");
+          }
+        }
+      } catch (err) {
+        console.error("Auth check failed:", err);
+        localStorage.removeItem("token");
+        localStorage.removeItem("adminToken");
+        localStorage.removeItem("user");
+        delete axios.defaults.headers.common["Authorization"];
+        setIsAuthenticated(false);
         setIsAdminAuthenticated(false);
+      } finally {
+        setLoading(false);
       }
-
-      setIsAuthenticated(authStatus);
-      setIsAdminAuthenticated(adminAuthStatus);
     };
 
     checkAuthStatus();
+
+    // Listen for storage events (for when other tabs change auth state)
     window.addEventListener("storage", checkAuthStatus);
     return () => window.removeEventListener("storage", checkAuthStatus);
   }, []);
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (token, userData) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("isAuthenticated", "true");
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminUser");
+    localStorage.removeItem("isAdminAuthenticated");
+
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
     setIsAuthenticated(true);
     setIsAdminAuthenticated(false);
-    localStorage.setItem("isAuthenticated", "true");
-    localStorage.setItem("isAdminAuthenticated", "false");
   };
 
   const handleAdminLoginSuccess = () => {
+    // Token and user data are stored in the AdminLogin component directly
+    localStorage.setItem("isAdminAuthenticated", "true");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("isAuthenticated");
+
     setIsAdminAuthenticated(true);
     setIsAuthenticated(false);
-    localStorage.setItem("isAdminAuthenticated", "true");
-    localStorage.setItem("isAuthenticated", "false");
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     localStorage.setItem("isAuthenticated", "false");
+    delete axios.defaults.headers.common["Authorization"];
+
+    setIsAuthenticated(false);
   };
 
   const handleAdminLogout = () => {
-    setIsAdminAuthenticated(false);
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminUser");
     localStorage.setItem("isAdminAuthenticated", "false");
+    delete axios.defaults.headers.common["Authorization"];
+
+    setIsAdminAuthenticated(false);
   };
 
   const ProtectedRoute = ({ children }) => {
+    if (loading) {
+      return <div className="loading">Loading...</div>;
+    }
     if (!isAuthenticated) return <Navigate to="/login" replace />;
     return children;
   };
 
   const AdminProtectedRoute = ({ children }) => {
+    if (loading) {
+      return <div className="loading">Loading...</div>;
+    }
     if (!isAdminAuthenticated) return <Navigate to="/admin/login" replace />;
     return children;
   };
@@ -102,6 +168,10 @@ function App() {
     </div>
   );
 
+  if (loading) {
+    return <div className="loading">Loading application...</div>;
+  }
+
   return (
     <Routes>
       {/* Public Routes */}
@@ -120,6 +190,8 @@ function App() {
           )
         }
       />
+      <Route path="/auth/success" element={<AuthSuccess onLoginSuccess={handleLoginSuccess} />} />
+
 
       <Route
         path="/signup"

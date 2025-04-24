@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Add this import
 import "./Dashboard.css";
 
 const Dashboard = ({ onLogout }) => {
@@ -13,6 +14,7 @@ const Dashboard = ({ onLogout }) => {
     totalParticipants: 0,
     avatarColor: "#6366f1",
   });
+  // Add these state declarations
   const [darkMode, setDarkMode] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -22,24 +24,24 @@ const Dashboard = ({ onLogout }) => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem("token");
+        console.log("Token from localStorage:", token);
         if (!token) {
           navigate("/login");
           return;
         }
+          const authHeader = `Bearer ${token}`;
+          console.log("Authorization header:", authHeader);
 
-        const response = await fetch("https://my-backend-pkhd.onrender.com/api/auth/me", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+         
+         const response = await axios.get("https://my-backend-pkhd.onrender.com/api/auth/me", {
+           headers: {
+             Authorization: authHeader, // Make sure token is correctly formatted
+           },
+         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch user data");
-        }
+         console.log("API response:", response.data);
 
-        const data = await response.json();
+        const data = response.data;
 
         const avatarColor = generateColorFromName(
           data.user.username || data.user.email
@@ -59,6 +61,11 @@ const Dashboard = ({ onLogout }) => {
         });
       } catch (err) {
         console.error("Dashboard error:", err);
+         if (err.response) {
+           console.error("Error response data:", err.response.data);
+           console.error("Error response status:", err.response.status);
+           console.error("Error response headers:", err.response.headers);
+         }
         setError(err.message);
       } finally {
         setLoading(false);
@@ -228,7 +235,6 @@ const Dashboard = ({ onLogout }) => {
         </div>
 
         <div className="dashboard-grid">
-          {/* In Dashboard.jsx, update your renderGridItem calls: */}
           {renderGridItem(
             "📤",
             "Submit Project",

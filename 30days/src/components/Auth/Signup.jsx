@@ -127,6 +127,14 @@ const Signup = ({ onLoginSuccess }) => {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       onLoginSuccess();
+      setFormData({
+        fullName: "",
+        username: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+
       navigate("/dashboard");
     } catch (err) {
       setApiError(err.message);
@@ -211,6 +219,9 @@ const Signup = ({ onLoginSuccess }) => {
               <span className={/[A-Z]/.test(formData.password) ? "valid" : ""}>
                 • Uppercase
               </span>
+              <span className={/[a-z]/.test(formData.password) ? "valid" : ""}>
+                • Lowercase
+              </span>
               <span className={/[0-9]/.test(formData.password) ? "valid" : ""}>
                 • Number
               </span>
@@ -253,12 +264,25 @@ const Signup = ({ onLoginSuccess }) => {
             <FaGithub />
             GitHub
           </button>
-          <button type="button" className="oauth-button google">
-            <FaGoogle />
-            Google
+          <button
+            type="button"
+            className="oauth-button google"
+            onClick={() => {
+              // Always redirect to dashboard after Google auth
+              const redirectPath = "/dashboard";
+
+              // Clear any existing tokens
+              localStorage.removeItem("token");
+
+              // Make sure this URL matches your backend route
+              window.location.href = `${
+                process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com"
+              }/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
+            }}
+          >
+            <FaGoogle /> Continue with Google
           </button>
         </div>
-
         <p className="switch-auth">
           Already have an account? <Link to="/login">Log In</Link>
         </p>

@@ -1,207 +1,241 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Star, ArrowLeft } from "react-feather";
+import { FiExternalLink, FiGithub, FiClock } from "react-icons/fi";
+import axios from "axios";
+import "./Users.css";
 
 const Users = () => {
+  const [users, setUsers] = useState([]);
   const [expandedUserId, setExpandedUserId] = useState(null);
+  const [userProjects, setUserProjects] = useState({});
+  const [loadingProjects, setLoadingProjects] = useState({});
+  const [userSubmissionsCount, setUserSubmissionsCount] = useState({});
+  const [loadingCounts, setLoadingCounts] = useState(false);
   const navigate = useNavigate();
+
+  const API_URL = process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+
+  useEffect(() => {
+    const fetchUsersAndCounts = async () => {
+      try {
+        setLoadingCounts(true);
+        const usersResponse = await axios.get(`${API_URL}/api/auth/users`, {
+          withCredentials: true,
+        });
+        const usersData = usersResponse.data;
+        setUsers(usersData);
+
+        // Initialize counts with existing submissions data (fallback)
+        const initialCounts = {};
+        usersData.forEach((user) => {
+          initialCounts[user._id] = user.submissions || 0;
+        });
+        setUserSubmissionsCount(initialCounts);
+
+        // Fetch accurate counts in the background
+        const updatedCounts = {};
+        await Promise.all(
+          usersData.map(async (user) => {
+            try {
+              const countResponse = await axios.get(
+                `${API_URL}/api/projects/user/${user._id}/count`,
+                { withCredentials: true }
+              );
+              updatedCounts[user._id] = countResponse.data.count || 0;
+            } catch (err) {
+              console.error(`Error fetching count for user ${user._id}:`, err);
+              updatedCounts[user._id] = initialCounts[user._id];
+            }
+          })
+        );
+        setUserSubmissionsCount(updatedCounts);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+      } finally {
+        setLoadingCounts(false);
+      }
+    };
+
+    fetchUsersAndCounts();
+  }, []);
+
+  useEffect(() => {
+    if (expandedUserId && !userProjects[expandedUserId]) {
+      fetchUserProjects(expandedUserId);
+    }
+  }, [expandedUserId]);
+
+  
+  const fetchUserProjects = async (userId) => {
+    setLoadingProjects((prev) => ({ ...prev, [userId]: true }));
+
+    try {
+      const [projectsResponse] = await Promise.all([
+        axios.get(`${API_URL}/api/projects/user/${userId}`, {
+          withCredentials: true,
+        }),
+      ]);
+
+      setUserProjects((prev) => ({
+        ...prev,
+        [userId]: projectsResponse.data.projects || [],
+      }));
+    } catch (err) {
+      console.error(`Error fetching projects for user ${userId}:`, err);
+      setUserProjects((prev) => ({
+        ...prev,
+        [userId]: [],
+      }));
+    } finally {
+      setLoadingProjects((prev) => ({ ...prev, [userId]: false }));
+    }
+  };
 
   const toggleUserExpansion = (userId) => {
     setExpandedUserId(expandedUserId === userId ? null : userId);
   };
 
-   const users = [
-     {
-       id: 1,
-       name: "Alex Johnson",
-       email: "alex@example.com",
-       joined: "12 days ago",
-       status: "active",
-       submissions: 12,
-       projects: [
-         { id: 101, title: "Weather App", ranked: true, date: "2 days ago" },
-         {
-           id: 102,
-           title: "E-commerce Site",
-           ranked: false,
-           date: "5 days ago",
-         },
-       ],
-     },
-     {
-       id: 2,
-       name: "Sarah Miller",
-       email: "sarah@example.com",
-       joined: "11 days ago",
-       status: "active",
-       submissions: 12,
-       projects: [
-         { id: 201, title: "Task Manager", ranked: true, date: "1 day ago" },
-         { id: 202, title: "Recipe Finder", ranked: true, date: "3 days ago" },
-       ],
-     },
-     {
-       id: 3,
-       name: "David Kim",
-       email: "david@example.com",
-       joined: "10 days ago",
-       status: "active",
-       submissions: 12,
-       projects: [
-         {
-           id: 301,
-           title: "Fitness Tracker",
-           ranked: false,
-           date: "4 days ago",
-         },
-         { id: 302, title: "Budget App", ranked: true, date: "6 days ago" },
-       ],
-     },
-     {
-       id: 4,
-       name: "Emma Wilson",
-       email: "emma@example.com",
-       joined: "9 days ago",
-       status: "active",
-       submissions: 11,
-       projects: [
-         { id: 401, title: "Recipe App", ranked: true, date: "1 day ago" },
-         {
-           id: 402,
-           title: "Travel Planner",
-           ranked: false,
-           date: "3 days ago",
-         },
-       ],
-     },
-     {
-       id: 5,
-       name: "James Brown",
-       email: "james@example.com",
-       joined: "8 days ago",
-       status: "active",
-       submissions: 10,
-       projects: [
-         {
-           id: 501,
-           title: "Social Media Dashboard",
-           ranked: true,
-           date: "2 days ago",
-         },
-         {
-           id: 502,
-           title: "E-learning Platform",
-           ranked: true,
-           date: "5 days ago",
-         },
-       ],
-     },
-     {
-       id: 6,
-       name: "Olivia Davis",
-       email: "olivia@example.com",
-       joined: "7 days ago",
-       status: "inactive",
-       submissions: 5,
-       projects: [
-         { id: 601, title: "Job Board", ranked: false, date: "1 week ago" },
-         {
-           id: 602,
-           title: "Portfolio Site",
-           ranked: false,
-           date: "2 weeks ago",
-         },
-       ],
-     },
-   ];
+  const formatDate = (dateString) => {
+    if (!dateString) return "No date";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const handleImageError = (e) => {
+    e.target.src = "https://i.pravatar.cc/150?img=3";
+  };
 
   return (
     <div className="users-page-container">
       <div className="page-header">
         <h2>User Management</h2>
-        <div className="stats-container">
-          {/* Add your stats here if needed */}
-        </div>
       </div>
 
-      <div className="users-container">
-        {users.map((user) => (
-          <div key={user.id} className="user-card glass-card">
-            <div 
-              className="user-summary" 
-              onClick={() => toggleUserExpansion(user.id)}
-            >
-              <div className="user-info">
-                <img
-                  src={`https://i.pravatar.cc/150?img=${user.id}`}
-                  alt={user.name}
-                  className="user-avatar"
-                />
-                <div className="user-details">
-                  <h3 className="user-name">{user.name}</h3>
-                  <p className="user-email">{user.email}</p>
-                  <div className="user-meta">
-                    <span>Joined: {user.joined}</span>
-                    <span>Submissions: {user.submissions}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="user-status">
-                <span className={`status-badge ${user.status}`}>
-                  {user.status}
-                </span>
-                <span className="expand-icon">
-                  {expandedUserId === user.id ? '−' : '+'}
-                </span>
-              </div>
-            </div>
-
-            {expandedUserId === user.id && (
-              <div className="user-projects">
-                <h4>Recent Projects</h4>
-                {user.projects.map((project) => (
-                  <div
-                    key={project.id}
-                    className="project-item"
-                    onClick={() => navigate(`/admin/rate-project/${project.id}`)}
-                  >
-                    <div className="project-info">
-                      <div className="project-title">
-                        {project.title}
-                        {project.ranked && (
-                          <span className="ranked-badge">
-                            <Star size={12} /> Ranked
-                          </span>
-                        )}
-                      </div>
-                      <div className="project-meta">
-                        <span className="project-date">{project.date}</span>
-                        {!project.ranked && (
-                          <button
-                            className="btn btn-small btn-rank"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/admin/rate-project/${project.id}`);
-                            }}
-                          >
-                            Rank Project
-                          </button>
-                        )}
-                      </div>
+      {loadingCounts ? (
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading user data...</p>
+        </div>
+      ) : (
+        <div className="users-container">
+          {users.map((user) => (
+            <div key={user._id} className="user-card glass-card">
+              <div
+                className="user-summary"
+                onClick={() => toggleUserExpansion(user._id)}
+              >
+                <div className="user-info">
+                  <img
+                    src={`https://i.pravatar.cc/150?img=${user._id}`}
+                    alt={user.fullName}
+                    className="user-avatar"
+                    onError={handleImageError}
+                  />
+                  <div className="user-details">
+                    <h3 className="user-name">{user.fullName}</h3>
+                    <p className="user-email">{user.email}</p>
+                    <div className="user-meta">
+                      <span>Joined: {formatDate(user.createdAt)}</span>
+                      <span>
+                        Submissions: {userSubmissionsCount[user._id] ?? 0}
+                      </span>
                     </div>
                   </div>
-                ))}
-                <Link
-                  to={`/admin/users/${user.id}/projects`}
-                  className="btn btn-primary view-all-btn"
-                >
-                  View All Projects <ArrowLeft size={14} />
-                </Link>
+                </div>
+                <div className="user-status">
+                  <span className={`status-badge ${user.status || "active"}`}>
+                    {user.status || "active"}
+                  </span>
+                  <span className="expand-icon">
+                    {expandedUserId === user._id ? "−" : "+"}
+                  </span>
+                </div>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+
+              {expandedUserId === user._id && (
+                <div className="user-projects">
+                  <h4>Recent Projects</h4>
+                  {loadingProjects[user._id] ? (
+                    <div className="loading-projects">
+                      <div className="spinner"></div>
+                      <p>Loading projects...</p>
+                    </div>
+                  ) : (
+                    <>
+                      {userProjects[user._id]?.length > 0 ? (
+                        <div className="projects-list">
+                          {" "}
+                          {/* Changed from projects-grid */}
+                          {userProjects[user._id].map((project) => (
+                            <div
+                              key={project._id}
+                              className="compact-project-card"
+                            >
+                              {" "}
+                              {/* Changed class */}
+                              <div className="compact-project-header">
+                                <h5>{project.projectName}</h5>
+                                <span className="compact-day-badge">
+                                  Day {project.day}
+                                </span>
+                              </div>
+                              <div className="compact-project-links">
+                                {project.liveLink && (
+                                  <a
+                                    href={project.liveLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="compact-link"
+                                  >
+                                    <FiExternalLink className="link-icon" />
+                                  </a>
+                                )}
+                                {project.repoLink && (
+                                  <a
+                                    href={project.repoLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="compact-link"
+                                  >
+                                    <FiGithub className="link-icon" />
+                                  </a>
+                                )}
+                              </div>
+                              <p className="compact-project-description">
+                                {project.description.length > 60
+                                  ? `${project.description.substring(0, 60)}...`
+                                  : project.description}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="no-projects">
+                          <p>No recent projects found</p>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  <button
+                    className="btn btn-primary view-all-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/admin/users/${user._id}/projects`); // Use absolute path
+                    }}
+                  >
+                    View All Projects
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
