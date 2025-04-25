@@ -137,32 +137,24 @@ function App() {
 
   // In App.js
   const handleAdminLoginSuccess = (token, userData) => {
-    console.log("Handling admin login success");
-    console.log("Admin token:", token);
-    console.log("Admin user data:", userData);
-
-    // Make sure token exists
-    if (!token) {
-      console.error("No token received in handleAdminLoginSuccess");
+    if (!token || !userData) {
+      console.error("Invalid token or user data");
       return;
     }
 
-    // Store token and user data
+    // Store all data in localStorage
     localStorage.setItem("adminToken", token);
     localStorage.setItem("adminUser", JSON.stringify(userData));
-    localStorage.setItem("isAdminAuthenticated", "true");
 
-    // Remove user authentication data
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("isAuthenticated");
-
-    // Set authorization header
+    // Set axios defaults
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
     // Update state
     setIsAdminAuthenticated(true);
     setIsAuthenticated(false);
+
+    // Force reload to ensure clean state
+    window.location.href = "/admin/leaderboard";
   };
 
   const handleLogout = () => {
