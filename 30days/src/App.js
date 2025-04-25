@@ -50,6 +50,8 @@ function App() {
 
       try {
         if (userToken) {
+                axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+
           const response = await axios.get("/api/auth/me", {
             headers: { Authorization: `Bearer ${userToken}` },
           });
@@ -62,6 +64,10 @@ function App() {
             throw new Error(response.data.message || "Authentication failed");
           }
         } else if (adminToken) {
+                axios.defaults.headers.common[
+                  "Authorization"
+                ] = `Bearer ${adminToken}`;
+
           const response = await axios.get("/api/auth/me", {
             headers: { Authorization: `Bearer ${adminToken}` },
           });
@@ -78,6 +84,9 @@ function App() {
         localStorage.removeItem("token");
         localStorage.removeItem("adminToken");
         localStorage.removeItem("user");
+         localStorage.removeItem("adminUser");
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("isAdminAuthenticated");
         delete axios.defaults.headers.common["Authorization"];
         setIsAuthenticated(false);
         setIsAdminAuthenticated(false);
@@ -107,12 +116,18 @@ function App() {
     setIsAdminAuthenticated(false);
   };
 
-  const handleAdminLoginSuccess = () => {
+  const handleAdminLoginSuccess = (token, userData) => {
     // Token and user data are stored in the AdminLogin component directly
+
+    localStorage.setItem("adminToken", token);
+    localStorage.setItem("adminUser", JSON.stringify(userData));
     localStorage.setItem("isAdminAuthenticated", "true");
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("isAuthenticated");
+
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     setIsAdminAuthenticated(true);
     setIsAuthenticated(false);
