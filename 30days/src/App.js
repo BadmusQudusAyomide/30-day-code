@@ -235,8 +235,15 @@ function App() {
       />
 
       {/* Admin Dashboard */}
-      <Route path="/admin/dashboard/*" element={<AdminDashboard onLogout={handleAdminLogout} />} />
-           
+      <Route
+        path="/admin/*"
+        element={
+          <AdminProtectedRoute>
+            <AdminDashboard onLogout={handleAdminLogout} />
+          </AdminProtectedRoute>
+        }
+      />
+
       {/* Regular User Routes */}
       <Route
         path="/dashboard"
