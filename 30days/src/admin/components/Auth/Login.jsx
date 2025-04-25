@@ -3,45 +3,50 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const AdminLogin = ({ setAuthenticated }) => {
-  const [emailOrUsername, setEmailOrUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // In AdminLogin.js
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
-    
+
     try {
-      const response = await axios.post('/api/auth/login', {
+      const response = await axios.post("/api/auth/login", {
         emailOrUsername,
-        password
+        password,
       });
-      
+
       const { user } = response.data;
-      
+
       // Check if user is an admin
       if (!user.isAdmin) {
-        setError('You do not have admin privileges');
+        setError("You do not have admin privileges");
         setLoading(false);
         return;
       }
-      
+
+      console.log("Admin login successful, user:", user);
+      console.log("Token:", user.token);
+
       // Store user data in localStorage
-      localStorage.setItem('adminToken', user.token);
-      localStorage.setItem('adminUser', JSON.stringify(user));
-      localStorage.setItem('isAdminAuthenticated', 'true');
-      
+      localStorage.setItem("adminToken", user.token);
+      localStorage.setItem("adminUser", JSON.stringify(user));
+      localStorage.setItem("isAdminAuthenticated", "true");
+
       // Set axios default header for future requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-      
-      // Call the parent component's authentication function
-    setAuthenticated(user.token, user);
-      
+      axios.defaults.headers.common["Authorization"] = `Bearer ${user.token}`;
+
+      // Pass token and user to parent component
+      setAuthenticated(user.token, user);
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
-      console.error('Login error:', err);
+      setError(
+        err.response?.data?.message || "Login failed. Please try again."
+      );
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
@@ -51,9 +56,9 @@ const AdminLogin = ({ setAuthenticated }) => {
     <div className="auth-container">
       <div className="auth-card glass-card">
         <h2 className="auth-title">Admin Login</h2>
-        
+
         {error && <div className="alert alert-danger">{error}</div>}
-        
+
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="emailOrUsername">Email or Username</label>
@@ -66,7 +71,7 @@ const AdminLogin = ({ setAuthenticated }) => {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
@@ -78,25 +83,28 @@ const AdminLogin = ({ setAuthenticated }) => {
               required
             />
           </div>
-          
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            style={{ width: '100%' }}
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: "100%" }}
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-        
+
         <div className="auth-footer">
-          <div style={{ marginBottom: '10px' }}>
+          <div style={{ marginBottom: "10px" }}>
             <Link to="/login" className="auth-link">
               <i className="fas fa-arrow-left"></i> Back to User Login
             </Link>
           </div>
           <div>
-            Don't have an account? <Link to="/admin/signup" className="auth-link">Sign up</Link>
+            Don't have an account?{" "}
+            <Link to="/admin/signup" className="auth-link">
+              Sign up
+            </Link>
           </div>
         </div>
       </div>
