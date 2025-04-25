@@ -46,11 +46,16 @@ function App() {
       const userToken = localStorage.getItem("token");
       const adminToken = localStorage.getItem("adminToken");
 
+      console.log("Checking auth status:");
+      console.log("User token exists:", !!userToken);
+      console.log("Admin token exists:", !!adminToken);
       setLoading(true);
 
       try {
         if (userToken) {
-                axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+          axios.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${userToken}`;
 
           const response = await axios.get("/api/auth/me", {
             headers: { Authorization: `Bearer ${userToken}` },
@@ -64,18 +69,32 @@ function App() {
             throw new Error(response.data.message || "Authentication failed");
           }
         } else if (adminToken) {
-                axios.defaults.headers.common[
-                  "Authorization"
-                ] = `Bearer ${adminToken}`;
+          console.log("Verifying admin token...");
+
+          axios.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${adminToken}`;
 
           const response = await axios.get("/api/auth/me", {
             headers: { Authorization: `Bearer ${adminToken}` },
           });
+          console.log("Admin auth response:", response.data);
+          console.log("Is user admin?", response.data.user?.isAdmin);
 
           if (response.data.success && response.data.user?.isAdmin) {
+            console.log("Admin authentication successful");
+
             setIsAdminAuthenticated(true);
             setIsAuthenticated(false);
+            localStorage.setItem(
+              "adminUser",
+              JSON.stringify(response.data.user)
+            );
           } else {
+            console.log(
+              "Admin check failed - user is not admin or success is false"
+            );
+
             throw new Error("Admin authentication failed");
           }
         }
@@ -84,9 +103,9 @@ function App() {
         localStorage.removeItem("token");
         localStorage.removeItem("adminToken");
         localStorage.removeItem("user");
-         localStorage.removeItem("adminUser");
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("isAdminAuthenticated");
+        localStorage.removeItem("adminUser");
+        localStorage.removeItem("isAuthenticated");
+        localStorage.removeItem("isAdminAuthenticated");
         delete axios.defaults.headers.common["Authorization"];
         setIsAuthenticated(false);
         setIsAdminAuthenticated(false);
@@ -116,19 +135,32 @@ function App() {
     setIsAdminAuthenticated(false);
   };
 
+  // In App.js
   const handleAdminLoginSuccess = (token, userData) => {
-    // Token and user data are stored in the AdminLogin component directly
+    console.log("Handling admin login success");
+    console.log("Admin token:", token);
+    console.log("Admin user data:", userData);
 
+    // Make sure token exists
+    if (!token) {
+      console.error("No token received in handleAdminLoginSuccess");
+      return;
+    }
+
+    // Store token and user data
     localStorage.setItem("adminToken", token);
     localStorage.setItem("adminUser", JSON.stringify(userData));
     localStorage.setItem("isAdminAuthenticated", "true");
 
+    // Remove user authentication data
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("isAuthenticated");
 
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    // Set authorization header
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
+    // Update state
     setIsAdminAuthenticated(true);
     setIsAuthenticated(false);
   };
@@ -205,8 +237,10 @@ function App() {
           )
         }
       />
-      <Route path="/auth/success" element={<AuthSuccess onLoginSuccess={handleLoginSuccess} />} />
-
+      <Route
+        path="/auth/success"
+        element={<AuthSuccess onLoginSuccess={handleLoginSuccess} />}
+      />
 
       <Route
         path="/signup"
