@@ -22,40 +22,30 @@ function AdminDashboard({ onLogout }) {
 
   useEffect(() => {
     const fetchAdminData = async () => {
-  try {
-    const token = localStorage.getItem("adminToken");
-    console.log("Admin token found:", !!token);
-    
-    if (!token) {
-      console.log("No admin token found, logging out");
-      onLogout();
-      return;
-    }
+      try {
+        const token = localStorage.getItem("adminToken");
 
-    // Set auth header
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    console.log("Auth header set for admin");
+        if (!token) {
+          onLogout();
+          return;
+        }
 
-    // Verify admin status and get user data
-    console.log("Attempting to fetch admin data from /api/auth/me");
-    const response = await axios.get("/api/auth/me");
-    console.log("Response received:", response.data);
+        const response = await axios.get("/api/auth/me");
 
-    if (!response.data.user?.isAdmin) {
-      console.error("Account is not an admin:", response.data.user);
-      onLogout();
-      return;
-    }
+        if (!response.data.success || !response.data.user?.isAdmin) {
+          console.error("Admin check failed:", response.data);
+          onLogout();
+          return;
+        }
 
-    console.log("Admin verification successful");
-    setAdminUser(response.data.user);
-  } catch (error) {
-    console.error("Admin verification failed:", error.response || error);
-    onLogout();
-  } finally {
-    setLoading(false);
-  }
-};
+        setAdminUser(response.data.user);
+      } catch (error) {
+        console.error("Admin verification failed:", error);
+        onLogout();
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchAdminData();
   }, [onLogout]);
