@@ -37,7 +37,7 @@ const AdminLogin = ({ setAuthenticated }) => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
       
       // Call the parent component's authentication function
-      setAuthenticated();
+    setAuthenticated(user.token, user);
       
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
