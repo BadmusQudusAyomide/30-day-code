@@ -1,50 +1,80 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import robotImage from '../assets/images/2.jpg';
 
 const Hero = () => {
+  const robotRef = useRef(null);
+
   useEffect(() => {
-    const createRobotAnimation = () => {
-      const robotContainer = document.getElementById("robot-animation");
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("animate-in");
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-      if (robotContainer) {
-        robotContainer.innerHTML = "";
+    if (robotRef.current) {
+      observer.observe(robotRef.current);
+    }
 
-        const robot = document.createElement("div");
-        robot.style.width = "100%";
-        robot.style.height = "100%";
-        robot.style.background =
-          "url(/api/placeholder/800/300) center/contain no-repeat";
-        robot.style.position = "relative";
-
-        robotContainer.appendChild(robot);
-      }
-    };
-
-    createRobotAnimation();
-
-    // Cleanup function
     return () => {
-      const robotContainer = document.getElementById("robot-animation");
-      if (robotContainer) {
-        robotContainer.innerHTML = "";
+      if (robotRef.current) {
+        observer.unobserve(robotRef.current);
       }
     };
   }, []);
 
   return (
     <section className="hero">
-      <h1>30 Days of Code Challenge</h1>
-      <h2>With VickyJay</h2>
-      <p>
-        The "30 Days of Code with VickyJay" challenge is an engaging and
-        intensive programming contest designed to foster continuous learning and
-        project development.
-      </p>
-      <a href="login.html" className="btn btn-primary">
-        Join the Challenge
-      </a>
+      <div className="container hero-container">
+        <div className="hero-content">
+          <h1 className="hero-title">
+            <span className="gradient-text">30 Days</span> of Code Challenge
+          </h1>
+          <h2 className="hero-subtitle">With VickyJay</h2>
+          <p className="hero-description">
+            An engaging and intensive programming journey designed to foster
+            continuous learning and project development through daily coding
+            challenges and community feedback.
+          </p>
+          <div className="hero-cta">
+            <Link to="/login?signup=true" className="btn btn-primary btn-large">
+              Join the Challenge
+              <ArrowRight size={20} />
+            </Link>
+          </div>
+        </div>
 
-      <div className="robot-illustration">
-        <div id="robot-animation"></div>
+        <div className="hero-visual" ref={robotRef}>
+          <div className="robot-container">
+            <div className="robot-glow"></div>
+            <img
+              src={robotImage}
+              alt="Robot Coding Illustration"
+              className="robot-image"
+            />
+            <div className="code-particles">
+              {Array(5)
+                .fill()
+                .map((_, i) => (
+                  <div
+                    key={i}
+                    className={`code-particle particle-${i + 1}`}
+                  >{`</>`}</div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="scroll-indicator">
+        <div className="mouse">
+          <div className="wheel"></div>
+        </div>
+        <div className="scroll-text">Scroll to explore</div>
       </div>
     </section>
   );

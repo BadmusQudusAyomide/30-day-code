@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 const Features = () => {
   const featuresList = [
@@ -6,50 +6,95 @@ const Features = () => {
       icon: "📊",
       title: "Challenge Overview",
       description:
-        "The challenge spans thirty days, during which participants are expected to create and submit a diverse range of projects. These projects can include websites, web pages, coding tools, or any other relevant coding endeavor. The primary goal is to encourage consistent coding practice and innovation.",
+        "Create and submit diverse projects over thirty days, from websites to coding tools. Foster consistent coding practice and innovation through daily challenges.",
     },
     {
       icon: "📝",
       title: "Submission Platform",
       description:
-        "Participants will use the dedicated submission platform to upload their daily projects. This platform serves as a centralized hub for showcasing participants' work, allowing for easy navigation and exploration. Each submission will be tagged with relevant information, such as project type, coding language, and date.",
+        "Use our dedicated platform to showcase your work with project details, coding language, and more. A centralized hub for all participants' creations.",
     },
     {
       icon: "💬",
-      title: "Participant Interaction",
+      title: "Community Interaction",
       description:
-        "The challenge promotes a sense of community by enabling participants to view and rate each other's projects. This interaction enhances the learning experience, as participants can draw inspiration from their peers, exchange ideas, and celebrate achievements. The submission platform facilitates seamless communication among participants.",
+        "View and rate others' projects, exchange ideas, and celebrate achievements. Build connections with fellow coders throughout the challenge.",
     },
     {
       icon: "⭐",
       title: "Rating System",
       description:
-        "Admins, representing the organizing body of the challenge, will play a crucial role in evaluating and rating the submitted projects. The rating criteria include factors such as creativity, functionality, code quality, and adherence to the daily theme or challenge prompt. Admins will provide constructive feedback to participants, fostering a learning environment.",
+        "Receive constructive feedback from challenge admins based on creativity, functionality, code quality, and theme adherence.",
     },
     {
       icon: "🎨",
-      title: "Daily Theme",
+      title: "Daily Themes",
       description:
-        "To add an extra layer of creativity and structure, each day of the challenge will feature a thematic prompt or focus. This can range from specific coding techniques to broader project themes. Participants are encouraged to incorporate these themes into their daily projects, adding an element of diversity to the overall challenge.",
+        "Each day features a unique thematic prompt to inspire your creativity. Incorporate these themes into your projects for an extra challenge.",
     },
     {
       icon: "⚡",
-      title: "Documentation Submission",
+      title: "Documentation",
       description:
-        "In addition to the daily project submissions, participants are required to submit a concise documentation file accompanying each project. This documentation should provide insights into the project's purpose, key features, and any notable challenges or learning experiences encountered during development.",
+        "Submit concise documentation with each project, sharing insights into your development process, key features, and learning experiences.",
     },
   ];
 
+  const sectionRef = useRef(null);
+  const cardsRef = useRef([]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in-view");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (cardsRef.current) {
+      cardsRef.current.forEach((card) => {
+        if (card) observer.observe(card);
+      });
+    }
+
+    return () => {
+      if (cardsRef.current) {
+        cardsRef.current.forEach((card) => {
+          if (card) observer.unobserve(card);
+        });
+      }
+    };
+  }, []);
+
   return (
-    <section className="features" id="features">
-      {featuresList.map((feature, index) => (
-        <div className="feature-card" key={index}>
-          <h3>
-            <span>{feature.icon}</span> {feature.title}
-          </h3>
-          <p>{feature.description}</p>
+    <section
+      className="features section-padding"
+      id="features"
+      ref={sectionRef}
+    >
+      <div className="container">
+        <h2 className="section-title">
+          Challenge <span className="gradient-text">Features</span>
+        </h2>
+        <div className="features-grid">
+          {featuresList.map((feature, index) => (
+            <div
+              className="feature-card"
+              key={index}
+              ref={(el) => (cardsRef.current[index] = el)}
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="feature-icon">{feature.icon}</div>
+              <h3 className="feature-title">{feature.title}</h3>
+              <p className="feature-description">{feature.description}</p>
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
     </section>
   );
 };

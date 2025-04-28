@@ -1,47 +1,80 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
 const BackgroundAnimation = () => {
+  const containerRef = useRef(null);
+
   useEffect(() => {
-    const createCircles = (count) => {
-      const animationContainer = document.getElementById("animation-container");
+    const container = containerRef.current;
+    if (!container) return;
 
-      // Clear any existing circles
-      if (animationContainer) {
-        animationContainer.innerHTML = "";
+    // Clear previous orbs
+    container.innerHTML = "";
 
-        for (let i = 0; i < count; i++) {
-          const circle = document.createElement("div");
-          circle.classList.add("circle");
+    const createOrbs = () => {
+      // Create different layers of orbs for depth
+      const orbCounts = [8, 6, 4]; // Different counts for each layer
+      const layers = 3;
 
-          // Random size between 50px and 300px
-          const size = Math.random() * 250 + 50;
-          circle.style.width = `${size}px`;
-          circle.style.height = `${size}px`;
+      for (let layer = 0; layer < layers; layer++) {
+        for (let i = 0; i < orbCounts[layer]; i++) {
+          const orb = document.createElement("div");
 
-          // Random position
-          circle.style.left = `${Math.random() * 100}%`;
-          circle.style.top = `${Math.random() * 100}%`;
+          // Layer-specific styling
+          const size = Math.random() * (250 - layer * 50) + 50;
+          const depth = layer + 1;
+          const speed = 15 + layer * 5; // Slower for background, faster for foreground
 
-          // Random animation delay
-          circle.style.animationDelay = `${Math.random() * 5}s`;
+          orb.classList.add("orb");
+          orb.classList.add(`orb-layer-${layer}`);
 
-          animationContainer.appendChild(circle);
+          // Randomize orb properties
+          orb.style.width = `${size}px`;
+          orb.style.height = `${size}px`;
+          orb.style.left = `${Math.random() * 100}%`;
+          orb.style.top = `${Math.random() * 100}%`;
+          orb.style.animationDuration = `${speed}s`;
+          orb.style.animationDelay = `${Math.random() * 5}s`;
+          orb.style.opacity = `${0.5 - layer * 0.15}`;
+          orb.style.zIndex = `-${depth}`;
+
+          // Randomize orb colors slightly for each layer
+          const hueOffset = layer * 20;
+          const gradientStart =
+            layer % 2 === 0
+              ? `hsla(${260 + hueOffset}, 100%, 60%, 0.2)`
+              : `hsla(${320 + hueOffset}, 100%, 60%, 0.2)`;
+          const gradientEnd =
+            layer % 2 === 0
+              ? `hsla(${320 - hueOffset}, 100%, 60%, 0.2)`
+              : `hsla(${260 - hueOffset}, 100%, 60%, 0.2)`;
+
+          orb.style.background = `radial-gradient(circle, ${gradientStart}, ${gradientEnd})`;
+
+          // Add unique animation path for each orb
+          const animationPath = Math.floor(Math.random() * 4);
+          orb.classList.add(`path-${animationPath}`);
+
+          container.appendChild(orb);
         }
       }
     };
 
-    createCircles(8);
+    createOrbs();
 
-    // Cleanup function
+    // Recreate orbs on window resize for better distribution
+    const handleResize = () => {
+      container.innerHTML = "";
+      createOrbs();
+    };
+
+    window.addEventListener("resize", handleResize);
+
     return () => {
-      const animationContainer = document.getElementById("animation-container");
-      if (animationContainer) {
-        animationContainer.innerHTML = "";
-      }
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  return <div className="background-animation" id="animation-container"></div>;
+  return <div className="background-animation" ref={containerRef}></div>;
 };
 
 export default BackgroundAnimation;
