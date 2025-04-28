@@ -1,85 +1,87 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
-import './Auth.css';
-import './AuthSuccess.jsx';
-
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
+import "./Auth.css";
+import "./AuthSuccess.jsx";
 
 const Login = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
-    emailOrUsername: '',
-    password: ''
+    emailOrUsername: "",
+    password: "",
   });
   const [errors, setErrors] = useState({
-    emailOrUsername: '',
-    password: ''
+    emailOrUsername: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState('');
+  const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
 
   const validateField = (name, value) => {
-    let error = '';
-    
+    let error = "";
+
     switch (name) {
-      case 'emailOrUsername':
-        if (!value.trim()) error = 'Email or username is required';
+      case "emailOrUsername":
+        if (!value.trim()) error = "Email or username is required";
         break;
-        
-      case 'password':
-        if (!value) error = 'Password is required';
+
+      case "password":
+        if (!value) error = "Password is required";
         break;
-        
+
       default:
         break;
     }
-    
+
     return error;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+      setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
     }
   };
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
-    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
-    
-    Object.keys(formData).forEach(key => {
+
+    Object.keys(formData).forEach((key) => {
       const error = validateField(key, formData[key]);
       newErrors[key] = error;
       if (error) isValid = false;
     });
-    
+
     setErrors(newErrors);
     return isValid;
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setApiError('');
-    
+    setApiError("");
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://my-backend-pkhd.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://my-backend-pkhd.onrender.com/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await response.json();
 
@@ -91,7 +93,7 @@ const Login = ({ onLoginSuccess }) => {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       onLoginSuccess();
-     
+
       console.log("Login successful, token stored:", data.user.token);
       localStorage.setItem("token", data.user.token);
       console.log(
@@ -174,22 +176,25 @@ const Login = ({ onLoginSuccess }) => {
             GitHub
           </button>
 
-<button
-  type="button"
-  className="oauth-button google"
-  onClick={() => {
-    // Always redirect to dashboard after Google auth
-    const redirectPath = '/dashboard';
-    
-    // Clear any existing tokens
-    localStorage.removeItem('token');
-    
-    // Make sure this URL matches your backend route
-    window.location.href = `${process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com"}/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
-  }}
->
-  <FaGoogle /> Continue with Google
-</button>
+          <button
+            type="button"
+            className="oauth-button google"
+            onClick={() => {
+              // Always redirect to dashboard after Google auth
+              const redirectPath = "/dashboard";
+
+              // Clear any existing tokens
+              localStorage.removeItem("token");
+
+              // Make sure this URL matches your backend route
+              window.location.href = `${
+                process.env.REACT_APP_API_URL ||
+                "https://my-backend-pkhd.onrender.com"
+              }/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
+            }}
+          >
+            <FaGoogle /> Continue with Google
+          </button>
         </div>
 
         <p className="switch-auth">

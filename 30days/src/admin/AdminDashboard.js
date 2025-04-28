@@ -13,6 +13,10 @@ import Settings from "./Settings";
 import AdminProjectList from "./AdminProjectList";
 import ProjectRating from "./ProjectRating";
 import "./styles.css";
+import Version from "../admin/Version";
+import "./Leaderboard.css";
+
+
 
 function AdminDashboard({ onLogout }) {
   const location = useLocation();
@@ -119,7 +123,11 @@ function AdminDashboard({ onLogout }) {
               path="users/:userId/projects"
               element={<AdminProjectList />}
             />
-            <Route path="users/:userId/projects/:projectId/rate" element={<ProjectRating />} />
+            <Route
+              path="users/:userId/projects/:projectId/rate"
+              element={<ProjectRating />}
+            />
+            <Route path="version" element={<Version />} />
           </Routes>
         </div>
       </div>

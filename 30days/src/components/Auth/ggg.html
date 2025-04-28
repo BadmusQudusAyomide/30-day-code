@@ -1,1193 +1,1108 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
-import './Auth.css';
-import './AuthSuccess.jsx';
-
-
-const Login = ({ onLoginSuccess }) => {
-  const [formData, setFormData] = useState({
-    emailOrUsername: '',
-    password: ''
-  });
-  const [errors, setErrors] = useState({
-    emailOrUsername: '',
-    password: ''
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState('');
-  const navigate = useNavigate();
-
-  const validateField = (name, value) => {
-    let error = '';
-    
-    switch (name) {
-      case 'emailOrUsername':
-        if (!value.trim()) error = 'Email or username is required';
-        break;
-        
-      case 'password':
-        if (!value) error = 'Password is required';
-        break;
-        
-      default:
-        break;
-    }
-    
-    return error;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
-    }
-  };
-
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-    
-    Object.keys(formData).forEach(key => {
-      const error = validateField(key, formData[key]);
-      newErrors[key] = error;
-      if (error) isValid = false;
-    });
-    
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setApiError('');
-    
-    if (!validateForm()) return;
-    
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      localStorage.setItem('token', data.user.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      onLoginSuccess();
-      navigate('/dashboard');
-    } catch (err) {
-      setApiError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="auth-container">
-      <form className="auth-box" onSubmit={handleLogin} noValidate>
-        <h2>Welcome Back</h2>
-        <p className="subtitle">Login to continue your coding challenge</p>
-
-        {apiError && <div className="error-message">{apiError}</div>}
-
-        <div className="form-group">
-          <label>Email or Username</label>
-          <input
-            type="text"
-            name="emailOrUsername"
-            placeholder="name@example.com or username"
-            value={formData.emailOrUsername}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-            className={errors.emailOrUsername ? "error" : ""}
-          />
-          {errors.emailOrUsername && (
-            <span className="error-text">{errors.emailOrUsername}</span>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label>Password</label>
-          <div className="password-input">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              required
-              className={errors.password ? "error" : ""}
-            />
-            <button
-              type="button"
-              className="toggle-password"
-              onClick={() => setShowPassword((prev) => !prev)}
-              aria-label="Toggle password visibility"
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-          </div>
-          {errors.password && (
-            <span className="error-text">{errors.password}</span>
-          )}
-        </div>
-
-        <div className="forgot-password">
-          <Link to="/forgot">Forgot password?</Link>
-        </div>
-
-        <button type="submit" className="login-btn" disabled={isLoading}>
-          {isLoading ? "Logging in..." : "Login"}
-        </button>
-
-        <div className="divider">or continue with</div>
-
-        <div className="oauth-buttons">
-          <button type="button" className="oauth-button github">
-            <FaGithub />
-            GitHub
-          </button>
-
-<button
-  type="button"
-  className="oauth-button google"
-  onClick={() => {
-    // Always redirect to dashboard after Google auth
-    const redirectPath = '/dashboard';
-    
-    // Clear any existing tokens
-    localStorage.removeItem('token');
-    
-    // Make sure this URL matches your backend route
-    window.location.href = `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
-  }}
->
-  <FaGoogle /> Continue with Google
-</button>
-        </div>
-
-        <p className="switch-auth">
-          Don't have an account? <Link to="/signup">Sign Up</Link>
-        </p>
-        <p className="admin-login">
-          Admin? <Link to="/admin">Login here</Link>
-        </p>
-      </form>
-    </div>
-  );
-};
-
-
-export default Login;
-
-
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { FaGithub, FaGoogle } from "react-icons/fa";
-import "./Auth.css";
-
-const Signup = ({ onLoginSuccess }) => {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [errors, setErrors] = useState({
-    fullName: "",
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState("");
-  const navigate = useNavigate();
-
-  const validateField = (name, value) => {
-    let error = "";
-
-    switch (name) {
-      case "fullName":
-        if (!value.trim()) error = "Full name is required";
-        else if (value.length < 2) error = "Name too short";
-        else if (!/^[a-zA-Z\s'-]+$/.test(value)) error = "Invalid characters";
-        break;
-
-      case "username":
-        if (value && !/^[a-zA-Z0-9_]+$/.test(value)) {
-          error = "Only letters, numbers and underscores";
-        }
-        break;
-
-      case "email":
-        if (!value) error = "Email is required";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          error = "Invalid email format";
-        }
-        break;
-
-      case "password":
-        if (!value) error = "Password is required";
-        else if (value.length < 8) error = "Minimum 8 characters";
-        else if (!/[A-Z]/.test(value)) error = "Need at least 1 uppercase";
-        else if (!/[a-z]/.test(value)) error = "Need at least 1 lowercase";
-        else if (!/[0-9]/.test(value)) error = "Need at least 1 number";
-        else if (!/[^A-Za-z0-9]/.test(value)) error = "Need at least 1 symbol";
-        break;
-
-      case "confirmPassword":
-        if (value !== formData.password) error = "Passwords must match";
-        break;
-
-      default:
-        break;
-    }
-
-    return error;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-
-    // Validate on change only after first blur
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
-    }
-  };
-
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    Object.keys(formData).forEach((key) => {
-      if (key !== "username") {
-        // username is optional
-        const error = validateField(key, formData[key]);
-        newErrors[key] = error;
-        if (error) isValid = false;
-      }
-    });
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setApiError("");
-
-    if (!validateForm()) return;
-
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          username: formData.username || undefined,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Signup failed");
-      }
-
-      localStorage.setItem("token", data.user.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      onLoginSuccess();
-      setFormData({
-        fullName: "",
-        username: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
-
-      navigate("/dashboard");
-    } catch (err) {
-      setApiError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="auth-container">
-      <form className="auth-box" onSubmit={handleSubmit} noValidate>
-        <h2>Create Account</h2>
-        <p className="subtitle">Join our coding community</p>
-
-        {apiError && <div className="error-message">{apiError}</div>}
-
-        <div className="form-group">
-          <label>Full Name *</label>
-          <input
-            type="text"
-            name="fullName"
-            placeholder="John Doe"
-            value={formData.fullName}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-            className={errors.fullName ? "error" : ""}
-          />
-          {errors.fullName && (
-            <span className="error-text">{errors.fullName}</span>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label>Username (optional)</label>
-          <input
-            type="text"
-            name="username"
-            placeholder="coder123"
-            value={formData.username}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            className={errors.username ? "error" : ""}
-          />
-          {errors.username && (
-            <span className="error-text">{errors.username}</span>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label>Email *</label>
-          <input
-            type="email"
-            name="email"
-            placeholder="name@example.com"
-            value={formData.email}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-            className={errors.email ? "error" : ""}
-          />
-          {errors.email && <span className="error-text">{errors.email}</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Password *</label>
-          <input
-            type="password"
-            name="password"
-            placeholder="••••••••"
-            value={formData.password}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-            className={errors.password ? "error" : ""}
-          />
-          {errors.password && (
-            <div className="password-hints">
-              <span className={formData.password.length >= 8 ? "valid" : ""}>
-                • 8+ characters
-              </span>
-              <span className={/[A-Z]/.test(formData.password) ? "valid" : ""}>
-                • Uppercase
-              </span>
-              <span className={/[a-z]/.test(formData.password) ? "valid" : ""}>
-                • Lowercase
-              </span>
-              <span className={/[0-9]/.test(formData.password) ? "valid" : ""}>
-                • Number
-              </span>
-              <span
-                className={
-                  /[^A-Za-z0-9]/.test(formData.password) ? "valid" : ""
-                }
-              >
-                • Symbol
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label>Confirm Password *</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="••••••••"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-            className={errors.confirmPassword ? "error" : ""}
-          />
-          {errors.confirmPassword && (
-            <span className="error-text">{errors.confirmPassword}</span>
-          )}
-        </div>
-
-        <button type="submit" className="login-btn" disabled={isLoading}>
-          {isLoading ? "Creating account..." : "Sign Up"}
-        </button>
-
-        <div className="divider">or continue with</div>
-
-        <div className="oauth-buttons">
-          <button type="button" className="oauth-button github">
-            <FaGithub />
-            GitHub
-          </button>
-          <button
-            type="button"
-            className="oauth-button google"
-            onClick={() => {
-              // Always redirect to dashboard after Google auth
-              const redirectPath = "/dashboard";
-
-              // Clear any existing tokens
-              localStorage.removeItem("token");
-
-              // Make sure this URL matches your backend route
-              window.location.href = `${
-                process.env.REACT_APP_API_URL || "http://localhost:5000"
-              }/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
-            }}
-          >
-            <FaGoogle /> Continue with Google
-          </button>
-        </div>
-        <p className="switch-auth">
-          Already have an account? <Link to="/login">Log In</Link>
-        </p>
-      </form>
-    </div>
-  );
-};
-
-export default Signup;
-
+// Updated Leaderboard.jsx with us- prefix styling
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; // Add this import
-import "./Dashboard.css";
+import "./Leaderboard.css";
+import {
+Users,
+Crown,
+Award,
+Flame,
+ChevronUp,
+ChevronDown,
+ExternalLink,
+Calendar,
+Trophy,
+Code,
+} from "lucide-react";
 
-const Dashboard = ({ onLogout }) => {
-  const navigate = useNavigate();
-  const [userData, setUserData] = useState({
-    name: "",
-    projectsSubmitted: 0,
-    currentDay: 0,
-    totalDays: 30,
-    rank: 0,
-    totalParticipants: 0,
-    avatarColor: "#6366f1",
-  });
-  // Add these state declarations
-  const [darkMode, setDarkMode] = useState(true);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
-        }
-
-        const response = await axios.get("http://localhost:5000/api/auth/me", {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
+const Leaderboard = () => {
+const [leaderboardData, setLeaderboardData] = useState([]);
+const [sortConfig, setSortConfig] = useState({
+key: "totalScore",
+direction: "descending",
 });
+const [expanded, setExpanded] = useState(null);
+const navigate = useNavigate();
+const [daysLeft, setDaysLeft] = useState(11); // 11 days left (19/30)
 
-const data = response.data;
+useEffect(() => {
+// Simulating data fetch
+const mockData = [
+{
+id: 1,
+name: "Alex Johnson",
+avatar:
+"https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
+projectsSubmitted: 24,
+projectQuality: 92,
+streak: 15,
+totalScore: 131,
+projects: [
+{
+id: 101,
+name: "Task Manager App",
+day: 12,
+liveLink: "https://example.com/task-app",
+},
+{
+id: 102,
+name: "Weather Dashboard",
+day: 15,
+liveLink: "https://example.com/weather",
+},
+{
+id: 103,
+name: "Portfolio Website",
+day: 19,
+liveLink: "https://example.com/portfolio",
+},
+],
+},
+{
+id: 2,
+name: "Sarah Miller",
+avatar:
+"https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744304003/IMG-20241127-WA0097_3_fjwtbx.jpg",
+projectsSubmitted: 19,
+projectQuality: 97,
+streak: 21,
+totalScore: 137,
+projects: [
+{
+id: 104,
+name: "Recipe Finder",
+day: 8,
+liveLink: "https://example.com/recipe",
+},
+{
+id: 105,
+name: "Movie Database",
+day: 14,
+liveLink: "https://example.com/movies",
+},
+],
+},
+{
+id: 3,
+name: "David Chen",
+avatar:
+"https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
+projectsSubmitted: 31,
+projectQuality: 85,
+streak: 7,
+totalScore: 123,
+projects: [
+{
+id: 106,
+name: "Chat Application",
+day: 5,
+liveLink: "https://example.com/chat",
+},
+{
+id: 107,
+name: "E-commerce Store",
+day: 10,
+liveLink: "https://example.com/store",
+},
+{
+id: 108,
+name: "Blog Platform",
+day: 21,
+liveLink: "https://example.com/blog",
+},
+],
+},
+{
+id: 4,
+name: "Maria Rodriguez",
+avatar:
+"https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
+projectsSubmitted: 26,
+projectQuality: 91,
+streak: 19,
+totalScore: 136,
+projects: [
+{
+id: 109,
+name: "Quiz App",
+day: 7,
+liveLink: "https://example.com/quiz",
+},
+{
+id: 110,
+name: "Fitness Tracker",
+day: 16,
+liveLink: "https://example.com/fitness",
+},
+],
+},
+{
+id: 5,
+name: "James Wilson",
+avatar:
+"https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744304003/IMG-20241127-WA0097_3_fjwtbx.jpg",
+projectsSubmitted: 17,
+projectQuality: 88,
+streak: 12,
+totalScore: 117,
+projects: [
+{
+id: 111,
+name: "Budget Calculator",
+day: 9,
+liveLink: "https://example.com/budget",
+},
+{
+id: 112,
+name: "News Aggregator",
+day: 18,
+liveLink: "https://example.com/news",
+},
+],
+},
+{
+id: 6,
+name: "Emma Thompson",
+avatar:
+"https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
+projectsSubmitted: 23,
+projectQuality: 94,
+streak: 25,
+totalScore: 142,
+projects: [
+{
+id: 113,
+name: "Social Media Dashboard",
+day: 6,
+liveLink: "https://example.com/social",
+},
+{
+id: 114,
+name: "Music Player",
+day: 11,
+liveLink: "https://example.com/music",
+},
+{
+id: 115,
+name: "Note Taking App",
+day: 20,
+liveLink: "https://example.com/notes",
+},
+],
+},
+{
+id: 7,
+name: "Michael Davis",
+avatar:
+"https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744303867/ChatGPT_Image_Apr_2_2025_05_56_53_AM_fnlzvs.png",
+projectsSubmitted: 21,
+projectQuality: 87,
+streak: 14,
+totalScore: 122,
+projects: [
+{
+id: 116,
+name: "Calendar App",
+day: 13,
+liveLink: "https://example.com/calendar",
+},
+{
+id: 117,
+name: "zTodo List",
+day: 17,
+liveLink: "https://example.com/todo",
+},
+],
+},
+{
+id: 42, // Your position
+name: "You",
+avatar:
+"https://res.cloudinary.com/dx7ybhsrm/image/upload/v1744304003/IMG-20241127-WA0097_3_fjwtbx.jpg",
+projectsSubmitted: 18,
+projectQuality: 89,
+streak: 19,
+totalScore: 118,
+projects: [
+{
+id: 118,
+name: "Password Generator",
+day: 4,
+liveLink: "https://example.com/password",
+},
+{
+id: 119,
+name: "Drawing App",
+day: 22,
+liveLink: "https://example.com/draw",
+},
+],
+},
+];
 
-        const avatarColor = generateColorFromName(
-          data.user.username || data.user.email
-        );
+// Sort the data based on total score by default
+const sortedData = [...mockData].sort(
+(a, b) => b.totalScore - a.totalScore
+);
+setLeaderboardData(sortedData);
+}, []);
 
-        setUserData({
-          name:
-            data.user.fullName ||
-            data.user.username ||
-            data.user.email.split("@")[0],
-          projectsSubmitted: data.stats?.projectsSubmitted || 0,
-          currentDay: data.stats?.currentDay || 1,
-          totalDays: 30,
-          rank: data.stats?.rank || 0,
-          totalParticipants: data.stats?.totalParticipants || 1000,
-          avatarColor,
-        });
-      } catch (err) {
-        console.error("Dashboard error:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+const requestSort = (key) => {
+let direction = "ascending";
+if (sortConfig.key === key && sortConfig.direction === "ascending") {
+direction = "descending";
+}
+setSortConfig({ key, direction });
 
-    fetchUserData();
-  }, [navigate]);
-
-  const generateColorFromName = (name) => {
-    if (!name) return "#6366f1";
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return `hsl(${hash % 360}, 70%, 60%)`;
-  };
-
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
-
-  const openLogoutModal = () => {
-    setShowLogoutModal(true);
-  };
-
-  const handleConfirmLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    if (onLogout) {
-      onLogout();
-    } else {
-      navigate("/login");
-    }
-    setShowLogoutModal(false);
-  };
-
-  const handleCancelLogout = () => {
-    setShowLogoutModal(false);
-  };
-
-  const calculateProgressPercentage = () => {
-    return (userData.currentDay / userData.totalDays) * 100;
-  };
-
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev);
-  };
-
-  const adjustColor = (color, amount) => {
-    // Simple color adjustment for gradient
-    let col = color.startsWith("#") ? color.slice(1) : color;
-    if (col.startsWith("hsl")) {
-      // Handle HSL color format
-      const values = col.match(/\d+/g);
-      if (values && values.length >= 3) {
-        const h = parseInt(values[0]);
-        const s = parseInt(values[1]);
-        const l = Math.min(100, parseInt(values[2]) + amount);
-        return `hsl(${h}, ${s}%, ${l}%)`;
-      }
-    }
-    return color;
-  };
-
-  if (loading) {
-    return (
-      <div className={`dashboard-loading ${darkMode ? "dark" : "light"}`}>
-        <div className="loading-spinner"></div>
-        <p>Loading your dashboard...</p>
-      </div>
-    );
+setLeaderboardData((prevData) => {
+return [...prevData].sort((a, b) => {
+if (a[key] < b[key]) { return direction==="ascending" ? -1 : 1; } if (a[key]> b[key]) {
+  return direction === "ascending" ? 1 : -1;
   }
+  return 0;
+  });
+  });
+  };
 
-  if (error) {
-    return (
-      <div className={`dashboard-error ${darkMode ? "dark" : "light"}`}>
-        <div className="error-icon">⚠️</div>
-        <h3>Error Loading Dashboard</h3>
-        <p>{error}</p>
-        <button
-          className="retry-button"
-          onClick={() => window.location.reload()}
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
+  const toggleExpand = (id) => {
+  setExpanded(expanded === id ? null : id);
+  };
+
+  const viewProject = (projectId) => {
+  navigate(`/project/${projectId}`);
+  };
+
+  const getScoreColor = (score) => {
+  if (score >= 90) return "us-text-success";
+  if (score >= 75) return "us-text-info";
+  if (score >= 60) return "us-text-warning";
+  return "us-text-danger";
+  };
+
+  const getRankIcon = (index) => {
+  if (index === 0) return
+  <Crown className="us-icon-gold" size={20} />;
+  if (index === 1) return
+  <Award className="us-icon-silver" size={20} />;
+  if (index === 2) return
+  <Award className="us-icon-bronze" size={20} />;
+  return <span className="us-font-bold us-text-rank">{index + 1}</span>;
+  };
 
   return (
-    <div className={`dashboard neo ${darkMode ? "dark" : "light"}`}>
-      <header className="dashboard-header">
-        <div className="brand">
-          <div className="logo" onClick={() => navigate("/")}>
-            <span className="code-text">Code</span>
-            <span className="days-text">&lt;30&gt;</span>
+  <div className="us-leaderboard-page">
+    {/* Challenge Header */}
+    <div className="us-challenge-header">
+      <div className="us-challenge-header-content">
+        <h1 className="us-title-main">Welcome to the 30 Days Challenge!</h1>
+        <p className="us-subtitle">
+          Keep going! You're making great progress.
+        </p>
+
+        <div className="us-challenge-progress">
+          <div className="us-progress-info">
+            <span className="us-progress-day">19 / 30</span>
+            <span className="us-progress-current">Day 19</span>
+            <span className="us-progress-percent">63% complete</span>
+          </div>
+          <div className="us-progress-bar-container">
+            <div className="us-progress-bar" style={{ width: "63%" }}></div>
           </div>
         </div>
-        <div className="header-controls">
-          <div className="dark-mode-toggle">
-            <input
-              type="checkbox"
-              id="darkmode-toggle"
-              checked={darkMode}
-              onChange={toggleDarkMode}
-            />
-            <label htmlFor="darkmode-toggle" className="toggle-label">
-              <span className="toggle-icon moon">🌙</span>
-              <span className="toggle-icon sun">☀️</span>
-            </label>
+
+        <div className="us-challenge-actions">
+          <button className="us-action-btn us-submit-btn">
+            Submit Project
+            <span className="us-action-desc">Upload today's challenge</span>
+          </button>
+          <button className="us-action-btn us-projects-btn">
+            My Projects
+            <span className="us-action-desc">18 submitted</span>
+          </button>
+          <button className="us-action-btn us-leaderboard-btn us-active">
+            Leaderboard
+            <span className="us-action-desc">Rank: #42 of 1204</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {/* Leaderboard Container */}
+    <div className="us-leaderboard-container">
+      <div className="us-leaderboard-header">
+        <h2 className="us-section-title">Challenge Leaderboard</h2>
+        <div className="us-leaderboard-stats">
+          <div className="us-stat-bubble">
+            <Trophy size={16} className="us-icon" />
+            <span>Top Performers</span>
           </div>
-          <div className="user-info">
-            <div className="user-name">{userData.name}</div>
-            <button
-              className="avatar-button"
-              onClick={() => handleNavigation("/profile")}
-              style={{ backgroundColor: userData.avatarColor }}
-              aria-label="View profile"
-              title="View and edit your profile"
+          <div className="us-stat-bubble">
+            <Users size={16} className="us-icon" />
+            <span>1204 Participants</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="us-leaderboard-controls">
+        <button className={`us-sort-btn ${ sortConfig.key==="totalScore" ? "us-active" : "" }`} onClick={()=>
+          requestSort("totalScore")}
+          >
+          Total Score
+          {sortConfig.key === "totalScore" &&
+          (sortConfig.direction === "ascending" ? (
+          <ChevronUp size={16} className="us-icon-sort" />
+          ) : (
+          <ChevronDown size={16} className="us-icon-sort" />
+          ))}
+        </button>
+        <button className={`us-sort-btn ${ sortConfig.key==="projectsSubmitted" ? "us-active" : "" }`} onClick={()=>
+          requestSort("projectsSubmitted")}
+          >
+          Projects
+          {sortConfig.key === "projectsSubmitted" &&
+          (sortConfig.direction === "ascending" ? (
+          <ChevronUp size={16} className="us-icon-sort" />
+          ) : (
+          <ChevronDown size={16} className="us-icon-sort" />
+          ))}
+        </button>
+        <button className={`us-sort-btn ${ sortConfig.key==="projectQuality" ? "us-active" : "" }`} onClick={()=>
+          requestSort("projectQuality")}
+          >
+          Quality
+          {sortConfig.key === "projectQuality" &&
+          (sortConfig.direction === "ascending" ? (
+          <ChevronUp size={16} className="us-icon-sort" />
+          ) : (
+          <ChevronDown size={16} className="us-icon-sort" />
+          ))}
+        </button>
+        <button className={`us-sort-btn ${ sortConfig.key==="streak" ? "us-active" : "" }`} onClick={()=>
+          requestSort("streak")}
+          >
+          Streak
+          {sortConfig.key === "streak" &&
+          (sortConfig.direction === "ascending" ? (
+          <ChevronUp size={16} className="us-icon-sort" />
+          ) : (
+          <ChevronDown size={16} className="us-icon-sort" />
+          ))}
+        </button>
+      </div>
+
+      <div className="us-leaderboard-list">
+        {leaderboardData.map((user, index) => (
+        <div key={user.id} className={`us-leaderboard-card ${ expanded===user.id ? "us-expanded" : "" } ${user.id===42
+          ? "us-current-user" : "" }`}>
+          <div className="us-leaderboard-main" onClick={()=> toggleExpand(user.id)}
             >
-              {userData.name.charAt(0).toUpperCase()}
-            </button>
+            <div className="us-rank-badge">{getRankIcon(index)}</div>
+            <div className="us-user-avatar">
+              <img src={user.avatar} alt={user.name} className="us-avatar-img" />
+              {user.id === 42 && (
+              <div className="us-user-you-badge">YOU</div>
+              )}
+            </div>
+            <div className="us-user-info">
+              <h3 className="us-user-name">{user.name}</h3>
+              <div className="us-score-info">
+                <span className={`us-total-score ${getScoreColor( user.totalScore )}`}>
+                  {user.totalScore} pts
+                </span>
+              </div>
+            </div>
+            <div className="us-quick-stats">
+              <div className="us-stat-item">
+                <span className="us-stat-value">
+                  {user.projectsSubmitted}
+                </span>
+                <span className="us-stat-label">Projects</span>
+              </div>
+              <div className="us-stat-item">
+                <span className={`us-stat-value ${getScoreColor( user.projectQuality )}`}>
+                  {user.projectQuality}
+                </span>
+                <span className="us-stat-label">Quality</span>
+              </div>
+              <div className="us-stat-item">
+                <span className="us-stat-value us-streak">
+                  {user.streak}{" "}
+                  <Flame size={14} className="us-streak-icon" />
+                </span>
+                <span className="us-stat-label">Streak</span>
+              </div>
+            </div>
+            <div className="us-expand-indicator">
+              {expanded === user.id ? (
+              <ChevronUp size={18} className="us-icon-chevron" />
+              ) : (
+              <ChevronDown size={18} className="us-icon-chevron" />
+              )}
+            </div>
           </div>
-        </div>
-      </header>
 
-      <main className="dashboard-content">
-        <div className="dashboard-header-section">
-          <h1 className="welcome">
-            Welcome back, {userData.name.split(" ")[0]}!
-          </h1>
-          <p className="welcome-subtitle">
-            {userData.projectsSubmitted > 0
-              ? `You've submitted ${userData.projectsSubmitted} projects so far!`
-              : "Ready to start your coding challenge?"}
-          </p>
-        </div>
+          {expanded === user.id && (
+          <div className="us-extended-details">
+            <div className="us-detailed-stats">
+              <div className="us-stat-row">
+                <span className="us-stat-name">Projects</span>
+                <div className="us-mini-progress-container">
+                  <div className="us-mini-progress-bar" style={{ width: `${(user.projectsSubmitted / 35) * 100}%`, }}>
+                  </div>
+                </div>
+                <span className="us-stat-number">
+                  {user.projectsSubmitted}
+                </span>
+              </div>
+              <div className="us-stat-row">
+                <span className="us-stat-name">Quality</span>
+                <div className="us-mini-progress-container">
+                  <div className={`us-mini-progress-bar us-quality ${getScoreColor( user.projectQuality )}`} style={{
+                    width: `${user.projectQuality}%` }}></div>
+                </div>
+                <span className="us-stat-number">
+                  {user.projectQuality}%
+                </span>
+              </div>
+              <div className="us-stat-row">
+                <span className="us-stat-name">Streak</span>
+                <div className="us-mini-progress-container">
+                  <div className="us-mini-progress-bar us-streak" style={{ width: `${(user.streak / 30) * 100}%` }}>
+                  </div>
+                </div>
+                <span className="us-stat-number">{user.streak} days</span>
+              </div>
+            </div>
 
-        <div className="progress-overview">
-          <div className="day-progress">
-            <div className="day-indicator">
-              <span className="day-number">{userData.currentDay}</span>
-              <span className="day-label">/ {userData.totalDays}</span>
-            </div>
-            <div className="progress-bar-container">
-              <div
-                className="progress-bar"
-                style={{
-                  width: `${calculateProgressPercentage()}%`,
-                  background: `linear-gradient(90deg, ${
-                    userData.avatarColor
-                  }, ${adjustColor(userData.avatarColor, 20)})`,
-                  boxShadow: darkMode
-                    ? `0 4px 8px rgba(0, 0, 0, 0.3), 0 -4px 8px rgba(255, 255, 255, 0.05)`
-                    : `0 4px 8px rgba(163, 177, 198, 0.6), 0 -4px 8px rgba(255, 255, 255, 0.8)`,
-                }}
-              ></div>
-            </div>
-            <div className="progress-stats">
-              <div className="day-text">Day {userData.currentDay}</div>
-              <div className="percentage-text">
-                {Math.round(calculateProgressPercentage())}% complete
+            <div className="us-projects-section">
+              <h4 className="us-projects-title">Recent Projects</h4>
+              <div className="us-projects-grid">
+                {user.projects.map((project) => (
+                <div key={project.id} className="us-project-card" onClick={()=> viewProject(project.id)}
+                  >
+                  <div className="us-project-info">
+                    <span className="us-project-name">
+                      {project.name}
+                    </span>
+                    <span className="us-project-day">
+                      Day {project.day}
+                    </span>
+                  </div>
+                  <ExternalLink size={16} className="us-project-link" />
+                </div>
+                ))}
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="dashboard-grid">
-          {renderGridItem(
-            "📤",
-            "Submit Project",
-            "Upload today's challenge",
-            "/SubmitProject"
-          )}
-          {renderGridItem(
-            "📁",
-            "My Projects",
-            `${userData.projectsSubmitted} submitted`,
-            "/ProjectList"
-          )}
-          {renderGridItem(
-            "📝",
-            "Daily Challenge",
-            `View Day ${userData.currentDay} task`,
-            "/daily-challenge"
-          )}
-          {renderGridItem("📚", "Resources", "Helpful materials", "/resources")}
-          {renderGridItem(
-            "👥",
-            "Community",
-            `${userData.totalParticipants} participants`,
-            "/community"
           )}
         </div>
-
-        <div className="logout-container">
-          <button className="logout-button" onClick={openLogoutModal}>
-            <span className="logout-icon">🚪</span>
-            Logout
-          </button>
-        </div>
-      </main>
-
-      <footer className="dashboard-footer">
-        <p>
-          Code&lt;30&gt; Challenge © {new Date().getFullYear()} |{" "}
-          <a href="#" className="footer-link">
-            Terms
-          </a>{" "}
-          |{" "}
-          <a href="#" className="footer-link">
-            Privacy
-          </a>
-        </p>
-      </footer>
-
-      {showLogoutModal && (
-        <div className="modal-overlay">
-          <div className={`logout-modal ${darkMode ? "dark" : "light"}`}>
-            <div className="modal-header">
-              <h3>Confirm Logout</h3>
-              <button className="close-button" onClick={handleCancelLogout}>
-                ×
-              </button>
-            </div>
-            <div className="modal-content">
-              <p>Are you sure you want to logout?</p>
-              <div className="modal-icon">🔒</div>
-            </div>
-            <div className="modal-actions">
-              <button className="cancel-button" onClick={handleCancelLogout}>
-                Cancel
-              </button>
-              <button className="confirm-button" onClick={handleConfirmLogout}>
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  function renderGridItem(emoji, title, description, path) {
-    return (
-      <div
-        className="grid-item"
-        onClick={() => handleNavigation(path)}
-        data-type={title.toLowerCase().replace(" ", "-")}
-      >
-        <div className="item-icon">{emoji}</div>
-        <div className="item-content">
-          <h3>{title}</h3>
-          <p>{description}</p>
-        </div>
-        <div className="item-action">→</div>
+        ))}
       </div>
-    );
-  }
-};
+    </div>
+  </div>
+  );
+  };
 
-export default Dashboard;
-
-
-// src/components/Auth/AuthSuccess.jsx
-import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
-
-const AuthSuccess = ({ onLoginSuccess }) => {
-const navigate = useNavigate();
-const [searchParams] = useSearchParams();
-
-useEffect(() => {
-const completeAuth = async () => {
-try {
-const token = searchParams.get('token');
-const redirect = searchParams.get('redirect') || '/dashboard';
-
-if (!token) {
-throw new Error('Missing authentication token');
-}
-
-// Verify token and get user data
-const response = await axios.get('/api/auth/me', {
-headers: { Authorization: `Bearer ${token}` }
-});
-
-if (!response.data.success) {
-throw new Error(response.data.message || 'Authentication failed');
-}
-
-// Complete login process
-onLoginSuccess(token, response.data.user);
-navigate(redirect);
-} catch (err) {
-console.error('Authentication error:', err);
-navigate(`/login?error=${encodeURIComponent(err.message)}`);
-}
-};
-
-completeAuth();
-}, [navigate, searchParams, onLoginSuccess]);
-
-return (
-<div className="auth-loading">
-  <h2>Completing Authentication</h2>
-  <p>Please wait while we prepare your dashboard...</p>
-</div>
-);
-};
-
-export default AuthSuccess;
+  export default Leaderboard;
 
 
-// App.js
-import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import axios from "axios";
-
-// Public components
-import Header from "./components/Header";
-import Hero from "./components/Hero";
-import Features from "./components/Features";
-import CtaSection from "./components/CtaSection";
-import Footer from "./components/Footer";
-import BackgroundAnimation from "./components/BackgroundAnimation";
-import Login from "./components/Auth/Login";
-import Signup from "./components/Auth/Signup";
-import AuthSuccess from './components/Auth/AuthSuccess'; 
 
 
-// Protected pages (user)
-import Dashboard from "./pages/Dashboard";
-import SubmitProject from "./pages/SubmitProject";
-import ProjectList from "./pages/ProjectList";
-import Leaderboard from "./pages/Leaderboard";
-import ProjectRating from "./pages/ProjectRating";
-import UserProfile from "./pages/UserProfile";
-import DailyChallenge from "./pages/DailyChallenge";
 
-// Admin components
-import AdminLogin from "./admin/components/Auth/Login";
-import AdminSignup from "./admin/components/Auth/Signup";
-import AdminDashboard from "./admin/AdminDashboard"; // renamed from admin/App.js
 
-import "./styles.css";
+  import React, { useState, useEffect } from "react";
+  import { Link, useNavigate } from "react-router-dom";
+  import { FiExternalLink, FiGithub, FiClock } from "react-icons/fi";
+  import axios from "axios";
+  import "./Users.css";
 
-// Configure axios defaults
-axios.defaults.baseURL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const Users = () => {
+  const [users, setUsers] = useState([]);
+  const [expandedUserId, setExpandedUserId] = useState(null);
+  const [userProjects, setUserProjects] = useState({});
+  const [loadingProjects, setLoadingProjects] = useState({});
+  const [userSubmissionsCount, setUserSubmissionsCount] = useState({});
+  const [loadingCounts, setLoadingCounts] = useState(false);
+  const navigate = useNavigate();
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const API_URL = process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   useEffect(() => {
-    // In App.js
-    const checkAuthStatus = async () => {
-      const userToken = localStorage.getItem("token");
-      const adminToken = localStorage.getItem("adminToken");
+  const fetchUsersAndCounts = async () => {
+  try {
+  setLoadingCounts(true);
+  const usersResponse = await axios.get(`${API_URL}/api/auth/users`, {
+  withCredentials: true,
+  });
+  const usersData = usersResponse.data;
+  setUsers(usersData);
 
-      setLoading(true);
+  // Initialize counts with existing submissions data (fallback)
+  const initialCounts = {};
+  usersData.forEach((user) => {
+  initialCounts[user._id] = user.submissions || 0;
+  });
+  setUserSubmissionsCount(initialCounts);
 
-      try {
-        if (userToken) {
-          const response = await axios.get("/api/auth/me", {
-            headers: { Authorization: `Bearer ${userToken}` },
-          });
+  // Fetch accurate counts in the background
+  const updatedCounts = {};
+  await Promise.all(
+  usersData.map(async (user) => {
+  try {
+  const countResponse = await axios.get(
+  `${API_URL}/api/projects/user/${user._id}/count`,
+  { withCredentials: true }
+  );
+  updatedCounts[user._id] = countResponse.data.count || 0;
+  } catch (err) {
+  console.error(`Error fetching count for user ${user._id}:`, err);
+  updatedCounts[user._id] = initialCounts[user._id];
+  }
+  })
+  );
+  setUserSubmissionsCount(updatedCounts);
+  } catch (err) {
+  console.error("Error fetching users:", err);
+  } finally {
+  setLoadingCounts(false);
+  }
+  };
 
-          if (response.data.success) {
-            setIsAuthenticated(true);
-            setIsAdminAuthenticated(false);
-            localStorage.setItem("user", JSON.stringify(response.data.user));
-          } else {
-            throw new Error(response.data.message || "Authentication failed");
-          }
-        } else if (adminToken) {
-          const response = await axios.get("/api/auth/me", {
-            headers: { Authorization: `Bearer ${adminToken}` },
-          });
-
-          if (response.data.success && response.data.user?.isAdmin) {
-            setIsAdminAuthenticated(true);
-            setIsAuthenticated(false);
-          } else {
-            throw new Error("Admin authentication failed");
-          }
-        }
-      } catch (err) {
-        console.error("Auth check failed:", err);
-        localStorage.removeItem("token");
-        localStorage.removeItem("adminToken");
-        localStorage.removeItem("user");
-        delete axios.defaults.headers.common["Authorization"];
-        setIsAuthenticated(false);
-        setIsAdminAuthenticated(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuthStatus();
-
-    // Listen for storage events (for when other tabs change auth state)
-    window.addEventListener("storage", checkAuthStatus);
-    return () => window.removeEventListener("storage", checkAuthStatus);
+  fetchUsersAndCounts();
   }, []);
 
-  const handleLoginSuccess = (token, userData) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("isAuthenticated", "true");
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
-    localStorage.removeItem("isAdminAuthenticated");
-
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-    setIsAuthenticated(true);
-    setIsAdminAuthenticated(false);
-  };
-
-  const handleAdminLoginSuccess = () => {
-    // Token and user data are stored in the AdminLogin component directly
-    localStorage.setItem("isAdminAuthenticated", "true");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("isAuthenticated");
-
-    setIsAdminAuthenticated(true);
-    setIsAuthenticated(false);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.setItem("isAuthenticated", "false");
-    delete axios.defaults.headers.common["Authorization"];
-
-    setIsAuthenticated(false);
-  };
-
-  const handleAdminLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
-    localStorage.setItem("isAdminAuthenticated", "false");
-    delete axios.defaults.headers.common["Authorization"];
-
-    setIsAdminAuthenticated(false);
-  };
-
-  const ProtectedRoute = ({ children }) => {
-    if (loading) {
-      return <div className="loading">Loading...</div>;
-    }
-    if (!isAuthenticated) return <Navigate to="/login" replace />;
-    return children;
-  };
-
-  const AdminProtectedRoute = ({ children }) => {
-    if (loading) {
-      return <div className="loading">Loading...</div>;
-    }
-    if (!isAdminAuthenticated) return <Navigate to="/admin/login" replace />;
-    return children;
-  };
-
-  const HomePage = () => (
-    <div className="app">
-      <BackgroundAnimation />
-      <Header
-        isAuthenticated={isAuthenticated || isAdminAuthenticated}
-        onLogout={isAdminAuthenticated ? handleAdminLogout : handleLogout}
-      />
-      <main>
-        <Hero />
-        <Features />
-        <CtaSection />
-      </main>
-      <Footer />
-    </div>
-  );
-
-  if (loading) {
-    return <div className="loading">Loading application...</div>;
+  useEffect(() => {
+  if (expandedUserId && !userProjects[expandedUserId]) {
+  fetchUserProjects(expandedUserId);
   }
+  }, [expandedUserId]);
+
+  const fetchUserProjects = async (userId) => {
+  setLoadingProjects((prev) => ({ ...prev, [userId]: true }));
+
+  try {
+  const [projectsResponse] = await Promise.all([
+  axios.get(`${API_URL}/api/projects/user/${userId}`, {
+  withCredentials: true,
+  }),
+  ]);
+
+  setUserProjects((prev) => ({
+  ...prev,
+  [userId]: projectsResponse.data.projects || [],
+  }));
+  } catch (err) {
+  console.error(`Error fetching projects for user ${userId}:`, err);
+  setUserProjects((prev) => ({
+  ...prev,
+  [userId]: [],
+  }));
+  } finally {
+  setLoadingProjects((prev) => ({ ...prev, [userId]: false }));
+  }
+  };
+
+  const toggleUserExpansion = (userId) => {
+  setExpandedUserId(expandedUserId === userId ? null : userId);
+  };
+
+  const formatDate = (dateString) => {
+  if (!dateString) return "No date";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  });
+  };
+
+  const handleImageError = (e) => {
+  e.target.src = "https://i.pravatar.cc/150?img=3";
+  };
 
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<HomePage />} />
+  <div className="users-page-container">
+    <div className="page-header">
+      <h2>User Management</h2>
+    </div>
 
-      <Route
-        path="/login"
-        element={
-          isAuthenticated || isAdminAuthenticated ? (
-            <Navigate
-              to={isAdminAuthenticated ? "/admin/leaderboard" : "/dashboard"}
-              replace
-            />
+    {loadingCounts ? (
+    <div className="loading-container">
+      <div className="spinner"></div>
+      <p>Loading user data...</p>
+    </div>
+    ) : (
+    <div className="users-container">
+      {users.map((user) => (
+      <div key={user._id} className="user-card glass-card">
+        <div className="user-summary" onClick={()=> toggleUserExpansion(user._id)}
+          >
+          <div className="user-info">
+            <img src={`https://i.pravatar.cc/150?img=${user._id}`} alt={user.fullName} className="user-avatar"
+              onError={handleImageError} />
+            <div className="user-details">
+              <h3 className="user-name">{user.fullName}</h3>
+              <p className="user-email">{user.email}</p>
+              <div className="user-meta">
+                <span>Joined: {formatDate(user.createdAt)}</span>
+                <span>
+                  Submissions: {userSubmissionsCount[user._id] ?? 0}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="user-status">
+            <span className={`status-badge ${user.status || "active" }`}>
+              {user.status || "active"}
+            </span>
+            <span className="expand-icon">
+              {expandedUserId === user._id ? "−" : "+"}
+            </span>
+          </div>
+        </div>
+
+        {expandedUserId === user._id && (
+        <div className="user-projects">
+          <h4>Recent Projects</h4>
+          {loadingProjects[user._id] ? (
+          <div className="loading-projects">
+            <div className="spinner"></div>
+            <p>Loading projects...</p>
+          </div>
           ) : (
-            <Login onLoginSuccess={handleLoginSuccess} />
-          )
-        }
-      />
-      <Route path="/auth/success" element={<AuthSuccess onLoginSuccess={handleLoginSuccess} />} />
+          <>
+            {userProjects[user._id]?.length > 0 ? (
+            <div className="projects-list">
+              {" "}
+              {/* Changed from projects-grid */}
+              {userProjects[user._id].map((project) => (
+              <div key={project._id} className="compact-project-card">
+                {" "}
+                {/* Changed class */}
+                <div className="compact-project-header">
+                  <h5>{project.projectName}</h5>
+                  <span className="compact-day-badge">
+                    Day {project.day}
+                  </span>
+                </div>
+                <div className="compact-project-links">
+                  {project.liveLink && (
+                  <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="compact-link">
+                    <FiExternalLink className="link-icon" />
+                  </a>
+                  )}
+                  {project.repoLink && (
+                  <a href={project.repoLink} target="_blank" rel="noopener noreferrer" className="compact-link">
+                    <FiGithub className="link-icon" />
+                  </a>
+                  )}
+                </div>
+                <p className="compact-project-description">
+                  {project.description.length > 60
+                  ? `${project.description.substring(0, 60)}...`
+                  : project.description}
+                </p>
+              </div>
+              ))}
+            </div>
+            ) : (
+            <div className="no-projects">
+              <p>No recent projects found</p>
+            </div>
+            )}
+          </>
+          )}
 
-
-      <Route
-        path="/signup"
-        element={
-          isAuthenticated || isAdminAuthenticated ? (
-            <Navigate
-              to={isAdminAuthenticated ? "/admin/leaderboard" : "/dashboard"}
-              replace
-            />
-          ) : (
-            <Signup onLoginSuccess={handleLoginSuccess} />
-          )
-        }
-      />
-
-      {/* Admin Auth Routes */}
-      <Route
-        path="/admin/login"
-        element={
-          isAdminAuthenticated ? (
-            <Navigate to="/admin/leaderboard" replace />
-          ) : isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <AdminLogin setAuthenticated={handleAdminLoginSuccess} />
-          )
-        }
-      />
-
-      <Route
-        path="/admin/signup"
-        element={
-          isAdminAuthenticated ? (
-            <Navigate to="/admin/leaderboard" replace />
-          ) : isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <AdminSignup setAuthenticated={handleAdminLoginSuccess} />
-          )
-        }
-      />
-
-      {/* Admin Dashboard */}
-      <Route
-        path="/admin/*"
-        element={
-          <AdminProtectedRoute>
-            <AdminDashboard onLogout={handleAdminLogout} />
-          </AdminProtectedRoute>
-        }
-      />
-
-      {/* Regular User Routes */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard onLogout={handleLogout} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/SubmitProject"
-        element={
-          <ProtectedRoute>
-            <SubmitProject onLogout={handleLogout} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/ProjectList"
-        element={
-          <ProtectedRoute>
-            <ProjectList onLogout={handleLogout} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/leaderboard"
-        element={
-          <ProtectedRoute>
-            <Leaderboard onLogout={handleLogout} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/project/:projectId"
-        element={
-          <ProtectedRoute>
-            <ProjectRating onLogout={handleLogout} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <UserProfile onLogout={handleLogout} />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/daily-challenge"
-        element={
-          <ProtectedRoute>
-            <DailyChallenge onLogout={handleLogout} />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Catch-all */}
-      <Route
-        path="*"
-        element={
-          isAdminAuthenticated ? (
-            <Navigate to="/admin/leaderboard" replace />
-          ) : isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        }
-      />
-    </Routes>
+          <button className="btn btn-primary view-all-btn" onClick={(e)=> {
+            e.stopPropagation();
+            navigate(`/admin/users/${user._id}/projects`); // Use absolute path
+            }}
+            >
+            View All Projects
+          </button>
+        </div>
+        )}
+      </div>
+      ))}
+    </div>
+    )}
+  </div>
   );
-}
+  };
 
-export default App;
+  export default Users;
 
+
+
+  import React, { useState, useEffect, useMemo } from "react";
+  import "./ProjectList.css";
+  import { useNavigate } from "react-router-dom";
+  import axios from "axios";
+  import {
+  FiArrowLeft,
+  FiSearch,
+  FiX,
+  FiClock,
+  FiExternalLink,
+  FiGithub,
+  FiPlus,
+  } from "react-icons/fi";
+
+  const ProjectList = () => {
+  const navigate = useNavigate();
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState({
+  day: "all",
+  search: "",
+  language: "all",
+  });
+  const [expandedProject, setExpandedProject] = useState(null);
+
+  const API_URL = process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+
+  useEffect(() => {
+  const fetchProjects = async () => {
+  try {
+  setLoading(true);
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+  navigate("/login", { state: { from: "/projects" } });
+  return;
+  }
+
+  const response = await axios.get(
+  `${API_URL}/api/projects/my-projects`,
+  {
+  headers: {
+  Authorization: `Bearer ${token}`,
+  },
+  }
+  );
+
+  if (response.data.success) {
+  const validProjects = response.data.projects.filter(
+  (project) =>
+  project.projectName &&
+  project.day !== undefined &&
+  project.description
+  );
+  setProjects(validProjects);
+  } else {
+  setError("Failed to fetch projects");
+  }
+  } catch (err) {
+  console.error("Error fetching projects:", err);
+  setError("An error occurred while fetching projects");
+  } finally {
+  setLoading(false);
+  }
+  };
+
+  fetchProjects();
+  }, [navigate, API_URL]);
+
+  const filteredProjects = useMemo(() => {
+  return projects.filter((project) => {
+  const matchesDay =
+  filter.day === "all" || project.day === parseInt(filter.day);
+  const matchesSearch =
+  filter.search === "" ||
+  project.projectName
+  .toLowerCase()
+  .includes(filter.search.toLowerCase()) ||
+  project.description.toLowerCase().includes(filter.search.toLowerCase());
+  const matchesLanguage =
+  filter.language === "all" ||
+  project.languages.toLowerCase().includes(filter.language.toLowerCase());
+
+  return matchesDay && matchesSearch && matchesLanguage;
+  });
+  }, [projects, filter.day, filter.search, filter.language]);
+
+  const projectsByDay = useMemo(() => {
+  return filteredProjects.reduce((acc, project) => {
+  if (!acc[project.day]) {
+  acc[project.day] = [];
+  }
+  acc[project.day].push(project);
+  return acc;
+  }, {});
+  }, [filteredProjects]);
+
+  const sortedDays = Object.keys(projectsByDay).sort((a, b) => b - a);
+  const days = Array.from(new Set(projects.map((project) => project.day))).sort(
+  (a, b) => a - b
+  );
+
+  const languages = Array.from(
+  new Set(
+  projects.flatMap((project) =>
+  project.languages.split(",").map((lang) => lang.trim())
+  )
+  )
+  )
+  .filter((lang) => lang !== "")
+  .sort();
+
+  const handleFilterChange = (e) => {
+  const { name, value } = e.target;
+  setFilter({
+  ...filter,
+  [name]: value,
+  });
+  };
+
+  const clearSearch = () => {
+  setFilter({
+  ...filter,
+  search: "",
+  });
+  };
+
+  const clearAllFilters = () => {
+  setFilter({
+  day: "all",
+  search: "",
+  language: "all",
+  });
+  };
+
+  const formatDate = (dateString) => {
+  if (!dateString) return "No date";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  });
+  };
+
+  const toggleProjectExpansion = (id) => {
+  setExpandedProject(expandedProject === id ? null : id);
+  };
+
+  const handleImageError = (e) => {
+  e.target.src =
+  "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
+  };
+
+  return (
+  <div className="pl-container">
+    <div className="pl-back-navigation">
+      <button onClick={()=> navigate("/dashboard")}
+        className="pl-back-button"
+        >
+        <FiArrowLeft className="pl-icon" />
+        Back to Dashboard
+      </button>
+      <button onClick={()=> navigate("/SubmitProject")}
+        className="pl-add-project-button"
+        >
+        <FiPlus className="pl-icon" />
+        New Project
+      </button>
+    </div>
+
+    <div className="pl-header">
+      <div className="pl-header-content">
+        <h1>My Projects</h1>
+        <p className="pl-subtitle">
+          Track your progress in the 30-day coding challenge
+        </p>
+      </div>
+    </div>
+
+    <div className="pl-filter-section">
+      <div className="pl-filter-controls">
+        <div className="pl-search-container">
+          <div className="pl-search-input">
+            <FiSearch className="pl-search-icon" />
+            <input type="text" placeholder="Search projects..." name="search" value={filter.search}
+              onChange={handleFilterChange} aria-label="Search projects" />
+            {filter.search && (
+            <button onClick={clearSearch} className="pl-clear-search" aria-label="Clear search">
+              <FiX />
+            </button>
+            )}
+          </div>
+        </div>
+
+        <div className="pl-filter-group">
+          <select id="language-filter" name="language" value={filter.language} onChange={handleFilterChange}>
+            <option value="all">All Languages</option>
+            {languages.map((lang) => (
+            <option key={lang} value={lang}>
+              {lang}
+            </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="pl-filter-group">
+          <select id="day-filter" name="day" value={filter.day} onChange={handleFilterChange}>
+            <option value="all">All Days</option>
+            {days.map((day) => (
+            <option key={day} value={day}>
+              Day {day}
+            </option>
+            ))}
+          </select>
+        </div>
+
+        {(filter.search ||
+        filter.day !== "all" ||
+        filter.language !== "all") && (
+        <button onClick={clearAllFilters} className="pl-clear-filters">
+          Clear All
+        </button>
+        )}
+      </div>
+    </div>
+
+    {loading ? (
+    <div className="pl-loading-state">
+      <div className="pl-spinner"></div>
+      <p>Loading your projects...</p>
+    </div>
+    ) : error ? (
+    <div className="pl-error-state">
+      <div className="pl-error-icon">!</div>
+      <h3>Error Loading Projects</h3>
+      <p>{error}</p>
+      <button className="pl-retry-button" onClick={()=> window.location.reload()}
+        >
+        Try Again
+      </button>
+    </div>
+    ) : filteredProjects.length === 0 ? (
+    <div className="pl-empty-state">
+      <div className="pl-empty-icon">📁</div>
+      <h3>No projects found</h3>
+      {filter.search ||
+      filter.day !== "all" ||
+      filter.language !== "all" ? (
+      <p>Try adjusting your search or filter criteria</p>
+      ) : (
+      <p>Start by submitting your first project</p>
+      )}
+      <button onClick={()=> navigate("/submit-project")}
+        className="pl-submit-button"
+        >
+        <FiPlus className="pl-icon" />
+        Submit Your First Project
+      </button>
+    </div>
+    ) : (
+    <div className="pl-projects-container">
+      <div className="pl-projects-summary">
+        <p className="pl-total-count">
+          Showing {filteredProjects.length} of {projects.length} projects
+        </p>
+      </div>
+
+      {sortedDays.map((day) => (
+      <div key={day} className="pl-day-group">
+        <div className="pl-day-header">
+          <h2>Day {day}</h2>
+          <span className="pl-project-count">
+            {projectsByDay[day].length} project
+            {projectsByDay[day].length !== 1 ? "s" : ""}
+          </span>
+        </div>
+
+        <div className="pl-projects-grid">
+          {projectsByDay[day].map((project) => (
+          <div key={project._id} className={`pl-project-card ${ expandedProject===project._id ? "pl-expanded" : "" }`}>
+            <div className="pl-project-image-container">
+              <img src={project.imageUrl} alt={project.projectName} onError={handleImageError}
+                className="pl-project-image" />
+              <div className="pl-day-indicator">Day {project.day}</div>
+            </div>
+
+            <div className="pl-project-content">
+              <div className="pl-project-header">
+                <h3>{project.projectName}</h3>
+                {project.status && (
+                <span className={`pl-status-badge pl-${project.status.toLowerCase()}`}>
+                  {project.status}
+                </span>
+                )}
+              </div>
+
+              <div className="pl-tags-container">
+                {project.languages.split(",").map((lang, index) => (
+                <span key={index} className="pl-language-tag">
+                  {lang.trim()}
+                </span>
+                ))}
+              </div>
+
+              <p className="pl-project-description">
+                {expandedProject === project._id
+                ? project.description
+                : project.description.length > 120
+                ? `${project.description.substring(0, 120)}...`
+                : project.description}
+                {project.description.length > 120 && (
+                <button onClick={()=> toggleProjectExpansion(project._id)}
+                  className="pl-read-more"
+                  >
+                  {expandedProject === project._id
+                  ? "Show less"
+                  : "Read more"}
+                </button>
+                )}
+              </p>
+
+              <div className="pl-project-footer">
+                <div className="pl-project-date">
+                  <FiClock className="pl-clock-icon" />
+                  {formatDate(
+                  project.submissionDate || project.createdAt
+                  )}
+                </div>
+
+                <div className="pl-project-links">
+                  {project.liveLink && (
+                  <a href={project.liveLink} target="_blank" rel="noopener noreferrer"
+                    className="pl-project-link pl-live-link" aria-label="View live demo">
+                    <FiExternalLink className="pl-link-icon" />
+                    Demo
+                  </a>
+                  )}
+                  {project.repoLink && (
+                  <a href={project.repoLink} target="_blank" rel="noopener noreferrer"
+                    className="pl-project-link pl-repo-link" aria-label="View source code">
+                    <FiGithub className="pl-link-icon" />
+                    Code
+                  </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          ))}
+        </div>
+      </div>
+      ))}
+
+      {filteredProjects.length > 5 && (
+      <div className="pl-back-to-top-container">
+        <button onClick={()=> window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="pl-back-to-top-button"
+          >
+          Back to top
+        </button>
+      </div>
+      )}
+    </div>
+    )}
+  </div>
+  );
+  };
+
+  export default ProjectList;

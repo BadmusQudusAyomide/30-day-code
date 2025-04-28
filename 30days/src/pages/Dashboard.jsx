@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; // Add this import
+import axios from "axios";
 import "./Dashboard.css";
 
 const Dashboard = ({ onLogout }) => {
@@ -14,11 +14,14 @@ const Dashboard = ({ onLogout }) => {
     totalParticipants: 0,
     avatarColor: "#6366f1",
   });
-  // Add these state declarations
   const [darkMode, setDarkMode] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [topPerformers, setTopPerformers] = useState([]);
+
+  const API_URL =
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -29,43 +32,107 @@ const Dashboard = ({ onLogout }) => {
           navigate("/login");
           return;
         }
-          const authHeader = `Bearer ${token}`;
-          console.log("Authorization header:", authHeader);
+        const authHeader = `Bearer ${token}`;
+        console.log("Authorization header:", authHeader);
 
-         
-         const response = await axios.get("https://my-backend-pkhd.onrender.com/api/auth/me", {
-           headers: {
-             Authorization: authHeader, // Make sure token is correctly formatted
-           },
-         });
+        // Fetch user data
+        const userResponse = await axios.get(`${API_URL}/api/auth/me`, {
+          headers: {
+            Authorization: authHeader,
+          },
+        });
+        console.log("User API response:", userResponse.data);
+        const userData = userResponse.data;
 
-         console.log("API response:", response.data);
+        // Fetch projects to get the accurate count
+        const projectsResponse = await axios.get(
+          `${API_URL}/api/projects/my-projects`,
+          {
+            headers: {
+              Authorization: authHeader,
+            },
+          }
+        );
 
-        const data = response.data;
+        // Get the actual count from projects response
+        const actualProjectCount = projectsResponse.data.success
+          ? projectsResponse.data.projects.filter(
+              (project) =>
+                project.projectName &&
+                project.day !== undefined &&
+                project.description
+            ).length
+          : 0;
+
+        // Fetch leaderboard data to get current ranking
+        const leaderboardResponse = await axios.get(
+          `${API_URL}/api/leaderboard/leaderboard`,
+          {
+            headers: {
+              Authorization: authHeader,
+            },
+          }
+        );
+        console.log("Leaderboard API response:", leaderboardResponse.data);
+
+        // Process leaderboard data
+        let userRank = 0;
+        let totalParticipants = 0;
+        let top3Users = [];
+
+        if (leaderboardResponse.data.success) {
+          const leaderboardData = leaderboardResponse.data.data;
+          totalParticipants = leaderboardData.length;
+
+          // Sort by total points
+          const sortedData = [...leaderboardData].sort(
+            (a, b) =>
+              (b.totalPoints || b.totalScore || 0) -
+              (a.totalPoints || a.totalScore || 0)
+          );
+
+          // Get top 3 performers
+          top3Users = sortedData.slice(0, 3).map((user) => ({
+            name: user.name,
+            points: user.totalPoints || user.totalScore || 0,
+            avatarColor: generateColorFromName(user.name),
+          }));
+
+          // Find user's rank
+          const userId = userData.user._id;
+          userRank =
+            sortedData.findIndex(
+              (user) => user.id === userId || user._id === userId
+            ) + 1;
+          if (userRank === 0) userRank = totalParticipants; // Default to last if not found
+        }
 
         const avatarColor = generateColorFromName(
-          data.user.username || data.user.email
+          userData.user.username || userData.user.email
         );
 
         setUserData({
           name:
-            data.user.fullName ||
-            data.user.username ||
-            data.user.email.split("@")[0],
-          projectsSubmitted: data.stats?.projectsSubmitted || 0,
-          currentDay: data.stats?.currentDay || 1,
+            userData.user.fullName ||
+            userData.user.username ||
+            userData.user.email.split("@")[0],
+          projectsSubmitted: actualProjectCount, // Use the actual count from projects
+          currentDay: userData.stats?.currentDay || 1,
           totalDays: 30,
-          rank: data.stats?.rank || 0,
-          totalParticipants: data.stats?.totalParticipants || 1000,
+          rank: userRank || userData.stats?.rank || 0,
+          totalParticipants:
+            totalParticipants || userData.stats?.totalParticipants || 1000,
           avatarColor,
         });
+
+        setTopPerformers(top3Users);
       } catch (err) {
         console.error("Dashboard error:", err);
-         if (err.response) {
-           console.error("Error response data:", err.response.data);
-           console.error("Error response status:", err.response.status);
-           console.error("Error response headers:", err.response.headers);
-         }
+        if (err.response) {
+          console.error("Error response data:", err.response.data);
+          console.error("Error response status:", err.response.status);
+          console.error("Error response headers:", err.response.headers);
+        }
         setError(err.message);
       } finally {
         setLoading(false);
@@ -73,7 +140,7 @@ const Dashboard = ({ onLogout }) => {
     };
 
     fetchUserData();
-  }, [navigate]);
+  }, [navigate, API_URL]);
 
   const generateColorFromName = (name) => {
     if (!name) return "#6366f1";
@@ -248,6 +315,12 @@ const Dashboard = ({ onLogout }) => {
             "/ProjectList"
           )}
           {renderGridItem(
+            "📊",
+            "Leaderboard",
+            `You're ranked #${userData.rank}`,
+            "/leaderboard"
+          )}
+          {renderGridItem(
             "📝",
             "Daily Challenge",
             `View Day ${userData.currentDay} task`,
@@ -260,6 +333,76 @@ const Dashboard = ({ onLogout }) => {
             `${userData.totalParticipants} participants`,
             "/community"
           )}
+        </div>
+
+        <div className="leaderboard-preview">
+          <div className="leaderboard-preview-header">
+            <h2>Current Rankings</h2>
+            <button
+              className="view-all-button"
+              onClick={() => handleNavigation("/leaderboard")}
+            >
+              View Full Leaderboard →
+            </button>
+          </div>
+          <div className="top-performers">
+            {topPerformers.length >= 3 ? (
+              <>
+                {renderTopPerformer(
+                  2,
+                  topPerformers[1].name,
+                  topPerformers[1].points,
+                  topPerformers[1].avatarColor
+                )}
+                {renderTopPerformer(
+                  1,
+                  topPerformers[0].name,
+                  topPerformers[0].points,
+                  topPerformers[0].avatarColor
+                )}
+                {renderTopPerformer(
+                  3,
+                  topPerformers[2].name,
+                  topPerformers[2].points,
+                  topPerformers[2].avatarColor
+                )}
+              </>
+            ) : (
+              <>
+                {renderTopPerformer(2, "Loading...", 0, "#f59e0b")}
+                {renderTopPerformer(1, "Loading...", 0, "#3b82f6")}
+                {renderTopPerformer(3, "Loading...", 0, "#10b981")}
+              </>
+            )}
+          </div>
+          <div className="your-rank-container">
+            <div className="your-rank-card">
+              <div className="rank-number">#{userData.rank}</div>
+              <div className="rank-info">
+                <div className="rank-user">
+                  <div
+                    className="rank-avatar"
+                    style={{ backgroundColor: userData.avatarColor }}
+                  >
+                    {userData.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="rank-name">{userData.name}</div>
+                </div>
+                <div className="rank-points">
+                  <span className="points-value">
+                    {userData.projectsSubmitted * 45}
+                  </span>
+                  <span className="points-label">Points</span>
+                </div>
+              </div>
+              <button
+                className="improve-rank-button"
+                onClick={() => handleNavigation("/SubmitProject")}
+              >
+                Improve Rank
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="logout-container">
@@ -323,6 +466,21 @@ const Dashboard = ({ onLogout }) => {
           <p>{description}</p>
         </div>
         <div className="item-action">→</div>
+      </div>
+    );
+  }
+
+  function renderTopPerformer(rank, name, points, color) {
+    return (
+      <div className="top-performer">
+        <div className="performer-rank">#{rank}</div>
+        <div className="performer-avatar" style={{ backgroundColor: color }}>
+          {name.charAt(0).toUpperCase()}
+        </div>
+        <div className="performer-info">
+          <div className="performer-name">{name}</div>
+          <div className="performer-points">{points} points</div>
+        </div>
       </div>
     );
   }

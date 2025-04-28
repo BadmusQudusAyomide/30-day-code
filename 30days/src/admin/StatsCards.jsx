@@ -10,9 +10,10 @@ const StatsCards = () => {
     challengeDay: 1,
   });
   const [loading, setLoading] = useState(true);
-  const [errors, setErrors] = useState({}); // Properly define errors state
+  const [errors, setErrors] = useState({});
 
-  const API_URL = process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+  const API_URL =
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   const fetchStat = async (endpoint, statKey) => {
     try {
@@ -27,7 +28,6 @@ const StatsCards = () => {
     } catch (err) {
       console.error(`Error fetching ${statKey}:`, err);
       setErrors((prev) => ({ ...prev, [statKey]: err.message }));
-      // Set default values if error occurs
       if (statKey === "challengeDay") {
         setStats((prev) => ({ ...prev, [statKey]: 1 }));
       }
@@ -52,7 +52,6 @@ const StatsCards = () => {
     fetchAllStats();
   }, []);
 
-  // Format number with fallback
   const formatStat = (value) => {
     return typeof value === "number" ? value.toLocaleString() : value;
   };

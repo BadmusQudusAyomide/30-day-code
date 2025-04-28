@@ -55,6 +55,17 @@ const Sidebar = ({ currentPath, isOpen, onLogout, toggleSidebar }) => {
           </Link>
         </li>
         <li>
+  <Link 
+    to="/admin/version"
+    className={currentPath.includes("version") ? "active" : ""}
+    onClick={toggleSidebar}
+  >
+    <i className="fas fa-info-circle"></i>
+    <span>Version</span>
+  </Link>
+</li>
+
+        <li>
           <button className="logout-btn" onClick={onLogout}>
             <i className="fas fa-sign-out-alt"></i>
             <span>Logout</span>

@@ -12,8 +12,7 @@ import Footer from "./components/Footer";
 import BackgroundAnimation from "./components/BackgroundAnimation";
 import Login from "./components/Auth/Login";
 import Signup from "./components/Auth/Signup";
-import AuthSuccess from './components/Auth/AuthSuccess'; 
-
+import AuthSuccess from "./components/Auth/AuthSuccess";
 
 // Protected pages (user)
 import Dashboard from "./pages/Dashboard";
