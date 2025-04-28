@@ -263,9 +263,19 @@ const Signup = ({ onLoginSuccess }) => {
         <div className="divider">or continue with</div>
 
         <div className="oauth-buttons">
-          <button type="button" className="oauth-button github">
-            <FaGithub />
-            GitHub
+          <button
+            type="button"
+            className="oauth-button github"
+            onClick={() => {
+              const redirectPath = "/dashboard";
+              localStorage.removeItem("token");
+              window.location.href = `${
+                process.env.REACT_APP_API_URL ||
+                "https://my-backend-pkhd.onrender.com"
+              }/api/auth/github?redirect=${encodeURIComponent(redirectPath)}`;
+            }}
+          >
+            <FaGithub /> Continue with GitHub
           </button>
           <button
             type="button"
