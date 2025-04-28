@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import robotImage from '../assets/images/2.jpg';
+import robotImage from '../assets/images/2.png';
 
 const Hero = () => {
   const robotRef = useRef(null);
