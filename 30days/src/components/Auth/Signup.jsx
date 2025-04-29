@@ -1,7 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FaGithub, FaGoogle } from "react-icons/fa";
-import "./Auth.css";
+import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
+import "./Auth.css"; // Same CSS file for consistent styling
+
+// Reusing the same AnimatedBackground component
+const AnimatedBackground = () => {
+  return (
+    <div className="animated-background">
+      <div className="orb orb-1"></div>
+      <div className="orb orb-2"></div>
+      <div className="orb orb-3"></div>
+      <div className="orb orb-4"></div>
+      <div className="orb orb-5"></div>
+      <div className="gradient-overlay"></div>
+    </div>
+  );
+};
 
 const Signup = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
@@ -18,6 +32,8 @@ const Signup = ({ onLoginSuccess }) => {
     password: "",
     confirmPassword: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
   const navigate = useNavigate();
@@ -147,160 +163,207 @@ const Signup = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="auth-container">
-      <form className="auth-box" onSubmit={handleSubmit} noValidate>
-        <h2>Create Account</h2>
-        <p className="subtitle">Join our coding community</p>
+    <div className="modern-auth-container">
+      <AnimatedBackground />
 
-        {apiError && <div className="error-message">{apiError}</div>}
+      <div className="card-container">
+        <div className="auth-card signup-card">
+          <div className="card-content">
+            <h2 className="auth-title">Create Account</h2>
+            <p className="auth-subtitle">Join our coding community</p>
 
-        <div className="form-group">
-          <label>Full Name *</label>
-          <input
-            type="text"
-            name="fullName"
-            placeholder="John Doe"
-            value={formData.fullName}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-            className={errors.fullName ? "error" : ""}
-          />
-          {errors.fullName && (
-            <span className="error-text">{errors.fullName}</span>
-          )}
-        </div>
+            {apiError && <div className="error-message">{apiError}</div>}
 
-        <div className="form-group">
-          <label>Username (optional)</label>
-          <input
-            type="text"
-            name="username"
-            placeholder="coder123"
-            value={formData.username}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            className={errors.username ? "error" : ""}
-          />
-          {errors.username && (
-            <span className="error-text">{errors.username}</span>
-          )}
-        </div>
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="form-group">
+                <label>Full Name *</label>
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="John Doe"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  required
+                  className={errors.fullName ? "error" : ""}
+                />
+                {errors.fullName && (
+                  <span className="error-text">{errors.fullName}</span>
+                )}
+              </div>
 
-        <div className="form-group">
-          <label>Email *</label>
-          <input
-            type="email"
-            name="email"
-            placeholder="name@example.com"
-            value={formData.email}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-            className={errors.email ? "error" : ""}
-          />
-          {errors.email && <span className="error-text">{errors.email}</span>}
-        </div>
+              <div className="form-group">
+                <label>Username (optional)</label>
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="coder123"
+                  value={formData.username}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={errors.username ? "error" : ""}
+                />
+                {errors.username && (
+                  <span className="error-text">{errors.username}</span>
+                )}
+              </div>
 
-        <div className="form-group">
-          <label>Password *</label>
-          <input
-            type="password"
-            name="password"
-            placeholder="••••••••"
-            value={formData.password}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-            className={errors.password ? "error" : ""}
-          />
-          {errors.password && (
-            <div className="password-hints">
-              <span className={formData.password.length >= 8 ? "valid" : ""}>
-                • 8+ characters
-              </span>
-              <span className={/[A-Z]/.test(formData.password) ? "valid" : ""}>
-                • Uppercase
-              </span>
-              <span className={/[a-z]/.test(formData.password) ? "valid" : ""}>
-                • Lowercase
-              </span>
-              <span className={/[0-9]/.test(formData.password) ? "valid" : ""}>
-                • Number
-              </span>
-              <span
-                className={
-                  /[^A-Za-z0-9]/.test(formData.password) ? "valid" : ""
-                }
+              <div className="form-group">
+                <label>Email *</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="name@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  required
+                  className={errors.email ? "error" : ""}
+                />
+                {errors.email && (
+                  <span className="error-text">{errors.email}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Password *</label>
+                <div className="password-input">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    required
+                    className={errors.password ? "error" : ""}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label="Toggle password visibility"
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+                {formData.password && (
+                  <div className="password-hints">
+                    <span
+                      className={formData.password.length >= 8 ? "valid" : ""}
+                    >
+                      • 8+ characters
+                    </span>
+                    <span
+                      className={/[A-Z]/.test(formData.password) ? "valid" : ""}
+                    >
+                      • Uppercase
+                    </span>
+                    <span
+                      className={/[a-z]/.test(formData.password) ? "valid" : ""}
+                    >
+                      • Lowercase
+                    </span>
+                    <span
+                      className={/[0-9]/.test(formData.password) ? "valid" : ""}
+                    >
+                      • Number
+                    </span>
+                    <span
+                      className={
+                        /[^A-Za-z0-9]/.test(formData.password) ? "valid" : ""
+                      }
+                    >
+                      • Symbol
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Confirm Password *</label>
+                <div className="password-input">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    required
+                    className={errors.confirmPassword ? "error" : ""}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    aria-label="Toggle confirm password visibility"
+                  >
+                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+                {errors.confirmPassword && (
+                  <span className="error-text">{errors.confirmPassword}</span>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="auth-button"
+                disabled={isLoading}
               >
-                • Symbol
-              </span>
+                {isLoading ? (
+                  <div className="loading-spinner"></div>
+                ) : (
+                  "Sign Up"
+                )}
+              </button>
+            </form>
+
+            <div className="divider">
+              <span>or continue with</span>
             </div>
-          )}
+
+            <div className="oauth-buttons">
+              <button
+                type="button"
+                className="oauth-button github"
+                onClick={() => {
+                  const redirectPath = "/dashboard";
+                  localStorage.removeItem("token");
+                  window.location.href = `${
+                    process.env.REACT_APP_API_URL ||
+                    "https://my-backend-pkhd.onrender.com"
+                  }/api/auth/github?redirect=${encodeURIComponent(
+                    redirectPath
+                  )}`;
+                }}
+              >
+                <FaGithub /> GitHub
+              </button>
+              <button
+                type="button"
+                className="oauth-button google"
+                onClick={() => {
+                  const redirectPath = "/dashboard";
+                  localStorage.removeItem("token");
+                  window.location.href = `${
+                    process.env.REACT_APP_API_URL ||
+                    "https://my-backend-pkhd.onrender.com"
+                  }/api/auth/google?redirect=${encodeURIComponent(
+                    redirectPath
+                  )}`;
+                }}
+              >
+                <FaGoogle /> Google
+              </button>
+            </div>
+            <p className="switch-auth">
+              Already have an account? <Link to="/login">Log In</Link>
+            </p>
+          </div>
         </div>
-
-        <div className="form-group">
-          <label>Confirm Password *</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="••••••••"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-            className={errors.confirmPassword ? "error" : ""}
-          />
-          {errors.confirmPassword && (
-            <span className="error-text">{errors.confirmPassword}</span>
-          )}
-        </div>
-
-        <button type="submit" className="login-btn" disabled={isLoading}>
-          {isLoading ? "Creating account..." : "Sign Up"}
-        </button>
-
-        <div className="divider">or continue with</div>
-
-        <div className="oauth-buttons">
-          <button
-            type="button"
-            className="oauth-button github"
-            onClick={() => {
-              const redirectPath = "/dashboard";
-              localStorage.removeItem("token");
-              window.location.href = `${
-                process.env.REACT_APP_API_URL ||
-                "https://my-backend-pkhd.onrender.com"
-              }/api/auth/github?redirect=${encodeURIComponent(redirectPath)}`;
-            }}
-          >
-            <FaGithub /> Continue with GitHub
-          </button>
-          <button
-            type="button"
-            className="oauth-button google"
-            onClick={() => {
-              // Always redirect to dashboard after Google auth
-              const redirectPath = "/dashboard";
-
-              // Clear any existing tokens
-              localStorage.removeItem("token");
-
-              // Make sure this URL matches your backend route
-              window.location.href = `${
-                process.env.REACT_APP_API_URL ||
-                "https://my-backend-pkhd.onrender.com"
-              }/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
-            }}
-          >
-            <FaGoogle /> Continue with Google
-          </button>
-        </div>
-        <p className="switch-auth">
-          Already have an account? <Link to="/login">Log In</Link>
-        </p>
-      </form>
+      </div>
     </div>
   );
 };

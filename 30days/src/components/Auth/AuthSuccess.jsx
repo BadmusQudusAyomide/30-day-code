@@ -1,7 +1,6 @@
-// src/components/Auth/AuthSuccess.jsx
-import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 
 const AuthSuccess = ({ onLoginSuccess }) => {
   const navigate = useNavigate();
@@ -10,27 +9,30 @@ const AuthSuccess = ({ onLoginSuccess }) => {
   useEffect(() => {
     const completeAuth = async () => {
       try {
-        const token = searchParams.get('token');
-        const redirect = searchParams.get('redirect') || '/dashboard';
+        const token = searchParams.get("token");
+        const redirect = searchParams.get("redirect") || "/dashboard";
 
         if (!token) {
-          throw new Error('Missing authentication token');
+          throw new Error("Missing authentication token");
         }
 
         // Verify token and get user data
-        const response = await axios.get('/api/auth/me', {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await axios.get("/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!response.data.success) {
-          throw new Error(response.data.message || 'Authentication failed');
+          throw new Error(response.data.message || "Authentication failed");
         }
 
         // Complete login process
+        // Save the token and user data (e.g., to localStorage or context)
         onLoginSuccess(token, response.data.user);
+        localStorage.setItem("token", token); // Ensure the token is saved
+
         navigate(redirect);
       } catch (err) {
-        console.error('Authentication error:', err);
+        console.error("Authentication error:", err);
         navigate(`/login?error=${encodeURIComponent(err.message)}`);
       }
     };

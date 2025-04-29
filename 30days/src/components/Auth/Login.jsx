@@ -1,8 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
-import "./Auth.css";
-import "./AuthSuccess.jsx";
+import "./Auth.css"; // We'll keep this CSS file
+import "./AuthSuccess.jsx"; // Adding this import from the second version
+
+// AnimatedBackground component for floating orbs (keeping this from first version)
+const AnimatedBackground = () => {
+  return (
+    <div className="animated-background">
+      <div className="orb orb-1"></div>
+      <div className="orb orb-2"></div>
+      <div className="orb orb-3"></div>
+      <div className="orb orb-4"></div>
+      <div className="orb orb-5"></div>
+      <div className="gradient-overlay"></div>
+    </div>
+  );
+};
 
 const Login = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
@@ -89,17 +103,26 @@ const Login = ({ onLoginSuccess }) => {
         throw new Error(data.message || "Login failed");
       }
 
+      // Set token and user data in localStorage
       localStorage.setItem("token", data.user.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
+      // Call the login success callback
       onLoginSuccess();
 
+      // Log success and token - Adding this from second version
       console.log("Login successful, token stored:", data.user.token);
+
+      // Set the token again to ensure it's properly stored (from second version)
       localStorage.setItem("token", data.user.token);
+
+      // Verify the token is actually in localStorage (from second version)
       console.log(
         "Token in localStorage after setting:",
         localStorage.getItem("token")
       );
+
+      // Navigate to dashboard
       navigate("/dashboard");
     } catch (err) {
       setApiError(err.message);
@@ -109,111 +132,126 @@ const Login = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="auth-container">
-      <form className="auth-box" onSubmit={handleLogin} noValidate>
-        <h2>Welcome Back</h2>
-        <p className="subtitle">Login to continue your coding challenge</p>
+    <div className="modern-auth-container">
+      <AnimatedBackground />
 
-        {apiError && <div className="error-message">{apiError}</div>}
+      <div className="card-container">
+        <div className="auth-card">
+          <div className="card-content">
+            <h2 className="auth-title">Welcome Back</h2>
+            <p className="auth-subtitle">
+              Login to continue your coding challenge
+            </p>
 
-        <div className="form-group">
-          <label>Email or Username</label>
-          <input
-            type="text"
-            name="emailOrUsername"
-            placeholder="name@example.com or username"
-            value={formData.emailOrUsername}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            required
-            className={errors.emailOrUsername ? "error" : ""}
-          />
-          {errors.emailOrUsername && (
-            <span className="error-text">{errors.emailOrUsername}</span>
-          )}
-        </div>
+            {apiError && <div className="error-message">{apiError}</div>}
 
-        <div className="form-group">
-          <label>Password</label>
-          <div className="password-input">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              required
-              className={errors.password ? "error" : ""}
-            />
-            <button
-              type="button"
-              className="toggle-password"
-              onClick={() => setShowPassword((prev) => !prev)}
-              aria-label="Toggle password visibility"
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
+            <form onSubmit={handleLogin} noValidate>
+              <div className="form-group">
+                <label>Email or Username</label>
+                <input
+                  type="text"
+                  name="emailOrUsername"
+                  placeholder="name@example.com or username"
+                  value={formData.emailOrUsername}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  required
+                  className={errors.emailOrUsername ? "error" : ""}
+                />
+                {errors.emailOrUsername && (
+                  <span className="error-text">{errors.emailOrUsername}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Password</label>
+                <div className="password-input">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    required
+                    className={errors.password ? "error" : ""}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label="Toggle password visibility"
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <span className="error-text">{errors.password}</span>
+                )}
+              </div>
+
+              <div className="forgot-password">
+                <Link to="/forgot">Forgot password?</Link>
+              </div>
+
+              <button
+                type="submit"
+                className="auth-button"
+                disabled={isLoading}
+              >
+                {isLoading ? "Logging in..." : "Login"}
+              </button>
+            </form>
+
+            <div className="divider">
+              <span>or continue with</span>
+            </div>
+
+            <div className="oauth-buttons">
+              <button
+                type="button"
+                className="oauth-button github"
+                onClick={() => {
+                  const redirectPath = "/dashboard";
+                  localStorage.removeItem("token");
+                  window.location.href = `${
+                    process.env.REACT_APP_API_URL ||
+                    "https://my-backend-pkhd.onrender.com"
+                  }/api/auth/github?redirect=${encodeURIComponent(
+                    redirectPath
+                  )}`;
+                }}
+              >
+                <FaGithub /> Continue with GitHub
+              </button>
+
+              <button
+                type="button"
+                className="oauth-button google"
+                onClick={() => {
+                  const redirectPath = "/dashboard";
+                  localStorage.removeItem("token");
+                  window.location.href = `${
+                    process.env.REACT_APP_API_URL ||
+                    "https://my-backend-pkhd.onrender.com"
+                  }/api/auth/google?redirect=${encodeURIComponent(
+                    redirectPath
+                  )}`;
+                }}
+              >
+                <FaGoogle /> Continue with Google
+              </button>
+            </div>
+
+            <p className="switch-auth">
+              Don't have an account? <Link to="/signup">Sign Up</Link>
+            </p>
+            <p className="admin-login">
+              Admin? <Link to="/admin">Login here</Link>
+            </p>
           </div>
-          {errors.password && (
-            <span className="error-text">{errors.password}</span>
-          )}
         </div>
-
-        <div className="forgot-password">
-          <Link to="/forgot">Forgot password?</Link>
-        </div>
-
-        <button type="submit" className="login-btn" disabled={isLoading}>
-          {isLoading ? "Logging in..." : "Login"}
-        </button>
-
-        <div className="divider">or continue with</div>
-
-        <div className="oauth-buttons">
-          <button
-            type="button"
-            className="oauth-button github"
-            onClick={() => {
-              const redirectPath = "/dashboard";
-              localStorage.removeItem("token");
-              window.location.href = `${
-                process.env.REACT_APP_API_URL ||
-                "https://my-backend-pkhd.onrender.com"
-              }/api/auth/github?redirect=${encodeURIComponent(redirectPath)}`;
-            }}
-          >
-            <FaGithub /> Continue with GitHub
-          </button>
-
-          <button
-            type="button"
-            className="oauth-button google"
-            onClick={() => {
-              // Always redirect to dashboard after Google auth
-              const redirectPath = "/dashboard";
-
-              // Clear any existing tokens
-              localStorage.removeItem("token");
-
-              // Make sure this URL matches your backend route
-              window.location.href = `${
-                process.env.REACT_APP_API_URL ||
-                "https://my-backend-pkhd.onrender.com"
-              }/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
-            }}
-          >
-            <FaGoogle /> Continue with Google
-          </button>
-        </div>
-
-        <p className="switch-auth">
-          Don't have an account? <Link to="/signup">Sign Up</Link>
-        </p>
-        <p className="admin-login">
-          Admin? <Link to="/admin">Login here</Link>
-        </p>
-      </form>
+      </div>
     </div>
   );
 };
