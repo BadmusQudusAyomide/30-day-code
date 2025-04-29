@@ -1,7 +1,8 @@
 // src/api/auth.js
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_URL =
+  process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com/api";
 
 export const verifyToken = async (token) => {
   try {

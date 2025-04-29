@@ -88,11 +88,14 @@ const Login = ({ onLoginSuccess }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://my-backend-pkhd.onrender.com/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await response.json();
 
@@ -212,7 +215,8 @@ const Login = ({ onLoginSuccess }) => {
                   const redirectPath = "/dashboard";
                   localStorage.removeItem("token");
                   window.location.href = `${
-                    process.env.REACT_APP_API_URL || "http://localhost:5000"
+                    process.env.REACT_APP_API_URL ||
+                    "https://my-backend-pkhd.onrender.com"
                   }/api/auth/github?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;
@@ -228,7 +232,8 @@ const Login = ({ onLoginSuccess }) => {
                   const redirectPath = "/dashboard";
                   localStorage.removeItem("token");
                   window.location.href = `${
-                    process.env.REACT_APP_API_URL || "http://localhost:5000"
+                    process.env.REACT_APP_API_URL ||
+                    "https://my-backend-pkhd.onrender.com"
                   }/api/auth/google?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;

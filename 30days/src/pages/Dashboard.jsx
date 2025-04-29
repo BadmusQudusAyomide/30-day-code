@@ -19,7 +19,8 @@ const Dashboard = ({ onLogout }) => {
   const [error, setError] = useState(null);
   const [topPerformers, setTopPerformers] = useState([]);
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_URL =
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   useEffect(() => {
     const fetchUserData = async () => {

@@ -11,7 +11,8 @@ const Version = () => {
     current: false,
     previous: false,
   });
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_URL =
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   useEffect(() => {
     const fetchChallenges = async () => {
@@ -78,73 +79,73 @@ const Version = () => {
     }
   };
 
-const exportToCSV = async (challengeId, isCurrent) => {
-  const exportKey = isCurrent ? "current" : "previous";
-  setExporting((prev) => ({ ...prev, [exportKey]: true }));
+  const exportToCSV = async (challengeId, isCurrent) => {
+    const exportKey = isCurrent ? "current" : "previous";
+    setExporting((prev) => ({ ...prev, [exportKey]: true }));
 
-  try {
-    // Check for token in multiple possible locations
-    let token =
-      localStorage.getItem("token") ||
-      sessionStorage.getItem("token") ||
-      (document.cookie.match(/token=([^;]+)/) || [])[1];
+    try {
+      // Check for token in multiple possible locations
+      let token =
+        localStorage.getItem("token") ||
+        sessionStorage.getItem("token") ||
+        (document.cookie.match(/token=([^;]+)/) || [])[1];
 
-    if (!token) {
-      console.error("Token not found in any storage");
-      throw new Error("Please log in again - no session found");
-    }
-
-    console.log("Using token:", token.substring(0, 10) + "...");
-
-    const response = await axios.get(
-      `${API_URL}/api/challenge/${challengeId}/export`,
-      {
-        responseType: "blob",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        timeout: 30000,
+      if (!token) {
+        console.error("Token not found in any storage");
+        throw new Error("Please log in again - no session found");
       }
-    );
 
-    // Handle successful download
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `challenge_${exportKey}_data.csv`);
-    document.body.appendChild(link);
-    link.click();
+      console.log("Using token:", token.substring(0, 10) + "...");
 
-    // Clean up
-    setTimeout(() => {
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    }, 100);
-  } catch (err) {
-    console.error("Export error details:", {
-      message: err.message,
-      response: err.response?.data,
-      stack: err.stack,
-    });
+      const response = await axios.get(
+        `${API_URL}/api/challenge/${challengeId}/export`,
+        {
+          responseType: "blob",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          timeout: 30000,
+        }
+      );
 
-    let errorMessage = "Export failed";
-    if (err.message.includes("token")) {
-      errorMessage = "Session expired - please log in again";
-    } else if (err.response?.data?.message) {
-      errorMessage = err.response.data.message;
+      // Handle successful download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `challenge_${exportKey}_data.csv`);
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      setTimeout(() => {
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    } catch (err) {
+      console.error("Export error details:", {
+        message: err.message,
+        response: err.response?.data,
+        stack: err.stack,
+      });
+
+      let errorMessage = "Export failed";
+      if (err.message.includes("token")) {
+        errorMessage = "Session expired - please log in again";
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      }
+
+      alert(errorMessage);
+
+      // Optionally redirect to login if token is invalid
+      if (err.response?.status === 401) {
+        window.location.href = "/login";
+      }
+    } finally {
+      setExporting((prev) => ({ ...prev, [exportKey]: false }));
     }
-
-    alert(errorMessage);
-
-    // Optionally redirect to login if token is invalid
-    if (err.response?.status === 401) {
-      window.location.href = "/login";
-    }
-  } finally {
-    setExporting((prev) => ({ ...prev, [exportKey]: false }));
-  }
-};
+  };
   const renderChallengeCard = (challenge, isCurrent) => {
     if (!challenge) return null;
 
@@ -247,6 +248,4 @@ const exportToCSV = async (challengeId, isCurrent) => {
   );
 };
 
-
 export default Version;
-

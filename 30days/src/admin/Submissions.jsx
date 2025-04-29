@@ -19,7 +19,8 @@ const Submissions = () => {
   const [filter, setFilter] = useState("all");
   const navigate = useNavigate();
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_URL =
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   const fetchSubmissions = async () => {
     try {
@@ -149,9 +150,13 @@ const Submissions = () => {
       return `${API_URL}/${user.profileImage}`;
     }
     // Return a default avatar based on user initials if no profile image
-    const initials = user?.fullName 
-      ? user.fullName.split(' ').map(n => n[0]).join('').toUpperCase()
-      : 'UU';
+    const initials = user?.fullName
+      ? user.fullName
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+      : "UU";
     return `https://ui-avatars.com/api/?name=${initials}&background=random&size=128`;
   };
 

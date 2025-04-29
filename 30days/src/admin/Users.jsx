@@ -417,7 +417,8 @@ const Users = () => {
   const [loadingCounts, setLoadingCounts] = useState(false);
   const navigate = useNavigate();
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_URL =
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   useEffect(() => {
     const fetchUsersAndCounts = async () => {
