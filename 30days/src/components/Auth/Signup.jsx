@@ -122,19 +122,16 @@ const Signup = ({ onLoginSuccess }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        "https://my-backend-pkhd.onrender.com/api/auth/signup",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            fullName: formData.fullName,
-            username: formData.username || undefined,
-            email: formData.email,
-            password: formData.password,
-          }),
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          username: formData.username || undefined,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
 
       const data = await response.json();
 
@@ -332,8 +329,7 @@ const Signup = ({ onLoginSuccess }) => {
                   const redirectPath = "/dashboard";
                   localStorage.removeItem("token");
                   window.location.href = `${
-                    process.env.REACT_APP_API_URL ||
-                    "https://my-backend-pkhd.onrender.com"
+                    process.env.REACT_APP_API_URL || "http://localhost:5000"
                   }/api/auth/github?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;
@@ -348,8 +344,7 @@ const Signup = ({ onLoginSuccess }) => {
                   const redirectPath = "/dashboard";
                   localStorage.removeItem("token");
                   window.location.href = `${
-                    process.env.REACT_APP_API_URL ||
-                    "https://my-backend-pkhd.onrender.com"
+                    process.env.REACT_APP_API_URL || "http://localhost:5000"
                   }/api/auth/google?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;

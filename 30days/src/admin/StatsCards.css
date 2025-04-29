@@ -1,14 +1,28 @@
 .stats-error {
-  grid-column: 1 / -1;
-  background: rgba(255, 0, 0, 0.1);
-  padding: 0.5rem;
-  border-radius: 4px;
-  color: var(--error-color);
-  text-align: center;
-  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #ffebee;
+  border-radius: 5px;
+  margin-bottom: 20px;
 }
 
-.stats-error p {
-  margin: 0;
+.refresh-btn {
+  padding: 5px 10px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
 }
 
+.refresh-btn:hover {
+  background: #d32f2f;
+}
+
+.stat-error {
+  font-size: 0.8rem;
+  color: #f44336;
+  margin-top: 5px;
+}

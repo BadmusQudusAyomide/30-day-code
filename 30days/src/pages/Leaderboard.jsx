@@ -34,8 +34,7 @@ const Leaderboard = () => {
   });
   const navigate = useNavigate();
 
-  const API_URL =
-    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   // Calculate challenge progress
   const calculateChallengeProgress = () => {
@@ -455,10 +454,6 @@ const Leaderboard = () => {
         <div className="us-leaderboard-header">
           <h2 className="us-section-title">Challenge Leaderboard</h2>
           <div className="us-leaderboard-stats">
-            <div className="us-stat-bubble">
-              <Trophy size={16} className="us-icon" />
-              <span>Top Performers</span>
-            </div>
             <div className="us-stat-bubble">
               <Users size={16} className="us-icon" />
               <span>{leaderboardData.length} Participants</span>

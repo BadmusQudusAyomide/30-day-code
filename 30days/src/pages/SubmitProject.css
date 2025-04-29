@@ -16,7 +16,39 @@
   padding: 2rem;
   width: 100%;
   max-width: 800px;
+  position: relative;
 }
+
+/* Back to Dashboard Button Styles */
+.back-to-dashboard {
+  margin-bottom: 1.5rem;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #8b92a8;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s;
+  width: fit-content;
+}
+
+.back-button svg {
+  transition: transform 0.2s;
+}
+
+.back-button:hover {
+  color: #5768e9;
+}
+
+.back-button:hover svg {
+  transform: translateX(-3px);
+}
+
+/* End back button styles */
 
 .submit-project-card h2 {
   color: #fff;
@@ -187,6 +219,15 @@ textarea {
   border-right: 4px solid #5EE075;
   border-bottom: 4px solid #5EE075;
   transform: rotate(45deg) translate(-10px, -15px);
+}
+
+.error-message {
+  background-color: rgba(255, 76, 76, 0.1);
+  border-left: 3px solid #ff4c4c;
+  color: #ff4c4c;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
 }
 
 @media (max-width: 768px) {

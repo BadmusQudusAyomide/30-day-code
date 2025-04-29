@@ -22,6 +22,8 @@ import Leaderboard from "./pages/Leaderboard";
 import ProjectRating from "./pages/ProjectRating";
 import UserProfile from "./pages/UserProfile";
 import DailyChallenge from "./pages/DailyChallenge";
+import Resources from "./pages/Resources";
+import Community from "./pages/Community";
 
 // Admin components
 import AdminLogin from "./admin/components/Auth/Login";
@@ -32,7 +34,7 @@ import "./styles.css";
 
 // Configure axios defaults
 axios.defaults.baseURL =
-  process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+  process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -334,10 +336,18 @@ function App() {
         }
       />
       <Route
-        path="/daily-challenge"
+        path="/resources"
         element={
           <ProtectedRoute>
-            <DailyChallenge onLogout={handleLogout} />
+            <Resources onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/community"
+        element={
+          <ProtectedRoute>
+            <Community onLogout={handleLogout} />
           </ProtectedRoute>
         }
       />

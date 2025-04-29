@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom"; // Import Link for navigation
 import "./SubmitProject.css";
 
 const SubmitProject = () => {
@@ -136,6 +137,25 @@ const SubmitProject = () => {
   return (
     <div className="submit-project-container">
       <div className="submit-project-card">
+        <div className="back-to-dashboard">
+          <Link to="/dashboard" className="back-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back to Dashboard
+          </Link>
+        </div>
+
         <h2>Submit Your Project</h2>
         <p className="subtitle">Day {formData.day} Challenge Submission</p>
 

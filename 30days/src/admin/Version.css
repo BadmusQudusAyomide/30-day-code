@@ -1,0 +1,309 @@
+/* Base Styles */
+.-ver-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  opacity: 0;
+  animation: -ver-fadein 0.5s ease-out forwards;
+}
+
+/* Animations */
+@keyframes -ver-fadein {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes -ver-slidedown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes -ver-slideup {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.-ver-animate-fadein {
+  opacity: 0;
+  animation: -ver-fadein 0.5s ease-out forwards;
+}
+
+.-ver-animate-slidedown {
+  opacity: 0;
+  animation: -ver-slidedown 0.5s ease-out forwards;
+}
+
+.-ver-animate-slideup {
+  opacity: 0;
+  animation: -ver-slideup 0.5s ease-out forwards;
+}
+
+/* Header */
+.-ver-header {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  animation-delay: 0.1s;
+}
+
+/* Challenges Grid */
+.-ver-challenges {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  perspective: 1000px;
+}
+
+@media (min-width: 768px) {
+  .-ver-challenges {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Card Styles */
+.-ver-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  animation-delay: 0.2s;
+}
+
+.-ver-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.-ver-card.-ver-active {
+  border-top: 4px solid #4CAF50;
+  background: linear-gradient(to bottom, #ffffff, #f5fff5);
+}
+
+.-ver-card.-ver-completed {
+  border-top: 4px solid #F44336;
+  background: linear-gradient(to bottom, #ffffff, #fff5f5);
+}
+
+/* Title */
+.-ver-title {
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  position: relative;
+}
+
+.-ver-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: #4CAF50;
+  transition: width 0.3s ease;
+}
+
+.-ver-card.-ver-completed .-ver-title::after {
+  background: #F44336;
+}
+
+.-ver-card:hover .-ver-title::after {
+  width: 80px;
+}
+
+/* Dates */
+.-ver-dates {
+  margin-bottom: 1rem;
+    color: black;
+
+}
+
+.-ver-label {
+  font-weight: 600;
+  color: #555;
+}
+
+/* Status */
+.-ver-status {
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.-ver-status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.-ver-status-badge.-ver-active {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.-ver-status-badge.-ver-completed {
+  background-color: #FFEBEE;
+  color: #C62828;
+}
+
+/* Progress Bar */
+.-ver-progress-container {
+  width: 100%;
+  background-color: #f0f0f0;
+  border-radius: 20px;
+  margin: 1rem 0;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.-ver-progress-bar {
+  height: 30px;
+  background: linear-gradient(90deg, #4CAF50, #81C784);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: width 0.5s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+}
+
+/* Export Button */
+.-ver-export-btn {
+  background: linear-gradient(135deg, #F44336, #E53935);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  width: 100%;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(244, 67, 54, 0.3);
+}
+
+.-ver-export-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.4);
+  background: linear-gradient(135deg, #E53935, #D32F2F);
+}
+
+.-ver-icon {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.-ver-export-btn:hover .-ver-icon {
+  transform: scale(1.1);
+}
+
+/* Loading State */
+.-ver-loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.-ver-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #3498db;
+  width: 40px;
+  height: 40px;
+  animation: -ver-spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes -ver-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.-ver-empty {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  color: #555;
+  animation-delay: 0.3s;
+}
+
+/* Add these new styles to your existing CSS */
+
+.-ver-export-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.-ver-export-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: none;
+}
+
+.-ver-export-btn:hover::after {
+  animation: -ver-shine 1.5s ease infinite;
+}
+
+@keyframes -ver-shine {
+  0% { left: -100%; }
+  20% { left: 100%; }
+  100% { left: 100%; }
+}
+
+.-ver-spinner-small {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: -ver-spin 1s ease-in-out infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Update existing button styles */
+.-ver-export-btn {
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+}
+
+.-ver-card.-ver-completed .-ver-export-btn {
+  background: linear-gradient(135deg, #F44336, #C62828);
+}
+
+.-ver-export-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.-ver-export-btn:disabled {
+  opacity: 0.7;
+  transform: none !important;
+  cursor: not-allowed;
+}

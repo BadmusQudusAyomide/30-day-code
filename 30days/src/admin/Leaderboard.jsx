@@ -9,8 +9,7 @@ const Leaderboard = () => {
   const [sortField, setSortField] = useState("totalPoints");
   const [sortDirection, setSortDirection] = useState("desc");
 
-  const API_URL =
-    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchUsers = async () => {

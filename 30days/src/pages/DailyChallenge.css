@@ -608,3 +608,74 @@ h1 {
     white-space: nowrap;
   }
 }
+
+/* Add these new styles to your DailyChallenge.css */
+
+.difficulty-beginner {
+  background: rgba(52, 211, 153, 0.2);
+  color: #34d399;
+}
+
+.difficulty-intermediate {
+  background: rgba(249, 115, 22, 0.2);
+  color: #f97316;
+}
+
+.difficulty-advanced {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.calendar-day.current {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  font-weight: bold;
+}
+
+.calendar-day.upcoming {
+  background: rgba(255, 255, 255, 0.05);
+  color: #666;
+}
+
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 4px;
+}
+
+.legend-color.completed {
+  background: rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.legend-color.current {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.legend-color.upcoming {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.resource-card {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Keep all your existing CSS styles */
