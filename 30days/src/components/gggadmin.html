@@ -1,463 +1,479 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
-import "./Auth.css";
-import "./AuthSuccess.jsx";
+import React, { useEffect, useRef } from "react";
 
-const Login = ({ onLoginSuccess }) => {
-const [formData, setFormData] = useState({
-emailOrUsername: "",
-password: "",
-});
-const [errors, setErrors] = useState({
-emailOrUsername: "",
-password: "",
-});
-const [showPassword, setShowPassword] = useState(false);
-const [isLoading, setIsLoading] = useState(false);
-const [apiError, setApiError] = useState("");
-const navigate = useNavigate();
+const BackgroundAnimation = () => {
+const containerRef = useRef(null);
 
-const validateField = (name, value) => {
-let error = "";
+useEffect(() => {
+const container = containerRef.current;
+if (!container) return;
 
-switch (name) {
-case "emailOrUsername":
-if (!value.trim()) error = "Email or username is required";
-break;
+// Clear previous orbs
+container.innerHTML = "";
 
-case "password":
-if (!value) error = "Password is required";
-break;
+const createOrbs = () => {
+// Create different layers of orbs for depth
+const orbCounts = [8, 6, 4]; // Different counts for each layer
+const layers = 3;
 
-default:
-break;
-}
-
-return error;
-};
-
-const handleChange = (e) => {
-const { name, value } = e.target;
-setFormData((prev) => ({ ...prev, [name]: value }));
-
-if (errors[name]) {
-setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
-}
-};
-
-const handleBlur = (e) => {
-const { name, value } = e.target;
-setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
-};
-
-const validateForm = () => {
-const newErrors = {};
-let isValid = true;
-
-Object.keys(formData).forEach((key) => {
-const error = validateField(key, formData[key]);
-newErrors[key] = error;
-if (error) isValid = false;
-});
-
-setErrors(newErrors);
-return isValid;
-};
-
-const handleLogin = async (e) => {
-e.preventDefault();
-setApiError("");
-
-if (!validateForm()) return;
-
-setIsLoading(true);
-
-try {
-const response = await fetch("https://my-backend-pkhd.onrender.com/api/auth/login", {
-method: "POST",
-headers: { "Content-Type": "application/json" },
-body: JSON.stringify(formData),
-});
-
-const data = await response.json();
-
-if (!response.ok) {
-throw new Error(data.message || "Login failed");
-}
-
-localStorage.setItem("token", data.user.token);
-localStorage.setItem("user", JSON.stringify(data.user));
-
-onLoginSuccess();
-
-console.log("Login successful, token stored:", data.user.token);
-localStorage.setItem("token", data.user.token);
-console.log(
-"Token in localStorage after setting:",
-localStorage.getItem("token")
-);
-navigate("/dashboard");
-} catch (err) {
-setApiError(err.message);
-} finally {
-setIsLoading(false);
-}
-};
-
-return (
-<div className="auth-container">
-  <form className="auth-box" onSubmit={handleLogin} noValidate>
-    <h2>Welcome Back</h2>
-    <p className="subtitle">Login to continue your coding challenge</p>
-
-    {apiError && <div className="error-message">{apiError}</div>}
-
-    <div className="form-group">
-      <label>Email or Username</label>
-      <input type="text" name="emailOrUsername" placeholder="name@example.com or username"
-        value={formData.emailOrUsername} onChange={handleChange} onBlur={handleBlur} required
-        className={errors.emailOrUsername ? "error" : "" } />
-      {errors.emailOrUsername && (
-      <span className="error-text">{errors.emailOrUsername}</span>
-      )}
-    </div>
-
-    <div className="form-group">
-      <label>Password</label>
-      <div className="password-input">
-        <input type={showPassword ? "text" : "password" } name="password" placeholder="••••••••"
-          value={formData.password} onChange={handleChange} onBlur={handleBlur} required className={errors.password
-          ? "error" : "" } />
-        <button type="button" className="toggle-password" onClick={()=> setShowPassword((prev) => !prev)}
-          aria-label="Toggle password visibility"
-          >
-          {showPassword ?
-          <FaEyeSlash /> :
-          <FaEye />}
-        </button>
-      </div>
-      {errors.password && (
-      <span className="error-text">{errors.password}</span>
-      )}
-    </div>
-
-    <div className="forgot-password">
-      <Link to="/forgot">Forgot password?</Link>
-    </div>
-
-    <button type="submit" className="login-btn" disabled={isLoading}>
-      {isLoading ? "Logging in..." : "Login"}
-    </button>
-
-    <div className="divider">or continue with</div>
-
-    <div className="oauth-buttons">
-      <button type="button" className="oauth-button github">
-        <FaGithub />
-        GitHub
-      </button>
-
-      <button type="button" className="oauth-button google" onClick={()=> {
-        // Always redirect to dashboard after Google auth
-        const redirectPath = "/dashboard";
-
-        // Clear any existing tokens
-        localStorage.removeItem("token");
-
-        // Make sure this URL matches your backend route
-        window.location.href = `${
-        process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com"
-        }/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
-        }}
-        >
-        <FaGoogle /> Continue with Google
-      </button>
-    </div>
-
-    <p className="switch-auth">
-      Don't have an account?
-      <Link to="/signup">Sign Up</Link>
-    </p>
-    <p className="admin-login">
-      Admin?
-      <Link to="/admin">Login here</Link>
-    </p>
-  </form>
-</div>
-);
-};
-
-export default Login;
-
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { FaGithub, FaGoogle } from "react-icons/fa";
-import "./Auth.css";
-
-const Signup = ({ onLoginSuccess }) => {
-const [formData, setFormData] = useState({
-fullName: "",
-username: "",
-email: "",
-password: "",
-confirmPassword: "",
-});
-const [errors, setErrors] = useState({
-fullName: "",
-username: "",
-email: "",
-password: "",
-confirmPassword: "",
-});
-const [isLoading, setIsLoading] = useState(false);
-const [apiError, setApiError] = useState("");
-const navigate = useNavigate();
-
-const validateField = (name, value) => {
-let error = "";
-
-switch (name) {
-case "fullName":
-if (!value.trim()) error = "Full name is required";
-else if (value.length < 2) error="Name too short" ; else if (!/^[a-zA-Z\s'-]+$/.test(value)) error="Invalid characters"
-  ; break; case "username" : if (value && !/^[a-zA-Z0-9_]+$/.test(value)) {
-  error="Only letters, numbers and underscores" ; } break; case "email" : if (!value) error="Email is required" ; else
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) { error="Invalid email format" ; } break; case "password" : if (!value)
-  error="Password is required" ; else if (value.length < 8) error="Minimum 8 characters" ; else if
-  (!/[A-Z]/.test(value)) error="Need at least 1 uppercase" ; else if (!/[a-z]/.test(value))
-  error="Need at least 1 lowercase" ; else if (!/[0-9]/.test(value)) error="Need at least 1 number" ; else if
-  (!/[^A-Za-z0-9]/.test(value)) error="Need at least 1 symbol" ; break; case "confirmPassword" : if (value
-  !==formData.password) error="Passwords must match" ; break; default: break; } return error; }; const
-  handleChange=(e)=> {
-  const { name, value } = e.target;
-  setFormData((prev) => ({ ...prev, [name]: value }));
-
-  // Validate on change only after first blur
-  if (errors[name]) {
-  setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
-  }
+for (let layer = 0; layer < layers; layer++) { for (let i=0; i < orbCounts[layer]; i++) { const
+  orb=document.createElement("div"); // Layer-specific styling const size=Math.random() * (250 - layer * 50) + 50; const
+  depth=layer + 1; const speed=15 + layer * 5; // Slower for background, faster for foreground orb.classList.add("orb");
+  orb.classList.add(`orb-layer-${layer}`); // Randomize orb properties orb.style.width=`${size}px`;
+  orb.style.height=`${size}px`; orb.style.left=`${Math.random() * 100}%`; orb.style.top=`${Math.random() * 100}%`;
+  orb.style.animationDuration=`${speed}s`; orb.style.animationDelay=`${Math.random() * 5}s`; orb.style.opacity=`${0.5 -
+  layer * 0.15}`; orb.style.zIndex=`-${depth}`; // Randomize orb colors slightly for each layer const hueOffset=layer *
+  20; const gradientStart=layer % 2===0 ? `hsla(${260 + hueOffset}, 100%, 60%, 0.2)` : `hsla(${320 + hueOffset}, 100%,
+  60%, 0.2)`; const gradientEnd=layer % 2===0 ? `hsla(${320 - hueOffset}, 100%, 60%, 0.2)` : `hsla(${260 - hueOffset},
+  100%, 60%, 0.2)`; orb.style.background=`radial-gradient(circle, ${gradientStart}, ${gradientEnd})`; // Add unique
+  animation path for each orb const animationPath=Math.floor(Math.random() * 4);
+  orb.classList.add(`path-${animationPath}`); container.appendChild(orb); } } }; createOrbs(); // Recreate orbs on
+  window resize for better distribution const handleResize=()=> {
+  container.innerHTML = "";
+  createOrbs();
   };
 
-  const handleBlur = (e) => {
-  const { name, value } = e.target;
-  setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
+  window.addEventListener("resize", handleResize);
+
+  return () => {
+  window.removeEventListener("resize", handleResize);
+  };
+  }, []);
+
+  return <div className="background-animation" ref={containerRef}></div>;
   };
 
-  const validateForm = () => {
-  const newErrors = {};
-  let isValid = true;
+  export default BackgroundAnimation;
 
-  Object.keys(formData).forEach((key) => {
-  if (key !== "username") {
-  // username is optional
-  const error = validateField(key, formData[key]);
-  newErrors[key] = error;
-  if (error) isValid = false;
-  }
-  });
+  import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
-  setErrors(newErrors);
-  return isValid;
-  };
-
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  setApiError("");
-
-  if (!validateForm()) return;
-
-  setIsLoading(true);
-
-  try {
-  const response = await fetch("https://my-backend-pkhd.onrender.com/api/auth/signup", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-  fullName: formData.fullName,
-  username: formData.username || undefined,
-  email: formData.email,
-  password: formData.password,
-  }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-  throw new Error(data.message || "Signup failed");
-  }
-
-  localStorage.setItem("token", data.user.token);
-  localStorage.setItem("user", JSON.stringify(data.user));
-
-  onLoginSuccess();
-  setFormData({
-  fullName: "",
-  username: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-  });
-
-  navigate("/dashboard");
-  } catch (err) {
-  setApiError(err.message);
-  } finally {
-  setIsLoading(false);
-  }
-  };
-
-  return (
-  <div className="auth-container">
-    <form className="auth-box" onSubmit={handleSubmit} noValidate>
-      <h2>Create Account</h2>
-      <p className="subtitle">Join our coding community</p>
-
-      {apiError && <div className="error-message">{apiError}</div>}
-
-      <div className="form-group">
-        <label>Full Name *</label>
-        <input type="text" name="fullName" placeholder="John Doe" value={formData.fullName} onChange={handleChange}
-          onBlur={handleBlur} required className={errors.fullName ? "error" : "" } />
-        {errors.fullName && (
-        <span className="error-text">{errors.fullName}</span>
-        )}
-      </div>
-
-      <div className="form-group">
-        <label>Username (optional)</label>
-        <input type="text" name="username" placeholder="coder123" value={formData.username} onChange={handleChange}
-          onBlur={handleBlur} className={errors.username ? "error" : "" } />
-        {errors.username && (
-        <span className="error-text">{errors.username}</span>
-        )}
-      </div>
-
-      <div className="form-group">
-        <label>Email *</label>
-        <input type="email" name="email" placeholder="name@example.com" value={formData.email} onChange={handleChange}
-          onBlur={handleBlur} required className={errors.email ? "error" : "" } />
-        {errors.email && <span className="error-text">{errors.email}</span>}
-      </div>
-
-      <div className="form-group">
-        <label>Password *</label>
-        <input type="password" name="password" placeholder="••••••••" value={formData.password} onChange={handleChange}
-          onBlur={handleBlur} required className={errors.password ? "error" : "" } />
-        {errors.password && (
-        <div className="password-hints">
-          <span className={formData.password.length>= 8 ? "valid" : ""}>
-            • 8+ characters
-          </span>
-          <span className={/[A-Z]/.test(formData.password) ? "valid" : "" }>
-            • Uppercase
-          </span>
-          <span className={/[a-z]/.test(formData.password) ? "valid" : "" }>
-            • Lowercase
-          </span>
-          <span className={/[0-9]/.test(formData.password) ? "valid" : "" }>
-            • Number
-          </span>
-          <span className={ /[^A-Za-z0-9]/.test(formData.password) ? "valid" : "" }>
-            • Symbol
-          </span>
-        </div>
-        )}
-      </div>
-
-      <div className="form-group">
-        <label>Confirm Password *</label>
-        <input type="password" name="confirmPassword" placeholder="••••••••" value={formData.confirmPassword}
-          onChange={handleChange} onBlur={handleBlur} required className={errors.confirmPassword ? "error" : "" } />
-        {errors.confirmPassword && (
-        <span className="error-text">{errors.confirmPassword}</span>
-        )}
-      </div>
-
-      <button type="submit" className="login-btn" disabled={isLoading}>
-        {isLoading ? "Creating account..." : "Sign Up"}
-      </button>
-
-      <div className="divider">or continue with</div>
-
-      <div className="oauth-buttons">
-        <button type="button" className="oauth-button github">
-          <FaGithub />
-          GitHub
-        </button>
-        <button type="button" className="oauth-button google" onClick={()=> {
-          // Always redirect to dashboard after Google auth
-          const redirectPath = "/dashboard";
-
-          // Clear any existing tokens
-          localStorage.removeItem("token");
-
-          // Make sure this URL matches your backend route
-          window.location.href = `${
-          process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com"
-          }/api/auth/google?redirect=${encodeURIComponent(redirectPath)}`;
-          }}
-          >
-          <FaGoogle /> Continue with Google
-        </button>
-      </div>
-      <p className="switch-auth">
-        Already have an account?
-        <Link to="/login">Log In</Link>
-      </p>
-    </form>
-  </div>
-  );
-  };
-
-  export default Signup;
-
-  // src/components/Auth/AuthSuccess.jsx
-  import { useEffect } from 'react';
-  import { useNavigate, useSearchParams } from 'react-router-dom';
-  import axios from 'axios';
-
-  const AuthSuccess = ({ onLoginSuccess }) => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+const CtaSection = () => {
+  const ctaRef = useRef(null);
 
   useEffect(() => {
-  const completeAuth = async () => {
-  try {
-  const token = searchParams.get('token');
-  const redirect = searchParams.get('redirect') || '/dashboard';
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+        }
+      },
+      { threshold: 0.2 }
+    );
 
-  if (!token) {
-  throw new Error('Missing authentication token');
-  }
+    if (ctaRef.current) {
+      observer.observe(ctaRef.current);
+    }
 
-  // Verify token and get user data
-  const response = await axios.get('/api/auth/me', {
-  headers: { Authorization: `Bearer ${token}` }
-  });
-
-  if (!response.data.success) {
-  throw new Error(response.data.message || 'Authentication failed');
-  }
-
-  // Complete login process
-  onLoginSuccess(token, response.data.user);
-  navigate(redirect);
-  } catch (err) {
-  console.error('Authentication error:', err);
-  navigate(`/login?error=${encodeURIComponent(err.message)}`);
-  }
-  };
-
-  completeAuth();
-  }, [navigate, searchParams, onLoginSuccess]);
+    return () => {
+      if (ctaRef.current) {
+        observer.unobserve(ctaRef.current);
+      }
+    };
+  }, []);
 
   return (
-  <div className="auth-loading">
-    <h2>Completing Authentication</h2>
-    <p>Please wait while we prepare your dashboard...</p>
-  </div>
-  );
-  };
+    <section className="cta-section" id="join" ref={ctaRef}>
+      <div className="container">
+        <div className="cta-content">
+          <h2 className="section-title">
+            Ready to <span className="gradient-text">Take the Challenge?</span>
+          </h2>
+          <p className="cta-description">
+            Join thousands of developers in this exciting 30-day journey to
+            improve your coding skills, build an impressive portfolio, and
+            connect with a vibrant community.
+          </p>
+          <Link to="/login?signup=true" className="btn btn-primary btn-large">
+            Register Now
+            <ArrowRight size={20} />
+          </Link>
+        </div>
 
-  export default AuthSuccess;
+        <div className="cta-decoration">
+          <div className="code-block">
+            <div className="code-line">
+              <span className="code-keyword">function</span>{" "}
+              <span className="code-function">joinChallenge</span>() {"{"}
+            </div>
+            <div className="code-line">
+              {" "}
+              <span className="code-keyword">const</span>{" "}
+              <span className="code-variable">coder</span> ={" "}
+              <span className="code-string">'you'</span>;
+            </div>
+            <div className="code-line">
+              {" "}
+              <span className="code-keyword">const</span>{" "}
+              <span className="code-variable">days</span> ={" "}
+              <span className="code-number">30</span>;
+            </div>
+            <div className="code-line">
+              {" "}
+              <span className="code-keyword">const</span>{" "}
+              <span className="code-variable">projects</span> = [];
+            </div>
+            <div className="code-line">
+              {" "}
+              <span className="code-keyword">const</span>{" "}
+              <span className="code-variable">skills</span> ={" "}
+              <span className="code-string">'leveling up'</span>;
+            </div>
+            <div className="code-line"> </div>
+            <div className="code-line">
+              {" "}
+              <span className="code-keyword">return</span>{" "}
+              <span className="code-string">'Amazing portfolio'</span>;
+            </div>
+            <div className="code-line">{"}"}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default CtaSection;
+
+import React, { useEffect, useRef } from "react";
+
+const Features = () => {
+  const featuresList = [
+    {
+      icon: "📊",
+      title: "Challenge Overview",
+      description:
+        "Create and submit diverse projects over thirty days, from websites to coding tools. Foster consistent coding practice and innovation through daily challenges.",
+    },
+    {
+      icon: "📝",
+      title: "Submission Platform",
+      description:
+        "Use our dedicated platform to showcase your work with project details, coding language, and more. A centralized hub for all participants' creations.",
+    },
+    {
+      icon: "💬",
+      title: "Community Interaction",
+      description:
+        "View and rate others' projects, exchange ideas, and celebrate achievements. Build connections with fellow coders throughout the challenge.",
+    },
+    {
+      icon: "⭐",
+      title: "Rating System",
+      description:
+        "Receive constructive feedback from challenge admins based on creativity, functionality, code quality, and theme adherence.",
+    },
+    {
+      icon: "🎨",
+      title: "Daily Themes",
+      description:
+        "Each day features a unique thematic prompt to inspire your creativity. Incorporate these themes into your projects for an extra challenge.",
+    },
+    {
+      icon: "⚡",
+      title: "Documentation",
+      description:
+        "Submit concise documentation with each project, sharing insights into your development process, key features, and learning experiences.",
+    },
+  ];
+
+  const sectionRef = useRef(null);
+  const cardsRef = useRef([]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in-view");
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (cardsRef.current) {
+      cardsRef.current.forEach((card) => {
+        if (card) observer.observe(card);
+      });
+    }
+
+    return () => {
+      if (cardsRef.current) {
+        cardsRef.current.forEach((card) => {
+          if (card) observer.unobserve(card);
+        });
+      }
+    };
+  }, []);
+
+  return (
+    <section
+      className="features section-padding"
+      id="features"
+      ref={sectionRef}
+    >
+      <div className="container">
+        <h2 className="section-title">
+          Challenge <span className="gradient-text">Features</span>
+        </h2>
+        <div className="features-grid">
+          {featuresList.map((feature, index) => (
+            <div
+              className="feature-card"
+              key={index}
+              ref={(el) => (cardsRef.current[index] = el)}
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="feature-icon">{feature.icon}</div>
+              <h3 className="feature-title">{feature.title}</h3>
+              <p className="feature-description">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Features;
+import React from "react";
+import { Github, Twitter, Linkedin, Heart } from "lucide-react";
+
+const Footer = () => {
+  return (
+    <footer className="footer">
+      <div className="container">
+        <div className="footer-content">
+          <div className="footer-brand">
+            <h3 className="footer-logo">
+              Code <span className="accent">&lt;30&gt;</span>
+            </h3>
+            <p className="footer-tagline">
+              Connect with the 30 Days of Code Challenge community
+            </p>
+          </div>
+
+          <div className="footer-links">
+            <div className="footer-links-column">
+              <h4>Navigate</h4>
+              <ul>
+                <li>
+                  <a href="#features">Features</a>
+                </li>
+                <li>
+                  <a href="#about">About</a>
+                </li>
+                <li>
+                  <a href="#rules">Rules</a>
+                </li>
+                <li>
+                  <a href="#faq">FAQ</a>
+                </li>
+              </ul>
+            </div>
+            <div className="footer-links-column">
+              <h4>Resources</h4>
+              <ul>
+                <li>
+                  <a href="#">Documentation</a>
+                </li>
+                <li>
+                  <a href="#">Past Challenges</a>
+                </li>
+                <li>
+                  <a href="#">Learning Path</a>
+                </li>
+                <li>
+                  <a href="#">Contact</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="footer-social">
+            <h4>Follow Us</h4>
+            <div className="social-links">
+              <a href="#" aria-label="GitHub">
+                <Github size={24} />
+              </a>
+              <a href="#" aria-label="Twitter">
+                <Twitter size={24} />
+              </a>
+              <a href="#" aria-label="LinkedIn">
+                <Linkedin size={24} />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <p className="copyright">
+            © {new Date().getFullYear()} 30 Days of Code Challenge with
+            VickyJay. All rights reserved.
+          </p>
+          <p className="footer-love">
+            Made by Snap Dragon Team<Heart size={16} className="heart-icon" />for  developers
+            everywhere
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Menu, X, Code } from "lucide-react";
+
+const Header = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  const toggleMenu = () => setMenuOpen(!menuOpen);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <header className={`header ${scrolled ? "scrolled" : ""}`}>
+      <div className="container header-container">
+        <Link to="/" className="logo">
+          <Code className="logo-icon" size={28} />
+          <span className="logo-text">
+            Code <span className="accent">&lt;30&gt;</span>
+          </span>
+        </Link>
+
+        <button
+          className="mobile-menu-btn"
+          onClick={toggleMenu}
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
+          <a href="#features" onClick={() => setMenuOpen(false)}>
+            Features
+          </a>
+          <a href="#about" onClick={() => setMenuOpen(false)}>
+            About
+          </a>
+          <a href="#rules" onClick={() => setMenuOpen(false)}>
+            Rules
+          </a>
+          <a href="#faq" onClick={() => setMenuOpen(false)}>
+            FAQ
+          </a>
+        </nav>
+
+        <div className={`cta-buttons ${menuOpen ? "open" : ""}`}>
+          <Link
+            to="/login"
+            className="btn btn-outline"
+            onClick={() => setMenuOpen(false)}
+          >
+            Login
+          </Link>
+          <Link
+            to="/login?signup=true"
+            className="btn btn-primary"
+            onClick={() => setMenuOpen(false)}
+          >
+            Sign up
+          </Link>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
+import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import robotImage from "../assets/images/2.png";
+
+const Hero = () => {
+const robotRef = useRef(null);
+
+useEffect(() => {
+const observer = new IntersectionObserver(
+([entry]) => {
+if (entry.isIntersecting) {
+entry.target.classList.add("animate-in");
+}
+},
+{ threshold: 0.1 }
+);
+
+if (robotRef.current) {
+observer.observe(robotRef.current);
+}
+
+return () => {
+if (robotRef.current) {
+observer.unobserve(robotRef.current);
+}
+};
+}, []);
+
+return (
+<section className="hero">
+  <div className="container hero-container">
+    <div className="hero-content">
+      <h1 className="hero-title">
+        <span className="gradient-text">30 Days</span> of Code Challenge
+      </h1>
+      <h2 className="hero-subtitle">With VickyJay</h2>
+      <p className="hero-description">
+        An engaging and intensive programming journey designed to foster
+        continuous learning and project development through daily coding
+        challenges and community feedback.
+      </p>
+      <div className="hero-cta">
+        <Link to="/login?signup=true" className="btn btn-primary btn-large">
+        Join the Challenge
+        <ArrowRight size={20} />
+        </Link>
+      </div>
+    </div>
+
+    <div className="hero-visual" ref={robotRef}>
+      <div className="robot-container robot-container-adjusted">
+        <div className="robot-glow"></div>
+        <img src={robotImage} alt="Robot Coding Illustration" className="robot-image" />
+        <div className="code-particles">
+          {Array(5)
+          .fill()
+          .map((_, i) => (
+          <div key={i} className={`code-particle particle-${i + 1}`}>{`</>`}</div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div className="scroll-indicator">
+    <div className="mouse">
+      <div className="wheel"></div>
+    </div>
+    <div className="scroll-text">Scroll to explore</div>
+  </div>
+</section>
+);
+};
+
+export default Hero;

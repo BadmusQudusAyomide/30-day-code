@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import BackgroundOrbs from "./BackgroundOrbs";
+import "./AuthStyles.css";
 
 const AdminSignup = ({ setAuthenticated }) => {
   const [fullName, setFullName] = useState("");
@@ -8,10 +10,20 @@ const AdminSignup = ({ setAuthenticated }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [adminKey, setAdminKey] = useState(""); // Special key to register as admin
+  const [adminKey, setAdminKey] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Animation for the form appearance
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,7 +72,16 @@ const AdminSignup = ({ setAuthenticated }) => {
 
   return (
     <div className="auth-container">
-      <div className="auth-card glass-card">
+      <BackgroundOrbs />
+
+      <div
+        className="auth-card glass-card"
+        style={{
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible ? "translateY(0)" : "translateY(20px)",
+          transition: "opacity 0.6s ease-out, transform 0.6s ease-out",
+        }}
+      >
         <h2 className="auth-title">Create Admin Account</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}
@@ -75,6 +96,8 @@ const AdminSignup = ({ setAuthenticated }) => {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
+              placeholder="Enter your full name"
+              autoComplete="name"
             />
           </div>
 
@@ -87,6 +110,8 @@ const AdminSignup = ({ setAuthenticated }) => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              placeholder="Choose a username"
+              autoComplete="username"
             />
           </div>
 
@@ -99,6 +124,8 @@ const AdminSignup = ({ setAuthenticated }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              placeholder="Enter your email address"
+              autoComplete="email"
             />
           </div>
 
@@ -111,6 +138,8 @@ const AdminSignup = ({ setAuthenticated }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              placeholder="Create a password"
+              autoComplete="new-password"
             />
           </div>
 
@@ -123,6 +152,8 @@ const AdminSignup = ({ setAuthenticated }) => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              placeholder="Confirm your password"
+              autoComplete="new-password"
             />
           </div>
 
@@ -135,21 +166,28 @@ const AdminSignup = ({ setAuthenticated }) => {
               value={adminKey}
               onChange={(e) => setAdminKey(e.target.value)}
               required
+              placeholder="Enter admin registration key"
+              autoComplete="off"
             />
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary"
-            style={{ width: "100%" }}
-            disabled={loading}
-          >
-            {loading ? "Creating Account..." : "Create Admin Account"}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? (
+              <span>
+                <i
+                  className="fas fa-circle-notch fa-spin"
+                  style={{ marginRight: "8px" }}
+                ></i>
+                Creating Account...
+              </span>
+            ) : (
+              "Create Admin Account"
+            )}
           </button>
         </form>
 
         <div className="auth-footer">
-          <div style={{ marginBottom: "10px" }}>
+          <div>
             <Link to="/admin/login" className="auth-link">
               Already have an admin account? Login
             </Link>
