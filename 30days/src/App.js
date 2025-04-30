@@ -336,6 +336,14 @@ function App() {
         }
       />
       <Route
+        path="/daily-challenge"
+        element={
+          <ProtectedRoute>
+            <DailyChallenge onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/resources"
         element={
           <ProtectedRoute>

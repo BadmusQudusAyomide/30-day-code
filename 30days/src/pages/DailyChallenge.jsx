@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom"; // Added import for Link
+import axios from "axios";
 import "./DailyChallenge.css";
 
 const DailyChallenge = () => {
@@ -11,6 +13,50 @@ const DailyChallenge = () => {
 
   const [activeTab, setActiveTab] = useState("current");
   const [newTaskText, setNewTaskText] = useState("");
+  const [currentDay, setCurrentDay] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const API_URL =
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+
+  // Fetch current day from API
+  useEffect(() => {
+    const fetchCurrentDay = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("token");
+        if (!token) {
+          // Handle no token case
+          setCurrentDay(1);
+          setLoading(false);
+          return;
+        }
+
+        const authHeader = `Bearer ${token}`;
+        const dayResponse = await axios.get(
+          `${API_URL}/api/challenge/current-day`,
+          {
+            headers: {
+              Authorization: authHeader,
+            },
+          }
+        );
+
+        // Set the day from the API response
+        setCurrentDay(dayResponse.data.day || 1);
+      } catch (err) {
+        console.error("Error fetching challenge day:", err);
+        setError("Failed to load current challenge day");
+        // Fallback to day 1
+        setCurrentDay(1);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCurrentDay();
+  }, [API_URL]);
 
   const toggleTask = (id) => {
     const updated = tasks.map((task) =>
@@ -45,24 +91,26 @@ const DailyChallenge = () => {
     {
       day: 1,
       title: "Counter App",
-      description: "Build a simple counter that can increment, decrement, and reset.",
+      description:
+        "Build a simple counter that can increment, decrement, and reset.",
       difficulty: "Beginner",
       requirements: [
         "Create a component with count state",
         "Implement increment, decrement and reset functionality",
-        "Display the current count"
-      ]
+        "Display the current count",
+      ],
     },
     {
       day: 2,
       title: "Todo List",
-      description: "Create a basic todo list that allows adding and removing items.",
+      description:
+        "Create a basic todo list that allows adding and removing items.",
       difficulty: "Beginner",
       requirements: [
         "Create input for new todos",
         "Display list of todos",
-        "Implement delete functionality"
-      ]
+        "Implement delete functionality",
+      ],
     },
     {
       day: 3,
@@ -72,8 +120,8 @@ const DailyChallenge = () => {
       requirements: [
         "Use fetch or axios to get weather data",
         "Display relevant weather information",
-        "Add loading states"
-      ]
+        "Add loading states",
+      ],
     },
     {
       day: 4,
@@ -83,8 +131,8 @@ const DailyChallenge = () => {
       requirements: [
         "Implement all basic math operations",
         "Handle decimal numbers",
-        "Clear functionality"
-      ]
+        "Clear functionality",
+      ],
     },
     {
       day: 5,
@@ -94,8 +142,8 @@ const DailyChallenge = () => {
       requirements: [
         "Store quiz questions",
         "Track user answers",
-        "Calculate and display score"
-      ]
+        "Calculate and display score",
+      ],
     },
     {
       day: 6,
@@ -105,8 +153,8 @@ const DailyChallenge = () => {
       requirements: [
         "Implement search functionality",
         "Display recipe cards",
-        "Show recipe details"
-      ]
+        "Show recipe details",
+      ],
     },
     {
       day: 7,
@@ -116,8 +164,8 @@ const DailyChallenge = () => {
       requirements: [
         "Add/remove transactions",
         "Calculate balance",
-        "Display chart of expenses"
-      ]
+        "Display chart of expenses",
+      ],
     },
     {
       day: 8,
@@ -127,8 +175,8 @@ const DailyChallenge = () => {
       requirements: [
         "Generate random card pairs",
         "Track matched pairs",
-        "Add timer/score"
-      ]
+        "Add timer/score",
+      ],
     },
     {
       day: 9,
@@ -138,8 +186,8 @@ const DailyChallenge = () => {
       requirements: [
         "Display blog posts",
         "Add comment functionality",
-        "Implement routing"
-      ]
+        "Implement routing",
+      ],
     },
     {
       day: 10,
@@ -149,8 +197,8 @@ const DailyChallenge = () => {
       requirements: [
         "Product gallery",
         "Add to cart functionality",
-        "Cart preview"
-      ]
+        "Cart preview",
+      ],
     },
     {
       day: 11,
@@ -160,8 +208,8 @@ const DailyChallenge = () => {
       requirements: [
         "Create auth forms",
         "Form validation",
-        "Mock authentication"
-      ]
+        "Mock authentication",
+      ],
     },
     {
       day: 12,
@@ -171,8 +219,8 @@ const DailyChallenge = () => {
       requirements: [
         "Create draggable cards",
         "Implement drop zones",
-        "Persist state"
-      ]
+        "Persist state",
+      ],
     },
     {
       day: 13,
@@ -182,8 +230,8 @@ const DailyChallenge = () => {
       requirements: [
         "Message list",
         "Input for new messages",
-        "Mock real-time updates"
-      ]
+        "Mock real-time updates",
+      ],
     },
     {
       day: 14,
@@ -193,30 +241,22 @@ const DailyChallenge = () => {
       requirements: [
         "Search movies from API",
         "Display movie details",
-        "Favorite functionality"
-      ]
+        "Favorite functionality",
+      ],
     },
     {
       day: 15,
       title: "Music Player",
       description: "Build a music player with playlists.",
       difficulty: "Advanced",
-      requirements: [
-        "Audio playback",
-        "Playlist management",
-        "Progress bar"
-      ]
+      requirements: ["Audio playback", "Playlist management", "Progress bar"],
     },
     {
       day: 16,
       title: "CSS Animation Challenge",
       description: "Create interactive UI with advanced CSS animations.",
       difficulty: "Intermediate",
-      requirements: [
-        "Hover effects",
-        "Transitions",
-        "Keyframe animations"
-      ]
+      requirements: ["Hover effects", "Transitions", "Keyframe animations"],
     },
     {
       day: 17,
@@ -226,8 +266,8 @@ const DailyChallenge = () => {
       requirements: [
         "Combine data from 2+ APIs",
         "Error handling",
-        "Loading states"
-      ]
+        "Loading states",
+      ],
     },
     {
       day: 18,
@@ -237,8 +277,8 @@ const DailyChallenge = () => {
       requirements: [
         "Multiple field types",
         "Real-time validation",
-        "Submission handling"
-      ]
+        "Submission handling",
+      ],
     },
     {
       day: 19,
@@ -248,8 +288,8 @@ const DailyChallenge = () => {
       requirements: [
         "Responsive layout",
         "Data visualization",
-        "Interactive elements"
-      ]
+        "Interactive elements",
+      ],
     },
     {
       day: 20,
@@ -259,8 +299,8 @@ const DailyChallenge = () => {
       requirements: [
         "About/projects sections",
         "Contact form",
-        "Responsive design"
-      ]
+        "Responsive design",
+      ],
     },
     {
       day: 21,
@@ -270,8 +310,8 @@ const DailyChallenge = () => {
       requirements: [
         "Redux store setup",
         "Actions and reducers",
-        "Connect components"
-      ]
+        "Connect components",
+      ],
     },
     {
       day: 22,
@@ -281,19 +321,15 @@ const DailyChallenge = () => {
       requirements: [
         "Detect scroll position",
         "Load more data",
-        "Performance optimization"
-      ]
+        "Performance optimization",
+      ],
     },
     {
       day: 23,
       title: "Dark Mode Toggle",
       description: "Add theme switching to an app.",
       difficulty: "Intermediate",
-      requirements: [
-        "Theme context",
-        "Toggle component",
-        "Persist preference"
-      ]
+      requirements: ["Theme context", "Toggle component", "Persist preference"],
     },
     {
       day: 24,
@@ -303,8 +339,8 @@ const DailyChallenge = () => {
       requirements: [
         "Keyboard navigation",
         "ARIA attributes",
-        "Screen reader testing"
-      ]
+        "Screen reader testing",
+      ],
     },
     {
       day: 25,
@@ -314,30 +350,22 @@ const DailyChallenge = () => {
       requirements: [
         "Type interfaces",
         "Type props and state",
-        "Fix type errors"
-      ]
+        "Fix type errors",
+      ],
     },
     {
       day: 26,
       title: "Performance Optimization",
       description: "Identify and fix performance bottlenecks.",
       difficulty: "Advanced",
-      requirements: [
-        "React.memo",
-        "useCallback/useMemo",
-        "Code splitting"
-      ]
+      requirements: ["React.memo", "useCallback/useMemo", "Code splitting"],
     },
     {
       day: 27,
       title: "Testing Challenge",
       description: "Add unit and integration tests to an app.",
       difficulty: "Advanced",
-      requirements: [
-        "Jest setup",
-        "Component tests",
-        "Mock API calls"
-      ]
+      requirements: ["Jest setup", "Component tests", "Mock API calls"],
     },
     {
       day: 28,
@@ -347,19 +375,15 @@ const DailyChallenge = () => {
       requirements: [
         "Extract hook logic",
         "Handle dependencies",
-        "Document usage"
-      ]
+        "Document usage",
+      ],
     },
     {
       day: 29,
       title: "Open Source Contribution",
       description: "Contribute to an open source React project.",
       difficulty: "Advanced",
-      requirements: [
-        "Find an issue",
-        "Make a PR",
-        "Address feedback"
-      ]
+      requirements: ["Find an issue", "Make a PR", "Address feedback"],
     },
     {
       day: 30,
@@ -369,51 +393,150 @@ const DailyChallenge = () => {
       requirements: [
         "Combine multiple features",
         "Polish UI/UX",
-        "Deploy to production"
-      ]
-    }
+        "Deploy to production",
+      ],
+    },
   ];
 
-  const currentDay = 1; // Change this to set the current day
-  const currentChallenge = allChallenges.find(challenge => challenge.day === currentDay);
-  const pastChallenges = allChallenges.filter(challenge => challenge.day < currentDay).reverse();
+  // Get the current challenge based on the current day
+  const currentChallenge =
+    allChallenges.find((challenge) => challenge.day === currentDay) ||
+    allChallenges[0];
+
+  // Get past challenges based on the current day
+  const pastChallenges = allChallenges
+    .filter((challenge) => challenge.day < currentDay)
+    .reverse();
 
   const reactResources = [
     {
       title: "React Official Documentation",
       url: "https://reactjs.org/docs/getting-started.html",
-      type: "documentation"
+      type: "documentation",
     },
     {
       title: "React Hooks Cheat Sheet",
       url: "https://react-hooks-cheatsheet.com/",
-      type: "cheatsheet"
+      type: "cheatsheet",
     },
     {
       title: "React Tutorial for Beginners",
       url: "https://www.youtube.com/watch?v=w7ejDZ8SWv8",
-      type: "video"
+      type: "video",
     },
     {
       title: "React Patterns",
       url: "https://reactpatterns.com/",
-      type: "patterns"
+      type: "patterns",
     },
     {
       title: "React TypeScript Cheat Sheet",
       url: "https://react-typescript-cheatsheet.netlify.app/",
-      type: "cheatsheet"
+      type: "cheatsheet",
     },
     {
       title: "React Testing Library",
       url: "https://testing-library.com/docs/react-testing-library/intro/",
-      type: "testing"
-    }
+      type: "testing",
+    },
   ];
+
+  if (loading) {
+    return (
+      <div className="daily-container">
+        <div className="glass-card">
+          {/* Back to Dashboard Button */}
+          <div className="back-nav">
+            <Link to="/dashboard" className="back-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              Back to Dashboard
+            </Link>
+          </div>
+          <header className="challenge-header">
+            <h1>🚀 30-Day React Challenge</h1>
+            <div className="loading-spinner"></div>
+            <p>Loading today's challenge...</p>
+          </header>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="daily-container">
+        <div className="glass-card">
+          {/* Back to Dashboard Button */}
+          <div className="back-nav">
+            <Link to="/dashboard" className="back-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              Back to Dashboard
+            </Link>
+          </div>
+          <header className="challenge-header">
+            <h1>🚀 30-Day React Challenge</h1>
+            <div className="error-message">
+              <p>{error}</p>
+              <button
+                className="retry-button"
+                onClick={() => window.location.reload()}
+              >
+                Try Again
+              </button>
+            </div>
+          </header>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="daily-container">
       <div className="glass-card">
+        {/* Back to Dashboard Button */}
+        <div className="back-nav">
+          <Link to="/dashboard" className="back-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back to Dashboard
+          </Link>
+        </div>
+
         <header className="challenge-header">
           <h1>🚀 30-Day React Challenge</h1>
           <p className="day-number">Day {currentDay} of 30</p>
@@ -448,7 +571,9 @@ const DailyChallenge = () => {
             <div className="challenge-details">
               <div className="challenge-header">
                 <h2>{currentChallenge.title}</h2>
-                <span className={`badge difficulty-${currentChallenge.difficulty.toLowerCase()}`}>
+                <span
+                  className={`badge difficulty-${currentChallenge.difficulty.toLowerCase()}`}
+                >
                   {currentChallenge.difficulty}
                 </span>
               </div>
@@ -542,17 +667,21 @@ const DailyChallenge = () => {
               <h3>React Resources</h3>
               <div className="resources-grid">
                 {reactResources.map((resource, index) => (
-                  <a 
-                    key={index} 
-                    href={resource.url} 
-                    target="_blank" 
+                  <a
+                    key={index}
+                    href={resource.url}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="resource-card"
                   >
                     <span className="resource-icon">
-                      {resource.type === 'video' ? '🎥' : 
-                       resource.type === 'documentation' ? '📚' :
-                       resource.type === 'cheatsheet' ? '📝' : '🧩'}
+                      {resource.type === "video"
+                        ? "🎥"
+                        : resource.type === "documentation"
+                        ? "📚"
+                        : resource.type === "cheatsheet"
+                        ? "📝"
+                        : "🧩"}
                     </span>
                     <h4>{resource.title}</h4>
                   </a>
@@ -569,26 +698,34 @@ const DailyChallenge = () => {
               Revisit past challenges to practice your skills
             </p>
 
-            {pastChallenges.map((challenge) => (
-              <div className="past-challenge-card" key={challenge.day}>
-                <div className="past-challenge-header">
-                  <span className="day-badge">Day {challenge.day}</span>
-                  <span
-                    className={`difficulty-badge ${challenge.difficulty.toLowerCase()}`}
-                  >
-                    {challenge.difficulty}
-                  </span>
+            {pastChallenges.length > 0 ? (
+              pastChallenges.map((challenge) => (
+                <div className="past-challenge-card" key={challenge.day}>
+                  <div className="past-challenge-header">
+                    <span className="day-badge">Day {challenge.day}</span>
+                    <span
+                      className={`difficulty-badge ${challenge.difficulty.toLowerCase()}`}
+                    >
+                      {challenge.difficulty}
+                    </span>
+                  </div>
+                  <h3>{challenge.title}</h3>
+                  <p>{challenge.description}</p>
+                  <div className="card-actions">
+                    <button className="view-btn">View Details</button>
+                    <button className="retry-btn">Retry Challenge</button>
+                  </div>
                 </div>
-                <h3>{challenge.title}</h3>
-                <p>{challenge.description}</p>
-                <div className="card-actions">
-                  <button className="view-btn">View Details</button>
-                  <button className="retry-btn">Retry Challenge</button>
-                </div>
+              ))
+            ) : (
+              <div className="no-past-challenges">
+                <p>You're just getting started! No past challenges yet.</p>
               </div>
-            ))}
+            )}
 
-            <button className="view-all-btn">View All Past Challenges</button>
+            {pastChallenges.length > 0 && (
+              <button className="view-all-btn">View All Past Challenges</button>
+            )}
           </div>
         )}
 
@@ -611,7 +748,9 @@ const DailyChallenge = () => {
                 <span className="stat-label">Overall Progress</span>
               </div>
               <div className="stat-card">
-                <span className="stat-number">{currentDay > 1 ? currentDay - 1 : 0}</span>
+                <span className="stat-number">
+                  {currentDay > 1 ? currentDay - 1 : 0}
+                </span>
                 <span className="stat-label">Current Streak</span>
               </div>
               <div className="stat-card">
@@ -629,8 +768,11 @@ const DailyChallenge = () => {
                   <div
                     key={challenge.day}
                     className={`calendar-day ${
-                      challenge.day < currentDay ? "completed" : 
-                      challenge.day === currentDay ? "current" : "upcoming"
+                      challenge.day < currentDay
+                        ? "completed"
+                        : challenge.day === currentDay
+                        ? "current"
+                        : "upcoming"
                     }`}
                     title={`Day ${challenge.day}: ${challenge.title}`}
                   >
@@ -661,7 +803,9 @@ const DailyChallenge = () => {
                 <div className="skill-progress-bar">
                   <div
                     className="skill-progress-fill"
-                    style={{ width: `${Math.min(100, (currentDay / 30) * 100)}%` }}
+                    style={{
+                      width: `${Math.min(100, (currentDay / 30) * 100)}%`,
+                    }}
                   ></div>
                 </div>
                 <span className="skill-percent">
@@ -673,11 +817,16 @@ const DailyChallenge = () => {
                 <div className="skill-progress-bar">
                   <div
                     className="skill-progress-fill"
-                    style={{ width: `${Math.min(100, ((currentDay - 5) / 25) * 100)}%` }}
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        Math.max(0, ((currentDay - 5) / 25) * 100)
+                      )}%`,
+                    }}
                   ></div>
                 </div>
                 <span className="skill-percent">
-                  {Math.round(((currentDay - 5) / 25) * 100)}%
+                  {Math.round(Math.max(0, ((currentDay - 5) / 25) * 100))}%
                 </span>
               </div>
               <div className="skill-bar">
@@ -685,11 +834,16 @@ const DailyChallenge = () => {
                 <div className="skill-progress-bar">
                   <div
                     className="skill-progress-fill"
-                    style={{ width: `${Math.min(100, ((currentDay - 2) / 28) * 100)}%` }}
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        Math.max(0, ((currentDay - 2) / 28) * 100)
+                      )}%`,
+                    }}
                   ></div>
                 </div>
                 <span className="skill-percent">
-                  {Math.round(((currentDay - 2) / 28) * 100)}%
+                  {Math.round(Math.max(0, ((currentDay - 2) / 28) * 100))}%
                 </span>
               </div>
               <div className="skill-bar">
@@ -697,7 +851,9 @@ const DailyChallenge = () => {
                 <div className="skill-progress-bar">
                   <div
                     className="skill-progress-fill"
-                    style={{ width: `${Math.min(100, (currentDay / 15) * 100)}%` }}
+                    style={{
+                      width: `${Math.min(100, (currentDay / 15) * 100)}%`,
+                    }}
                   ></div>
                 </div>
                 <span className="skill-percent">
@@ -711,8 +867,12 @@ const DailyChallenge = () => {
         <footer className="challenge-footer">
           <div className="footer-content">
             <div className="community-stats">
-              <span>👥 {Math.floor(Math.random() * 2000) + 1000} participants today</span>
-              <span>🏆 Top performer: ReactMaster{Math.floor(Math.random() * 100)}</span>
+              <span>
+                👥 {Math.floor(Math.random() * 2000) + 1000} participants today
+              </span>
+              <span>
+                🏆 Top performer: ReactMaster{Math.floor(Math.random() * 100)}
+              </span>
             </div>
             <button className="share-btn">Share Your Progress</button>
           </div>

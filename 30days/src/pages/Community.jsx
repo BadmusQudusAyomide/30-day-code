@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPage.css";
 
+
+
 const Community = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("feed");
@@ -10,62 +12,67 @@ const Community = () => {
   const [popularSubmissions, setPopularSubmissions] = useState([]);
   const [newPostContent, setNewPostContent] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data initialization
   useEffect(() => {
-    // Simulate loading data
-    const mockPosts = [
-      {
-        id: 1,
-        user: {
-          name: "Alex Johnson",
-          avatar: "https://i.pravatar.cc/150?img=1",
-          role: "Moderator",
-        },
-        content:
-          "Just submitted my latest project! Check it out and let me know what you think.",
-        timestamp: "2 hours ago",
-        likes: 14,
-        comments: 5,
-        isLiked: false,
-      },
-      {
-        id: 2,
-        user: {
-          name: "Sam Wilson",
-          avatar: "https://i.pravatar.cc/150?img=5",
-          role: "Contributor",
-        },
-        content:
-          "Looking for collaborators on a new open-source submission system. Anyone interested?",
-        timestamp: "5 hours ago",
-        likes: 8,
-        comments: 3,
-        isLiked: true,
-      },
-      {
-        id: 3,
-        user: {
-          name: "Taylor Smith",
-          avatar: "https://i.pravatar.cc/150?img=11",
-          role: "Member",
-        },
-        content:
-          "Has anyone encountered issues with the submission API? Getting 404 errors suddenly.",
-        timestamp: "1 day ago",
-        likes: 5,
-        comments: 7,
-        isLiked: false,
-      },
-    ];
+    const fetchCommunityData = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
 
-    const mockUsers = [
+        const response = await fetch("/api/auth/community/all-data", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch community data");
+        }
+
+        const { data } = await response.json();
+        
+        setCurrentUser(data.currentUser);
+        setUsers(data.users);
+        setPopularSubmissions(data.popularSubmissions);
+        setPosts(data.posts || []); // Will be empty until you implement posts
+
+      } catch (error) {
+        console.error("Error fetching community data:", error);
+        // Instead of mock data, show error state
+        setUsers([]);
+        setPopularSubmissions([]);
+        setPosts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCommunityData();
+  }, [navigate]);
+
+
+  // Helper functions for mock data
+  const getRandomColor = () => {
+    const colors = ["007bff", "28a745", "dc3545", "fd7e14", "6f42c1"];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  const generateMockUsers = () => {
+    return [
       {
-        id: 1,
-        name: "Alex Johnson",
-        avatar: "https://i.pravatar.cc/150?img=1",
+        id: currentUser?._id || 1,
+        name: currentUser?.fullName || currentUser?.username || "Alex Johnson",
+        avatar: currentUser?.profileImage || "https://i.pravatar.cc/150?img=1",
         submissions: 12,
         role: "Moderator",
+        username: currentUser?.username || "alexj",
       },
       {
         id: 2,
@@ -89,24 +96,26 @@ const Community = () => {
         role: "Member",
       },
     ];
+  };
 
-    const mockSubmissions = [
-      {
-        id: 1,
-        title: "AI Content Moderation System",
-        author: "Alex Johnson",
-        likes: 24,
-        views: 156,
-        thumbnail: "https://via.placeholder.com/150/007bff/ffffff?text=AI",
-      },
+  const generateMockSubmissions = () => {
+    return [
+    {
+      id: 1,
+      title: "AI Content Moderation System",
+      author: currentUser?.fullName || currentUser?.username || "Alex Johnson",
+      authorUsername: currentUser?.username || "alexj",
+      likes: 24,
+      views: 156,
+      thumbnail: "https://via.placeholder.com/150/007bff/ffffff?text=AI",
+    },
       {
         id: 2,
         title: "Blockchain Submission Tracker",
         author: "Sam Wilson",
         likes: 18,
         views: 98,
-        thumbnail:
-          "https://via.placeholder.com/150/28a745/ffffff?text=Blockchain",
+        thumbnail: "https://via.placeholder.com/150/28a745/ffffff?text=Blockchain",
       },
       {
         id: 3,
@@ -117,59 +126,90 @@ const Community = () => {
         thumbnail: "https://via.placeholder.com/150/dc3545/ffffff?text=React",
       },
     ];
+  };
 
-    setPosts(mockPosts);
-    setUsers(mockUsers);
-    setPopularSubmissions(mockSubmissions);
-  }, []);
 
-  const handlePostSubmit = (e) => {
+  const handlePostSubmit = async (e) => {
     e.preventDefault();
     if (!newPostContent.trim()) return;
 
-    const newPost = {
-      id: posts.length + 1,
-      user: {
-        name: "Current User",
-        avatar: "https://i.pravatar.cc/150?img=3",
-        role: "Member",
-      },
-      content: newPostContent,
-      timestamp: "Just now",
-      likes: 0,
-      comments: 0,
-      isLiked: false,
-    };
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/community/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content: newPostContent }),
+      });
 
-    setPosts([newPost, ...posts]);
-    setNewPostContent("");
+      if (response.ok) {
+        const newPost = await response.json();
+        setPosts([newPost, ...posts]);
+        setNewPostContent("");
+      } else {
+        setShowPopup(true);
+      }
+    } catch (err) {
+      setShowPopup(true);
+    }
   };
 
-  const handleLike = (postId) => {
-    setPosts(
-      posts.map((post) => {
-        if (post.id === postId) {
-          return {
-            ...post,
-            likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-            isLiked: !post.isLiked,
-          };
-        }
-        return post;
-      })
-    );
+  const handleLike = async (postId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`/api/community/posts/${postId}/like`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const updatedPost = await response.json();
+        setPosts(
+          posts.map((post) => (post.id === postId ? updatedPost : post))
+        );
+      } else {
+        setShowPopup(true);
+      }
+    } catch (err) {
+      setShowPopup(true);
+    }
   };
 
   const handleBackToDashboard = () => {
-    navigate("/dashboard"); // Adjust the route as needed for your application
+    navigate("/dashboard");
   };
 
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  if (loading) {
+    return (
+      <div className="community-container">
+        <div className="loading-indicator">Loading community data...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="community-container">
+      {/* Coming Soon Popup */}
+      {showPopup && (
+        <div className="coming-soon-overlay">
+          <div className="coming-soon-popup">
+            <h2>Community Features Coming Soon!</h2>
+            <p>We're working hard to bring you an amazing community experience.</p>
+            <p>This is a preview of what's to come. Most features are currently disabled.</p>
+            <button onClick={() => setShowPopup(false)}>Close</button>
+          </div>
+        </div>
+      )}
+
+
       <header className="community-header">
         <div className="header-top">
           <button onClick={handleBackToDashboard} className="back-button">
@@ -289,10 +329,18 @@ const Community = () => {
                       >
                         ❤️ {post.likes}
                       </button>
-                      <button className="comment-button">
+                      <button 
+                        className="comment-button"
+                        onClick={() => setShowPopup(true)}
+                      >
                         💬 {post.comments} comments
                       </button>
-                      <button className="share-button">↗️ Share</button>
+                      <button 
+                        className="share-button"
+                        onClick={() => setShowPopup(true)}
+                      >
+                        ↗️ Share
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -304,7 +352,10 @@ const Community = () => {
             <div className="discussions-container">
               <h2>Discussion Topics</h2>
               <div className="discussion-topics">
-                <div className="topic-card">
+                <div 
+                  className="topic-card"
+                  onClick={() => setShowPopup(true)}
+                >
                   <h3>Submission Guidelines</h3>
                   <p>
                     Latest updates to our submission requirements and formatting
@@ -315,7 +366,10 @@ const Community = () => {
                     <span>Last updated 2 days ago</span>
                   </div>
                 </div>
-                <div className="topic-card">
+                <div 
+                  className="topic-card"
+                  onClick={() => setShowPopup(true)}
+                >
                   <h3>Technical Support</h3>
                   <p>
                     Having issues with the submission system? Ask for help here
@@ -325,7 +379,10 @@ const Community = () => {
                     <span>Last updated 5 hours ago</span>
                   </div>
                 </div>
-                <div className="topic-card">
+                <div 
+                  className="topic-card"
+                  onClick={() => setShowPopup(true)}
+                >
                   <h3>Feature Requests</h3>
                   <p>Suggest new features for the submission platform</p>
                   <div className="topic-stats">
@@ -360,7 +417,12 @@ const Community = () => {
                     <div className="member-stats">
                       <span>{user.submissions} submissions</span>
                     </div>
-                    <button className="message-button">Message</button>
+                    <button 
+                      className="message-button"
+                      onClick={() => setShowPopup(true)}
+                    >
+                      Message
+                    </button>
                   </div>
                 ))}
               </div>

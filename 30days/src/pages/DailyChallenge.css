@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 1rem;
   color: #fff;
   font-family: 'Inter', sans-serif;
 }
@@ -14,11 +14,12 @@
   border-radius: 20px;
   backdrop-filter: blur(14px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  padding: 2rem;
+  padding: 1.5rem;
   max-width: 700px;
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.1);
   animation: fadeIn 1s ease;
+  overflow: hidden;
 }
 
 .challenge-header {
@@ -26,11 +27,17 @@
 }
 
 h1 {
-  font-size: 2.25rem;
+  font-size: clamp(1.5rem, 5vw, 2.25rem);
   margin-bottom: 0.5rem;
   background: linear-gradient(120deg, #6c7cff, #8b5cf6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  word-wrap: break-word;
+}
+
+h2, h3, h4 {
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .day-number {
@@ -43,6 +50,7 @@ h1 {
   display: flex;
   gap: 0.5rem;
   margin-top: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .tab {
@@ -53,6 +61,7 @@ h1 {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
 .tab.active {
@@ -67,6 +76,8 @@ h1 {
   color: #cfcfcf;
   border-left: 4px solid #6366f1;
   padding-left: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 .challenge-details p {
@@ -74,6 +85,7 @@ h1 {
   margin: 0.5rem 0 1.5rem;
   line-height: 1.6;
   color: #ddd;
+  word-wrap: break-word;
 }
 
 .challenge-header {
@@ -81,6 +93,7 @@ h1 {
   align-items: center;
   gap: 1rem;
   margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .badge {
@@ -89,6 +102,7 @@ h1 {
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .requirements, .bonus-section {
@@ -96,6 +110,7 @@ h1 {
   padding: 1rem;
   border-radius: 12px;
   margin: 1rem 0;
+  word-wrap: break-word;
 }
 
 .requirements h3, .bonus-section h3 {
@@ -111,6 +126,7 @@ h1 {
 
 .req-list li, .bonus-list li {
   margin-bottom: 0.5rem;
+  line-height: 1.4;
 }
 
 .bonus-list li {
@@ -127,11 +143,15 @@ h1 {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .add-task-form {
   display: flex;
   gap: 0.5rem;
+  width: 100%;
+  max-width: 400px;
 }
 
 .task-input {
@@ -141,12 +161,14 @@ h1 {
   padding: 0.5rem 1rem;
   border-radius: 8px;
   font-size: 0.9rem;
+  flex: 1;
+  min-width: 0; /* Prevent flex item from overflowing */
 }
 
 .add-task-btn {
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
   border: none;
-  width: 2rem;
+  min-width: 2rem;
   height: 2rem;
   border-radius: 8px;
   color: #fff;
@@ -155,6 +177,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .task-list ul {
@@ -173,6 +196,7 @@ h1 {
   gap: 0.75rem;
   transition: all 0.3s ease;
   border: 1px solid transparent;
+  word-break: break-word;
 }
 
 .task-content {
@@ -181,6 +205,7 @@ h1 {
   gap: 0.75rem;
   cursor: pointer;
   flex: 1;
+  min-width: 0; /* Prevent flex item from overflowing */
 }
 
 .task-item.completed {
@@ -204,6 +229,7 @@ h1 {
   cursor: pointer;
   opacity: 0.7;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .delete-task:hover {
@@ -267,7 +293,7 @@ h1 {
 
 .resources-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
 }
 
@@ -280,6 +306,8 @@ h1 {
   gap: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
 }
 
 .resource-card:hover {
@@ -289,12 +317,14 @@ h1 {
 
 .resource-icon {
   font-size: 1.5rem;
+  flex-shrink: 0;
 }
 
 .resource-card h4 {
   font-size: 0.9rem;
   font-weight: 500;
   color: #ddd;
+  word-break: break-word;
 }
 
 .past-challenges {
@@ -304,6 +334,7 @@ h1 {
 .subtitle {
   color: #aaa;
   margin-bottom: 1.5rem;
+  word-wrap: break-word;
 }
 
 .past-challenge-card {
@@ -318,6 +349,8 @@ h1 {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .day-badge {
@@ -351,17 +384,20 @@ h1 {
 .past-challenge-card h3 {
   font-size: 1.1rem;
   margin: 0.5rem 0;
+  word-wrap: break-word;
 }
 
 .past-challenge-card p {
   color: #bbb;
   font-size: 0.9rem;
   margin-bottom: 1rem;
+  word-wrap: break-word;
 }
 
 .card-actions {
   display: flex;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .view-btn, .retry-btn {
@@ -370,6 +406,8 @@ h1 {
   font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex-grow: 1;
+  text-align: center;
 }
 
 .view-btn {
@@ -407,7 +445,7 @@ h1 {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 1rem;
   margin: 1.5rem 0;
 }
@@ -450,7 +488,7 @@ h1 {
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
   gap: 0.5rem;
 }
 
@@ -471,10 +509,59 @@ h1 {
   border: 1px solid rgba(99, 102, 241, 0.3);
 }
 
+.calendar-day.current {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  font-weight: bold;
+}
+
 .calendar-day.missed {
   background: rgba(239, 68, 68, 0.1);
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.calendar-day.upcoming {
+  background: rgba(255, 255, 255, 0.05);
+  color: #666;
+}
+
+.calendar-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.legend-color.completed {
+  background: rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.legend-color.current {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.legend-color.upcoming {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .skill-progress {
@@ -495,6 +582,7 @@ h1 {
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .skill-name {
@@ -509,6 +597,7 @@ h1 {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   overflow: hidden;
+  min-width: 0; /* Prevent overflow */
 }
 
 .skill-progress-fill {
@@ -533,6 +622,8 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .community-stats {
@@ -559,6 +650,45 @@ h1 {
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #6366f1;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.retry-button {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.no-past-challenges {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #aaa;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -570,112 +700,122 @@ h1 {
   }
 }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile-specific adjustments */
 @media (max-width: 600px) {
-  .stats-grid, .resources-grid {
-    grid-template-columns: 1fr;
+  .daily-container {
+    padding: 0.5rem;
+  }
+  
+  .glass-card {
+    padding: 1rem;
+    border-radius: 15px;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
   }
   
   .task-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
   }
   
-  .add-task-form {
+  .skill-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .skill-name {
     width: 100%;
+    margin-bottom: 0.25rem;
   }
   
-  .task-input {
-    flex: 1;
+  .skill-percent {
+    width: 100%;
+    text-align: left;
+    margin-top: 0.25rem;
   }
   
   .footer-content {
     flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
+    align-items: stretch;
   }
   
   .share-btn {
-    width: 100%;
+    text-align: center;
+  }
+  
+  .calendar-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  
+  .resources-grid {
+    grid-template-columns: 1fr;
   }
   
   .tabs {
     overflow-x: auto;
+    white-space: nowrap;
     padding-bottom: 0.5rem;
   }
+}
+
+/* Small tablets */
+@media (min-width: 601px) and (max-width: 768px) {
+  .calendar-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
   
-  .tab {
-    white-space: nowrap;
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .resources-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Add these new styles to your DailyChallenge.css */
-
-.difficulty-beginner {
-  background: rgba(52, 211, 153, 0.2);
-  color: #34d399;
+/* Ensure all text wraps properly */
+* {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  -ms-word-break: break-all;
+  word-break: break-word;
+}
+.back-nav {
+  margin-bottom: 1rem;
 }
 
-.difficulty-intermediate {
-  background: rgba(249, 115, 22, 0.2);
-  color: #f97316;
-}
-
-.difficulty-advanced {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-}
-
-.calendar-day.current {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: white;
-  font-weight: bold;
-}
-
-.calendar-day.upcoming {
-  background: rgba(255, 255, 255, 0.05);
-  color: #666;
-}
-
-.calendar-legend {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.legend-item {
-  display: flex;
+.back-button {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.8rem;
-  color: #aaa;
-}
-
-.legend-color {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 4px;
-}
-
-.legend-color.completed {
-  background: rgba(99, 102, 241, 0.2);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-}
-
-.legend-color.current {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-}
-
-.legend-color.upcoming {
+  color: #a5a8ff;
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
-.resource-card {
-  text-decoration: none;
-  color: inherit;
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-2px);
 }
 
-/* Keep all your existing CSS styles */
+.back-button svg {
+  transition: transform 0.2s ease;
+}
+
+.back-button:hover svg {
+  transform: translateX(-3px);
+}
+
+/* Add this to your existing DailyChallenge.css file */

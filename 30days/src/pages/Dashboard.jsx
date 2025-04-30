@@ -45,11 +45,7 @@ const Dashboard = ({ onLogout }) => {
           currentDay = dayResponse.data.day || 1;
         } catch (dayError) {
           console.error("Error fetching challenge day:", dayError);
-          // You could add a toast notification here if you want
         }
-
-        // Simulate loading for 5 seconds
-        await new Promise((resolve) => setTimeout(resolve, 5000));
 
         // Fetch user data
         const userResponse = await axios.get(`${API_URL}/api/auth/me`, {
@@ -202,44 +198,20 @@ const Dashboard = ({ onLogout }) => {
 
   if (loading) {
     return (
-      <div className="-dsh-dashboard-loading -dsh-dark">
-        <div className="-dsh-floating-orbs">
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="-dsh-floating-orb"
-              style={{
-                "--delay": `${i * 0.5}s`,
-                "--size": `${Math.random() * 5 + 5}px`,
-                "--distance": `${Math.random() * 100 + 50}px`,
-                "--duration": `${Math.random() * 10 + 10}s`,
-              }}
-            />
-          ))}
-        </div>
-        <div className="-dsh-shimmer-loading">
-          <div className="-dsh-shimmer-logo"></div>
-          <div className="-dsh-shimmer-welcome"></div>
-          <div className="-dsh-shimmer-progress"></div>
-          <div className="-dsh-shimmer-grid">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="-dsh-shimmer-grid-item"></div>
-            ))}
-          </div>
-          <div className="-dsh-shimmer-leaderboard"></div>
-        </div>
+      <div className="dashboard-loading">
+        <div className="loading-spinner"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="-dsh-dashboard-error -dsh-dark">
-        <div className="-dsh-error-icon">⚠️</div>
+      <div className="dashboard-error">
+        <div className="error-icon">⚠️</div>
         <h3>Error Loading Dashboard</h3>
         <p>{error}</p>
         <button
-          className="-dsh-retry-button"
+          className="retry-button"
           onClick={() => window.location.reload()}
         >
           Retry
@@ -249,40 +221,19 @@ const Dashboard = ({ onLogout }) => {
   }
 
   return (
-    <div className="-dsh-dashboard -dsh-dark">
-      <div className="-dsh-background-layers">
-        <div className="-dsh-layer-1"></div>
-        <div className="-dsh-layer-2"></div>
-        <div className="-dsh-layer-3"></div>
-      </div>
-
-      <div className="-dsh-floating-orbs">
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="-dsh-floating-orb"
-            style={{
-              "--delay": `${i * 0.5}s`,
-              "--size": `${Math.random() * 10 + 5}px`,
-              "--distance": `${Math.random() * 200 + 100}px`,
-              "--duration": `${Math.random() * 20 + 10}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      <header className="-dsh-dashboard-header">
-        <div className="-dsh-brand">
-          <div className="-dsh-logo" onClick={() => navigate("/")}>
-            <span className="-dsh-code-text">Code</span>
-            <span className="-dsh-days-text">&lt;30&gt;</span>
+    <div className="dashboard">
+      <header className="dashboard-header">
+        <div className="brand">
+          <div className="logo" onClick={() => navigate("/")}>
+            <span className="code-text">Code</span>
+            <span className="days-text">&lt;30&gt;</span>
           </div>
         </div>
-        <div className="-dsh-header-controls">
-          <div className="-dsh-user-info">
-            <div className="-dsh-user-name">{userData.name}</div>
+        <div className="header-controls">
+          <div className="user-info">
+            <div className="user-name">{userData.name}</div>
             <button
-              className="-dsh-avatar-button"
+              className="avatar-button"
               onClick={() => handleNavigation("/profile")}
               style={{ backgroundColor: userData.avatarColor }}
               aria-label="View profile"
@@ -294,31 +245,29 @@ const Dashboard = ({ onLogout }) => {
         </div>
       </header>
 
-      <main className="-dsh-dashboard-content">
-        <div className="-dsh-dashboard-header-section">
-          <h1 className="-dsh-welcome">
+      <main className="dashboard-content">
+        <div className="dashboard-header-section">
+          <h1 className="welcome">
             Welcome back,{" "}
-            <span className="-dsh-gradient-text">
-              {userData.name.split(" ")[0]}
-            </span>
+            <span className="gradient-text">{userData.name.split(" ")[0]}</span>
             !
           </h1>
-          <p className="-dsh-welcome-subtitle">
+          <p className="welcome-subtitle">
             {userData.projectsSubmitted > 0
               ? `You've submitted ${userData.projectsSubmitted} projects so far!`
               : "Ready to start your coding challenge?"}
           </p>
         </div>
 
-        <div className="-dsh-progress-overview">
-          <div className="-dsh-day-progress">
-            <div className="-dsh-day-indicator">
-              <span className="-dsh-day-number">{userData.currentDay}</span>
-              <span className="-dsh-day-label">/ {userData.totalDays}</span>
+        <div className="progress-overview">
+          <div className="day-progress">
+            <div className="day-indicator">
+              <span className="day-number">{userData.currentDay}</span>
+              <span className="day-label">/ {userData.totalDays}</span>
             </div>
-            <div className="-dsh-progress-bar-container">
+            <div className="progress-bar-container">
               <div
-                className="-dsh-progress-bar"
+                className="progress-bar"
                 style={{
                   width: `${calculateProgressPercentage()}%`,
                   background: `linear-gradient(90deg, ${
@@ -326,30 +275,30 @@ const Dashboard = ({ onLogout }) => {
                   }, ${adjustColor(userData.avatarColor, 20)})`,
                 }}
               ></div>
-              <div className="-dsh-progress-milestones">
+              <div className="progress-milestones">
                 {[...Array(userData.totalDays)].map((_, i) => (
                   <div
                     key={i}
-                    className={`-dsh-milestone ${
-                      i < userData.currentDay ? "-dsh-completed" : ""
+                    className={`milestone ${
+                      i < userData.currentDay ? "completed" : ""
                     }`}
                     style={{ left: `${(i / userData.totalDays) * 100}%` }}
                   />
                 ))}
               </div>
             </div>
-            <div className="-dsh-progress-stats">
-              <div className="-dsh-day-text">
+            <div className="progress-stats">
+              <div className="day-text">
                 Day {userData.currentDay} of {userData.totalDays}
               </div>
-              <div className="-dsh-percentage-text">
+              <div className="percentage-text">
                 {Math.round(calculateProgressPercentage())}% complete
               </div>
             </div>
           </div>
         </div>
 
-        <div className="-dsh-dashboard-grid">
+        <div className="dashboard-grid">
           {renderGridItem(
             "📤",
             "Submit Project",
@@ -383,17 +332,17 @@ const Dashboard = ({ onLogout }) => {
           )}
         </div>
 
-        <div className="-dsh-leaderboard-preview">
-          <div className="-dsh-leaderboard-preview-header">
+        <div className="leaderboard-preview">
+          <div className="leaderboard-preview-header">
             <h2>Current Rankings</h2>
             <button
-              className="-dsh-view-all-button"
+              className="view-all-button"
               onClick={() => handleNavigation("/leaderboard")}
             >
               View Full Leaderboard →
             </button>
           </div>
-          <div className="-dsh-top-performers">
+          <div className="top-performers">
             {topPerformers.length >= 3 ? (
               <>
                 {renderTopPerformer(
@@ -423,28 +372,28 @@ const Dashboard = ({ onLogout }) => {
               </>
             )}
           </div>
-          <div className="-dsh-your-rank-container">
-            <div className="-dsh-your-rank-card">
-              <div className="-dsh-rank-number">#{userData.rank}</div>
-              <div className="-dsh-rank-info">
-                <div className="-dsh-rank-user">
+          <div className="your-rank-container">
+            <div className="your-rank-card">
+              <div className="rank-number">#{userData.rank}</div>
+              <div className="rank-info">
+                <div className="rank-user">
                   <div
-                    className="-dsh-rank-avatar"
+                    className="rank-avatar"
                     style={{ backgroundColor: userData.avatarColor }}
                   >
                     {userData.name.charAt(0).toUpperCase()}
                   </div>
-                  <div className="-dsh-rank-name">{userData.name}</div>
+                  <div className="rank-name">{userData.name}</div>
                 </div>
-                <div className="-dsh-rank-points">
-                  <span className="-dsh-points-value">
+                <div className="rank-points">
+                  <span className="points-value">
                     {userData.projectsSubmitted * 45}
                   </span>
-                  <span className="-dsh-points-label">Points</span>
+                  <span className="points-label">Points</span>
                 </div>
               </div>
               <button
-                className="-dsh-improve-rank-button"
+                className="improve-rank-button"
                 onClick={() => handleNavigation("/SubmitProject")}
               >
                 Improve Rank
@@ -453,54 +402,45 @@ const Dashboard = ({ onLogout }) => {
           </div>
         </div>
 
-        <div className="-dsh-logout-container">
-          <button className="-dsh-logout-button" onClick={openLogoutModal}>
-            <span className="-dsh-logout-icon">🚪</span>
+        <div className="logout-container">
+          <button className="logout-button" onClick={openLogoutModal}>
+            <span className="logout-icon">🚪</span>
             Logout
           </button>
         </div>
       </main>
 
-      <footer className="-dsh-dashboard-footer">
+      <footer className="dashboard-footer">
         <p>
           Code&lt;30&gt; Challenge © {new Date().getFullYear()} |{" "}
-          <a href="#" className="-dsh-footer-link">
+          <a href="#" className="footer-link">
             Terms
           </a>{" "}
           |{" "}
-          <a href="#" className="-dsh-footer-link">
+          <a href="#" className="footer-link">
             Privacy
           </a>
         </p>
       </footer>
 
       {showLogoutModal && (
-        <div className="-dsh-modal-overlay">
-          <div className="-dsh-logout-modal -dsh-dark">
-            <div className="-dsh-modal-header">
+        <div className="modal-overlay">
+          <div className="logout-modal">
+            <div className="modal-header">
               <h3>Confirm Logout</h3>
-              <button
-                className="-dsh-close-button"
-                onClick={handleCancelLogout}
-              >
+              <button className="close-button" onClick={handleCancelLogout}>
                 ×
               </button>
             </div>
-            <div className="-dsh-modal-content">
+            <div className="modal-content">
               <p>Are you sure you want to logout?</p>
-              <div className="-dsh-modal-icon">🔒</div>
+              <div className="modal-icon">🔒</div>
             </div>
-            <div className="-dsh-modal-actions">
-              <button
-                className="-dsh-cancel-button"
-                onClick={handleCancelLogout}
-              >
+            <div className="modal-actions">
+              <button className="cancel-button" onClick={handleCancelLogout}>
                 Cancel
               </button>
-              <button
-                className="-dsh-confirm-button"
-                onClick={handleConfirmLogout}
-              >
+              <button className="confirm-button" onClick={handleConfirmLogout}>
                 Logout
               </button>
             </div>
@@ -513,33 +453,30 @@ const Dashboard = ({ onLogout }) => {
   function renderGridItem(emoji, title, description, path) {
     return (
       <div
-        className="-dsh-grid-item"
+        className="grid-item"
         onClick={() => handleNavigation(path)}
         data-type={title.toLowerCase().replace(" ", "-")}
       >
-        <div className="-dsh-item-icon">{emoji}</div>
-        <div className="-dsh-item-content">
+        <div className="item-icon">{emoji}</div>
+        <div className="item-content">
           <h3>{title}</h3>
           <p>{description}</p>
         </div>
-        <div className="-dsh-item-action">→</div>
+        <div className="item-action">→</div>
       </div>
     );
   }
 
   function renderTopPerformer(rank, name, points, color) {
     return (
-      <div className="-dsh-top-performer">
-        <div className="-dsh-performer-rank">#{rank}</div>
-        <div
-          className="-dsh-performer-avatar"
-          style={{ backgroundColor: color }}
-        >
+      <div className="top-performer">
+        <div className="performer-rank">#{rank}</div>
+        <div className="performer-avatar" style={{ backgroundColor: color }}>
           {name.charAt(0).toUpperCase()}
         </div>
-        <div className="-dsh-performer-info">
-          <div className="-dsh-performer-name">{name}</div>
-          <div className="-dsh-performer-points">{points} points</div>
+        <div className="performer-info">
+          <div className="performer-name">{name}</div>
+          <div className="performer-points">{points} points</div>
         </div>
       </div>
     );
