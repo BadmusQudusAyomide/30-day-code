@@ -13,7 +13,7 @@ const StatsCards = () => {
   const [errors, setErrors] = useState({});
 
   const API_URL =
-    process.env.REACT_APP_API_URL || "my-backend-pkhd.onrender.com";
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   const fetchStat = async (endpoint, statKey) => {
     try {

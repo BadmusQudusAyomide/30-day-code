@@ -22,7 +22,7 @@ export const useAuth = () => {
   const api = axios.create({
     baseURL:
       process.env.REACT_APP_API_URL ||
-      "https://https://my-backend-pkhd.onrender.com/api",
+      "https://my-backend-pkhd.onrender.com/api",
   });
 
   api.interceptors.request.use((config) => {
@@ -39,7 +39,7 @@ export const useAuth = () => {
       const response = await axios.post(
         `${
           process.env.REACT_APP_API_URL ||
-          "https://https://my-backend-pkhd.onrender.com/api"
+          "https://my-backend-pkhd.onrender.com/api"
         }/auth/login`,
         { emailOrUsername, password }
       );

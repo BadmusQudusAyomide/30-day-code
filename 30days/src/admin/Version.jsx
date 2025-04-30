@@ -9,7 +9,7 @@ const Version = () => {
   const [progress, setProgress] = useState(0);
   const [exporting, setExporting] = useState(false);
   const API_URL =
-    process.env.REACT_APP_API_URL || "my-backend-pkhd.onrender.com";
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   useEffect(() => {
     const fetchChallenges = async () => {
