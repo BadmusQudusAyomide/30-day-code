@@ -26,14 +26,13 @@ const ProjectRating = () => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
 
-  // Rating state with the exact criteria names we need for the backend
   const [ratingState, setRatingState] = useState({
     criteria: {
       functionality: { value: 0, hover: 0 },
       design: { value: 0, hover: 0 },
-      innovation: { value: 0, hover: 0 }, // This represents "Creativity" in the UI
+      innovation: { value: 0, hover: 0 },
       codeQuality: { value: 0, hover: 0 },
-      completeness: { value: 0, hover: 0 }, // This represents "Usability" in the UI
+      completeness: { value: 0, hover: 0 },
     },
     feedback: "",
   });
@@ -41,14 +40,12 @@ const ProjectRating = () => {
   const API_URL =
     process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
-  // Fetch project data
   useEffect(() => {
     const fetchProject = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Get admin token from localStorage
         const token = localStorage.getItem("adminToken");
 
         if (!token) {
@@ -58,7 +55,6 @@ const ProjectRating = () => {
           return;
         }
 
-        // Fetch project data from API
         const response = await axios.get(
           `${API_URL}/api/projects/${projectId}`,
           {
@@ -84,7 +80,6 @@ const ProjectRating = () => {
     fetchProject();
   }, [projectId, navigate, API_URL]);
 
-  // Calculate average rating from criteria
   const calculateAverageRating = () => {
     const criteriaValues = Object.values(ratingState.criteria).map(
       (criterion) => criterion.value
@@ -94,7 +89,6 @@ const ProjectRating = () => {
     return average === 0 ? 0 : parseFloat(average.toFixed(1));
   };
 
-  // Handle star rating selection for criteria
   const handleCriteriaRating = (criterion, rating) => {
     setRatingState((prev) => ({
       ...prev,
@@ -108,7 +102,6 @@ const ProjectRating = () => {
     }));
   };
 
-  // Handle star rating hover for criteria
   const handleCriteriaHover = (criterion, hover) => {
     setRatingState((prev) => ({
       ...prev,
@@ -122,25 +115,21 @@ const ProjectRating = () => {
     }));
   };
 
-  // Handle feedback text change
   const handleFeedbackChange = (e) => {
     setRatingState((prev) => ({
       ...prev,
       feedback: e.target.value,
     }));
   };
-  // Check if any criterion has been rated
   const hasRating = Object.values(ratingState.criteria).some(
     (criterion) => criterion.value > 0
   );
 
-  // Handle form submission
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
       setError(null);
 
-      // Validate form - check if at least one rating is provided
       const hasRating = Object.values(ratingState.criteria).some(
         (criterion) => criterion.value > 0
       );
@@ -151,10 +140,8 @@ const ProjectRating = () => {
         return;
       }
 
-      // Get admin token
       const token = localStorage.getItem("adminToken");
 
-      // Prepare the rating data - extract just the values
       const criteriaValues = {};
       Object.entries(ratingState.criteria).forEach(([key, data]) => {
         criteriaValues[key] = data.value;
@@ -166,8 +153,6 @@ const ProjectRating = () => {
         feedback: ratingState.feedback,
       };
 
-      // Submit rating to API
-      // In ProjectRating.js, update handleSubmit
       const response = await axios.post(
         `${API_URL}/api/ratings/submit`,
         ratingData,
@@ -181,9 +166,8 @@ const ProjectRating = () => {
 
       if (response.data.success) {
         setSubmitted(true);
-        // Redirect after successful submission with delay
         setTimeout(() => {
-          navigate("/admin/submissions");
+          navigate(`/admin/users/${project.user._id}/projects`);
         }, 2500);
       } else {
         setError(response.data.message || "Failed to submit rating");
@@ -196,7 +180,6 @@ const ProjectRating = () => {
     }
   };
 
-  // Render stars for rating
   const renderStars = (value, hoverValue, size, onSelect, onHover, onLeave) => {
     return Array(5)
       .fill(0)
@@ -220,7 +203,6 @@ const ProjectRating = () => {
       });
   };
 
-  // Format date helper
   const formatDate = (dateString) => {
     if (!dateString) return "No date available";
     const date = new Date(dateString);
@@ -233,7 +215,6 @@ const ProjectRating = () => {
     });
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="pr-project-rating-container">
@@ -246,7 +227,6 @@ const ProjectRating = () => {
     );
   }
 
-  // Error state
   if (error && !project) {
     return (
       <div className="pr-project-rating-container">
@@ -256,16 +236,20 @@ const ProjectRating = () => {
           <p>{error}</p>
           <button
             className="pr-action-button pr-primary"
-            onClick={() => navigate("/admin/submissions")}
+            onClick={() => {
+              const redirectPath = project?.user?._id
+                ? `/admin/users/${project.user._id}/projects`
+                : "/admin/users";
+              navigate(redirectPath);
+            }}
           >
-            <ArrowLeft size={16} /> Back to Submissions
+            <ArrowLeft size={16} /> Back to Projects
           </button>
         </div>
       </div>
     );
   }
 
-  // Success state
   if (submitted) {
     return (
       <div className="pr-project-rating-container">
@@ -286,30 +270,31 @@ const ProjectRating = () => {
     );
   }
 
-  // Extract student details from project
   const studentName =
     project?.user?.fullName || project?.user?.username || "Unknown Student";
   const studentAvatar =
     project?.user?.profileImage ||
     `https://i.pravatar.cc/150?img=${project?._id?.substring(0, 6) || "1"}`;
 
-  // Calculate the average rating for display
   const averageRating = calculateAverageRating();
 
   return (
     <div className="pr-project-rating-container">
-      {/* Header */}
       <div className="pr-rating-header">
         <button
           className="pr-back-button"
-          onClick={() => navigate("/admin/submissions")}
+          onClick={() => {
+            const backPath = project?.user?._id
+              ? `/admin/users/${project.user._id}/projects`
+              : "/admin/submissions";
+            navigate(backPath);
+          }}
         >
-          <ArrowLeft size={16} /> Back to Submissions
+          <ArrowLeft size={16} /> Back to Projects
         </button>
         <h1>Project Evaluation</h1>
       </div>
 
-      {/* Project Preview */}
       <div className="pr-project-preview">
         <div className="pr-project-image">
           <img
@@ -385,12 +370,10 @@ const ProjectRating = () => {
         </div>
       </div>
 
-      {/* Rating Form */}
       <div className="pr-rating-form-container">
         <h3>Rate This Project</h3>
 
         <div className="pr-rating-form">
-          {/* Overall Rating Display (calculated from criteria) */}
           {averageRating > 0 && (
             <div className="pr-overall-rating">
               <label>Overall Rating: {averageRating.toFixed(1)}/5</label>
@@ -400,7 +383,6 @@ const ProjectRating = () => {
             </div>
           )}
 
-          {/* Criteria Ratings */}
           <div className="pr-criteria-ratings">
             {[
               { key: "functionality", label: "Functionality" },
@@ -430,7 +412,6 @@ const ProjectRating = () => {
             ))}
           </div>
 
-          {/* Feedback Section */}
           <div className="pr-comment-input">
             <label>Feedback & Comments</label>
             <textarea
@@ -441,14 +422,12 @@ const ProjectRating = () => {
             ></textarea>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="pr-rating-error-message">
               <AlertCircle size={16} /> {error}
             </div>
           )}
 
-          {/* Submit Button */}
           <button
             className="pr-submit-rating-button"
             onClick={handleSubmit}

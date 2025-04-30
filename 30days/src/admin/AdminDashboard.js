@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import axios from "axios";
 
-// Components
+// Omor nah The Component be this
 import Sidebar from "./Sidebar";
 import TopNav from "./TopNav";
 import StatsCards from "./StatsCards";
@@ -59,16 +59,13 @@ function AdminDashboard({ onLogout }) {
   };
 
   const handleLogout = () => {
-    // Clear admin data
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminUser");
     delete axios.defaults.headers.common["Authorization"];
 
-    // Call the parent logout function
     onLogout();
   };
 
-  // Close sidebar when clicking outside on mobile
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (

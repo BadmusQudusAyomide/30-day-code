@@ -24,6 +24,7 @@ import UserProfile from "./pages/UserProfile";
 import DailyChallenge from "./pages/DailyChallenge";
 import Resources from "./pages/Resources";
 import Community from "./pages/Community";
+import ProjectRatingView from "./pages/ProjectRatingView";
 
 // Admin components
 import AdminLogin from "./admin/components/Auth/Login";
@@ -358,6 +359,10 @@ function App() {
             <Community onLogout={handleLogout} />
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/projects/:projectId/ratings"
+        element={<ProjectRatingView />}
       />
 
       {/* Catch-all */}

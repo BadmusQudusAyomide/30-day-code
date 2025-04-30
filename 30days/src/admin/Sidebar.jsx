@@ -24,7 +24,7 @@ const Sidebar = ({ currentPath, isOpen, onLogout, toggleSidebar }) => {
             <span>Leaderboard</span>
           </Link>
         </li>
-        <li>
+        {/* <li>
           <Link 
             to="/admin/submissions"
             className={currentPath.includes("submissions") ? "active" : ""}
@@ -33,7 +33,7 @@ const Sidebar = ({ currentPath, isOpen, onLogout, toggleSidebar }) => {
             <i className="fas fa-inbox"></i>
             <span>Submissions</span>
           </Link>
-        </li>
+        </li> */}
         <li>
           <Link 
             to="/admin/users"

@@ -1,0 +1,186 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: #333;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.backButton {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.backButton:hover {
+  color: #333;
+}
+
+.title {
+  all: unset;
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #222;
+}
+
+.projectName {
+  all: unset;
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #444;
+}
+
+.ratingsList {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.ratingItem {
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eaeaea;
+}
+
+.ratingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.feedbackTitle {
+  all: unset;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.overallRating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.criteriaRatings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.criteriaItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.starContainer {
+  position: relative;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+}
+
+.ratingStar {
+  color: #ffc107;
+  width: 18px;
+  height: 18px;
+}
+
+.filled {
+  color: #ffc107;
+}
+
+.halfStar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+.ratingValue {
+  margin-left: 0.3rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.feedback {
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.commentsTitle {
+  all: unset;
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.commentsText {
+  all: unset;
+  display: block;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #555;
+}
+
+.noRatings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: #666;
+  background: #f9f9f9;
+  border-radius: 0.5rem;
+  border: 1px dashed #ddd;
+}
+
+.noRatingsIcon {
+  color: #ccc;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: #d32f2f;
+  background: #fde8e8;
+  border-radius: 0.5rem;
+}

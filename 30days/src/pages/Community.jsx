@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPage.css";
 
-
-
 const Community = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("feed");
@@ -26,7 +24,7 @@ const Community = () => {
           return;
         }
 
-        const response = await fetch("/api/auth/community/all-data", {
+        const response = await fetch("/api/community/all-data", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -41,11 +39,10 @@ const Community = () => {
         setCurrentUser(data.currentUser);
         setUsers(data.users);
         setPopularSubmissions(data.popularSubmissions);
-        setPosts(data.posts || []); // Will be empty until you implement posts
+        setPosts([]); // Empty posts until implemented
 
       } catch (error) {
         console.error("Error fetching community data:", error);
-        // Instead of mock data, show error state
         setUsers([]);
         setPopularSubmissions([]);
         setPosts([]);
@@ -57,126 +54,13 @@ const Community = () => {
     fetchCommunityData();
   }, [navigate]);
 
-
-  // Helper functions for mock data
-  const getRandomColor = () => {
-    const colors = ["007bff", "28a745", "dc3545", "fd7e14", "6f42c1"];
-    return colors[Math.floor(Math.random() * colors.length)];
-  };
-
-  const generateMockUsers = () => {
-    return [
-      {
-        id: currentUser?._id || 1,
-        name: currentUser?.fullName || currentUser?.username || "Alex Johnson",
-        avatar: currentUser?.profileImage || "https://i.pravatar.cc/150?img=1",
-        submissions: 12,
-        role: "Moderator",
-        username: currentUser?.username || "alexj",
-      },
-      {
-        id: 2,
-        name: "Sam Wilson",
-        avatar: "https://i.pravatar.cc/150?img=5",
-        submissions: 8,
-        role: "Contributor",
-      },
-      {
-        id: 3,
-        name: "Casey Kim",
-        avatar: "https://i.pravatar.cc/150?img=6",
-        submissions: 5,
-        role: "Member",
-      },
-      {
-        id: 4,
-        name: "Taylor Smith",
-        avatar: "https://i.pravatar.cc/150?img=11",
-        submissions: 3,
-        role: "Member",
-      },
-    ];
-  };
-
-  const generateMockSubmissions = () => {
-    return [
-    {
-      id: 1,
-      title: "AI Content Moderation System",
-      author: currentUser?.fullName || currentUser?.username || "Alex Johnson",
-      authorUsername: currentUser?.username || "alexj",
-      likes: 24,
-      views: 156,
-      thumbnail: "https://via.placeholder.com/150/007bff/ffffff?text=AI",
-    },
-      {
-        id: 2,
-        title: "Blockchain Submission Tracker",
-        author: "Sam Wilson",
-        likes: 18,
-        views: 98,
-        thumbnail: "https://via.placeholder.com/150/28a745/ffffff?text=Blockchain",
-      },
-      {
-        id: 3,
-        title: "React UI Component Library",
-        author: "Casey Kim",
-        likes: 32,
-        views: 210,
-        thumbnail: "https://via.placeholder.com/150/dc3545/ffffff?text=React",
-      },
-    ];
-  };
-
-
-  const handlePostSubmit = async (e) => {
+  const handlePostSubmit = (e) => {
     e.preventDefault();
-    if (!newPostContent.trim()) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("/api/community/posts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ content: newPostContent }),
-      });
-
-      if (response.ok) {
-        const newPost = await response.json();
-        setPosts([newPost, ...posts]);
-        setNewPostContent("");
-      } else {
-        setShowPopup(true);
-      }
-    } catch (err) {
-      setShowPopup(true);
-    }
+    setShowPopup(true);
   };
 
-  const handleLike = async (postId) => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`/api/community/posts/${postId}/like`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const updatedPost = await response.json();
-        setPosts(
-          posts.map((post) => (post.id === postId ? updatedPost : post))
-        );
-      } else {
-        setShowPopup(true);
-      }
-    } catch (err) {
-      setShowPopup(true);
-    }
+  const handleLike = () => {
+    setShowPopup(true);
   };
 
   const handleBackToDashboard = () => {
@@ -209,7 +93,6 @@ const Community = () => {
         </div>
       )}
 
-
       <header className="community-header">
         <div className="header-top">
           <button onClick={handleBackToDashboard} className="back-button">
@@ -227,38 +110,45 @@ const Community = () => {
         <aside className="community-sidebar">
           <div className="sidebar-section">
             <h3>Top Contributors</h3>
-            <ul className="contributors-list">
-              {users.slice(0, 5).map((user) => (
-                <li key={user.id} className="contributor-item">
+            <div className="contributors-grid">
+              {users.slice(0, 6).map((user, index) => (
+                <div key={user.id} className={`contributor-card rank-${index + 1}`}>
+                  <div className="contributor-rank">{index + 1}</div>
                   <img
                     src={user.avatar}
                     alt={user.name}
                     className="contributor-avatar"
                   />
-                  <div className="contributor-info">
-                    <span className="contributor-name">{user.name}</span>
-                    <span className="contributor-role">{user.role}</span>
+                  <div className="contributor-details">
+                    <h4 className="contributor-name">{user.name}</h4>
+                    <p className="contributor-role">{user.role}</p>
+                    <div className="contributor-stats">
+                      <span className="submissions-count">
+                        {user.submissions || 0} submissions
+                      </span>
+                    </div>
                   </div>
-                  <span className="contributor-submissions">
-                    {user.submissions} submissions
-                  </span>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
           <div className="sidebar-section">
             <h3>Popular Submissions</h3>
             <div className="submissions-grid">
               {popularSubmissions.map((submission) => (
-                <div key={submission.id} className="submission-card">
-                  <img src={submission.thumbnail} alt={submission.title} />
+                <div key={submission.id} className="submission-card" onClick={() => setShowPopup(true)}>
+                  <div className="submission-thumbnail">
+                    <img src={submission.thumbnail} alt={submission.title} />
+                  </div>
                   <div className="submission-info">
                     <h4>{submission.title}</h4>
-                    <p>by {submission.author}</p>
+                    <p className="submission-author">
+                      by <span>@{submission.authorUsername || submission.author}</span>
+                    </p>
                     <div className="submission-stats">
-                      <span>❤️ {submission.likes}</span>
-                      <span>👁️ {submission.views}</span>
+                      <span className="likes">❤️ {submission.likes || 0}</span>
+                      <span className="views">👁️ {submission.views || 0}</span>
                     </div>
                   </div>
                 </div>
@@ -292,58 +182,34 @@ const Community = () => {
           {activeTab === "feed" && (
             <div className="feed-container">
               <form onSubmit={handlePostSubmit} className="post-form">
-                <textarea
-                  placeholder="Share something with the community..."
-                  value={newPostContent}
-                  onChange={(e) => setNewPostContent(e.target.value)}
-                />
+                <div className="post-form-header">
+                  <img
+                    src={currentUser?.profileImage || "https://i.pravatar.cc/150?img=1"}
+                    alt={currentUser?.fullName || currentUser?.username || "You"}
+                    className="post-user-avatar"
+                  />
+                  <textarea
+                    placeholder="Share something with the community..."
+                    value={newPostContent}
+                    onChange={(e) => setNewPostContent(e.target.value)}
+                    onClick={() => setShowPopup(true)}
+                    readOnly
+                  />
+                </div>
                 <div className="post-form-actions">
-                  <button type="submit" className="post-button">
+                  <button type="submit" className="post-button" disabled>
                     Post
                   </button>
                 </div>
               </form>
 
               <div className="posts-list">
-                {posts.map((post) => (
-                  <div key={post.id} className="post-card">
-                    <div className="post-header">
-                      <img
-                        src={post.user.avatar}
-                        alt={post.user.name}
-                        className="post-avatar"
-                      />
-                      <div className="post-user-info">
-                        <span className="post-username">{post.user.name}</span>
-                        <span className="post-userrole">{post.user.role}</span>
-                      </div>
-                      <span className="post-time">{post.timestamp}</span>
-                    </div>
-                    <div className="post-content">
-                      <p>{post.content}</p>
-                    </div>
-                    <div className="post-actions">
-                      <button
-                        className={`like-button ${post.isLiked ? "liked" : ""}`}
-                        onClick={() => handleLike(post.id)}
-                      >
-                        ❤️ {post.likes}
-                      </button>
-                      <button 
-                        className="comment-button"
-                        onClick={() => setShowPopup(true)}
-                      >
-                        💬 {post.comments} comments
-                      </button>
-                      <button 
-                        className="share-button"
-                        onClick={() => setShowPopup(true)}
-                      >
-                        ↗️ Share
-                      </button>
-                    </div>
+                {posts.length === 0 && (
+                  <div className="empty-state">
+                    <h3>No posts yet</h3>
+                    <p>Be the first to share something with the community!</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           )}
@@ -352,43 +218,9 @@ const Community = () => {
             <div className="discussions-container">
               <h2>Discussion Topics</h2>
               <div className="discussion-topics">
-                <div 
-                  className="topic-card"
-                  onClick={() => setShowPopup(true)}
-                >
-                  <h3>Submission Guidelines</h3>
-                  <p>
-                    Latest updates to our submission requirements and formatting
-                    standards
-                  </p>
-                  <div className="topic-stats">
-                    <span>24 posts</span>
-                    <span>Last updated 2 days ago</span>
-                  </div>
-                </div>
-                <div 
-                  className="topic-card"
-                  onClick={() => setShowPopup(true)}
-                >
-                  <h3>Technical Support</h3>
-                  <p>
-                    Having issues with the submission system? Ask for help here
-                  </p>
-                  <div className="topic-stats">
-                    <span>56 posts</span>
-                    <span>Last updated 5 hours ago</span>
-                  </div>
-                </div>
-                <div 
-                  className="topic-card"
-                  onClick={() => setShowPopup(true)}
-                >
-                  <h3>Feature Requests</h3>
-                  <p>Suggest new features for the submission platform</p>
-                  <div className="topic-stats">
-                    <span>18 posts</span>
-                    <span>Last updated 1 week ago</span>
-                  </div>
+                <div className="empty-state">
+                  <h3>Discussions coming soon</h3>
+                  <p>We'll be launching discussion forums in the next update!</p>
                 </div>
               </div>
             </div>
@@ -402,25 +234,24 @@ const Community = () => {
                   placeholder="Search members..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onClick={() => setShowPopup(true)}
+                  readOnly
                 />
               </div>
               <div className="members-grid">
                 {filteredUsers.map((user) => (
-                  <div key={user.id} className="member-card">
+                  <div key={user.id} className="member-card" onClick={() => setShowPopup(true)}>
                     <img
                       src={user.avatar}
                       alt={user.name}
                       className="member-avatar"
                     />
                     <h3>{user.name}</h3>
-                    <p>{user.role}</p>
+                    <p className="member-role">{user.role}</p>
                     <div className="member-stats">
-                      <span>{user.submissions} submissions</span>
+                      <span>{user.submissions || 0} submissions</span>
                     </div>
-                    <button 
-                      className="message-button"
-                      onClick={() => setShowPopup(true)}
-                    >
+                    <button className="message-button" disabled>
                       Message
                     </button>
                   </div>

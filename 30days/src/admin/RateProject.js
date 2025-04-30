@@ -10,9 +10,8 @@ const RateProject = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would typically send the rating to your backend
     console.log("Rating submitted:", { userId, projectId, rating, feedback });
-    navigate(-1); // Go back to previous page
+    navigate(-1); 
   };
 
   return (

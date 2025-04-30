@@ -11,6 +11,8 @@ import {
   FiGithub,
   FiPlus,
 } from "react-icons/fi";
+import { Star } from "react-feather";
+import { MessageSquare } from "lucide-react";
 
 const ProjectList = () => {
   const navigate = useNavigate();
@@ -125,6 +127,23 @@ const ProjectList = () => {
       ...filter,
       search: "",
     });
+  };
+  const renderStars = (rating) => {
+    return Array(5)
+      .fill(0)
+      .map((_, index) => {
+        const starValue = index + 1;
+        const isFilled = rating >= starValue;
+
+        return (
+          <Star
+            key={index}
+            size={16}
+            className={`pl-rating-star ${isFilled ? "pl-filled" : ""}`}
+            fill={isFilled ? "currentColor" : "none"}
+          />
+        );
+      });
   };
 
   const clearAllFilters = () => {
@@ -332,6 +351,14 @@ const ProjectList = () => {
                             {project.status}
                           </span>
                         )}
+                        {project.averageRating > 0 && (
+                          <div className="pl-rating-display">
+                            {renderStars(Math.round(project.averageRating))}
+                            <span className="pl-rating-value">
+                              {project.averageRating.toFixed(1)}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="pl-tags-container">
@@ -396,6 +423,15 @@ const ProjectList = () => {
                         </div>
                       </div>
                     </div>
+
+                    <button
+                      onClick={() =>
+                        navigate(`/projects/${project._id}/ratings`)
+                      }
+                      className="pl-view-feedback-button"
+                    >
+                      <MessageSquare size={14} /> View Feedback
+                    </button>
                   </div>
                 ))}
               </div>

@@ -164,7 +164,6 @@ const AdminProjectList = () => {
   };
 
   const navigateToRateProject = (projectId) => {
-    // Navigate to the existing route defined in AdminDashboard
     navigate(`/admin/rate-project/${projectId}`);
   };
 

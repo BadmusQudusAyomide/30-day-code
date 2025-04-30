@@ -1,4 +1,3 @@
-/* Main container styles */
 .admin-project-list {
   max-width: 1200px;
   margin: 0 auto;
@@ -7,7 +6,6 @@
   color: #1f2937;
 }
 
-/* Top Navigation Bar */
 .admin-top-navigation {
   display: flex;
   justify-content: space-between;
@@ -41,7 +39,6 @@
   height: 18px;
 }
 
-/* Header Styles */
 .admin-header {
   text-align: center;
   margin-bottom: 2.5rem;
@@ -59,7 +56,6 @@
   font-size: 1.1rem;
 }
 
-/* Filter Section Styles */
 .admin-filter-panel {
   background-color: #f9fafb;
   border-radius: 10px;
@@ -170,7 +166,6 @@
   border-color: #d1d5db;
 }
 
-/* Empty state styling */
 .admin-empty-state,
 .admin-loading-container,
 .admin-error-container {
@@ -219,7 +214,6 @@
   background-color: #2563eb;
 }
 
-/* Loading state styles */
 .admin-loader {
   border: 4px solid #f3f3f3;
   border-top: 4px solid #3b82f6;
@@ -235,7 +229,6 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Project Section Styles */
 .admin-projects-container {
   margin-top: 2rem;
 }
@@ -278,7 +271,6 @@
   font-weight: 500;
 }
 
-/* Projects Grid */
 .admin-projects-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -297,7 +289,6 @@
   }
 }
 
-/* Project Card Styles */
 .admin-project-card {
   display: flex;
   flex-direction: column;
@@ -428,7 +419,6 @@
   text-decoration: underline;
 }
 
-/* New structure for better aligned buttons */
 .admin-project-footer {
   display: flex;
   flex-direction: column;
@@ -449,7 +439,6 @@
   height: 14px;
 }
 
-/* New class for project actions layout */
 .admin-project-actions {
   display: flex;
   flex-direction: column;
@@ -490,7 +479,6 @@
   transition: all 0.2s ease;
 }
 
-/* Rate Project button styles */
 .admin-rate-button {
   background-color: #fef3c7;
   color: #92400e;
@@ -531,7 +519,6 @@
   height: 14px;
 }
 
-/* Back to top button */
 .admin-back-to-top {
   display: flex;
   justify-content: center;
@@ -554,7 +541,6 @@
   transform: translateY(-2px);
 }
 
-/* Error icon styles */
 .admin-error-icon {
   display: flex;
   align-items: center;
@@ -569,7 +555,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* Responsive layout improvements */
 @media (max-width: 639px) {
   .admin-project-list {
     padding: 1rem;
@@ -607,7 +592,6 @@
 }
 
 
-/* Update the project card to use flex layout to push footer to bottom */
 .admin-project-card {
   display: flex;
   flex-direction: column;
@@ -626,13 +610,11 @@
   flex: 1;
 }
 
-/* Make the project description take up available space, pushing footer down */
 .admin-project-description {
   flex: 1;
   margin-bottom: 1.5rem;
 }
 
-/* Reorganize the project footer and actions */
 .admin-project-footer {
   margin-top: auto;
   display: flex;
@@ -648,17 +630,15 @@
   font-size: 0.8rem;
 }
 
-/* Project actions layout - reorganized */
 .admin-project-actions {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-/* Make rating button full width and at the bottom */
 .admin-primary-action {
   width: 100%;
-  order: 2; /* Move this to be after secondary actions */
+  order: 2; 
 }
 
 .admin-primary-action .admin-rate-button {
@@ -666,11 +646,10 @@
   justify-content: center;
 }
 
-/* Secondary actions (GitHub and Demo) on the same line */
 .admin-secondary-actions {
   display: flex;
   gap: 0.5rem;
-  order: 1; /* Move this to be before primary action */
+  order: 1; 
 }
 
 .admin-secondary-actions a {
@@ -678,7 +657,6 @@
   justify-content: center;
 }
 
-/* Button styles */
 .admin-demo-link,
 .admin-code-link,
 .admin-rate-button {
@@ -694,13 +672,12 @@
   transition: all 0.2s ease;
 }
 
-/* Rate Project button styles */
 .admin-rate-button {
   background-color: #fef3c7;
   color: #92400e;
   border: none;
   cursor: pointer;
-  margin-top: 0.5rem; /* Add some space between the action rows */
+  margin-top: 0.5rem; 
 }
 
 .admin-rate-button:hover {
@@ -708,7 +685,6 @@
   color: #78350f;
 }
 
-/* Media query for responsive layout */
 @media (max-width: 639px) {
   .admin-project-list {
     padding: 1rem;
@@ -720,18 +696,17 @@
 }
 
 @media (min-width: 640px) {
-  /* We retain the column layout for the actions in all screen sizes
-     since we want the rate button at the bottom */
+
   .admin-project-actions {
     flex-direction: column;
     gap: 0.75rem;
   }
 }
 
-/* Add to your AdminProjectList.css */
+
 .admin-user-name {
   font-weight: 600;
-  color: #4f46e5; /* Or any color that matches your theme */
+  color: #4f46e5; 
 }
 
 .admin-subtitle {

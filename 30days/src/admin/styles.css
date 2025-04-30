@@ -633,7 +633,6 @@ body {
   }
 }
 
-/* Super Large Devices (1201px and up) */
 @media (min-width: 1201px) {
   .sidebar-toggle {
     display: none;

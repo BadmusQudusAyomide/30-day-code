@@ -9,7 +9,6 @@ export const AdminAuthProvider = ({ children }) => {
   const [adminUser, setAdminUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check if user is authenticated on initial load
   useEffect(() => {
     const checkAuthStatus = async () => {
       const storedToken = localStorage.getItem("adminToken");
@@ -18,19 +17,16 @@ export const AdminAuthProvider = ({ children }) => {
       if (storedToken && storedUser) {
         const user = JSON.parse(storedUser);
 
-        // Verify token is valid by making a request to protected route
         try {
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${storedToken}`;
 
-          // Optional: Verify token is valid with backend
           await axios.get(`${process.env.REACT_APP_API_URL}/api/auth/me`);
 
           setAdminUser(user);
         } catch (err) {
           console.error("Auth verification failed:", err);
-          // Token is invalid, clear storage
           localStorage.removeItem("adminToken");
           localStorage.removeItem("adminUser");
           delete axios.defaults.headers.common["Authorization"];

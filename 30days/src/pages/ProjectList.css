@@ -761,3 +761,116 @@
     justify-content: space-between;
   }
 }
+/* Add to ProjectList.css */
+.pl-rating-display {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.pl-rating-star {
+  color: #ffc107;
+}
+
+.pl-rating-star.pl-filled {
+  fill: currentColor;
+}
+
+.pl-rating-value {
+  font-size: 0.9em;
+  margin-left: 3px;
+}
+
+.pl-view-feedback-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.pl-view-feedback-button:hover {
+  color: #333;
+}
+/* Add to ProjectList.css */
+.pl-feedback-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  margin-top: auto;
+}
+
+.pl-feedback-preview {
+  margin-bottom: 1rem;
+}
+
+.pl-feedback-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.pl-feedback-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.pl-thumbs-up {
+  color: #4ade80;
+}
+
+.pl-thumbs-down {
+  color: #f87171;
+}
+
+.pl-comments-icon {
+  color: #60a5fa;
+}
+
+.pl-latest-comment {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.pl-comment-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.pl-comment-author {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-align: right;
+}
+
+.pl-view-feedback-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  background-color: rgba(109, 40, 217, 0.1);
+  color: var(--primary-color);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.pl-view-feedback-button:hover {
+  background-color: rgba(109, 40, 217, 0.2);
+  color: var(--primary-hover);
+}
