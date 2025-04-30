@@ -10,7 +10,6 @@ const RateProject = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Rating submitted:", { userId, projectId, rating, feedback });
     navigate(-1); 
   };
 

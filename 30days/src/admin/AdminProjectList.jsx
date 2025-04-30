@@ -63,7 +63,6 @@ const AdminProjectList = () => {
           setError("Failed to fetch projects");
         }
       } catch (err) {
-        console.error("Error fetching projects:", err);
         setError("An error occurred while fetching projects");
       } finally {
         setLoading(false);

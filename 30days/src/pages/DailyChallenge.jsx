@@ -46,7 +46,6 @@ const DailyChallenge = () => {
         // Set the day from the API response
         setCurrentDay(dayResponse.data.day || 1);
       } catch (err) {
-        console.error("Error fetching challenge day:", err);
         setError("Failed to load current challenge day");
         // Fallback to day 1
         setCurrentDay(1);

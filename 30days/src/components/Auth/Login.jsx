@@ -89,7 +89,7 @@ const Login = ({ onLoginSuccess }) => {
 
     try {
       const response = await fetch(
-        "https://my-backend-pkhd.onrender.com/api/auth/login",
+        "my-backend-pkhd.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -103,26 +103,13 @@ const Login = ({ onLoginSuccess }) => {
         throw new Error(data.message || "Login failed");
       }
 
-      // Set token and user data in localStorage
       localStorage.setItem("token", data.user.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // Call the login success callback
       onLoginSuccess();
 
-      // Log success and token - Adding this from second version
-      console.log("Login successful, token stored:", data.user.token);
-
-      // Set the token again to ensure it's properly stored (from second version)
       localStorage.setItem("token", data.user.token);
 
-      // Verify the token is actually in localStorage (from second version)
-      console.log(
-        "Token in localStorage after setting:",
-        localStorage.getItem("token")
-      );
-
-      // Navigate to dashboard
       navigate("/dashboard");
     } catch (err) {
       setApiError(err.message);
@@ -216,13 +203,14 @@ const Login = ({ onLoginSuccess }) => {
                   localStorage.removeItem("token");
                   window.location.href = `${
                     process.env.REACT_APP_API_URL ||
-                    "https://my-backend-pkhd.onrender.com"
+                    "my-backend-pkhd.onrender.com"
                   }/api/auth/github?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;
                 }}
               >
-                <FaGithub /> Continue with GitHub
+                <FaGithub />
+                GitHub
               </button>
 
               <button
@@ -233,13 +221,14 @@ const Login = ({ onLoginSuccess }) => {
                   localStorage.removeItem("token");
                   window.location.href = `${
                     process.env.REACT_APP_API_URL ||
-                    "https://my-backend-pkhd.onrender.com"
+                    "my-backend-pkhd.onrender.com"
                   }/api/auth/google?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;
                 }}
               >
-                <FaGoogle /> Continue with Google
+                <FaGoogle />
+                Google
               </button>
             </div>
 

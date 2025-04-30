@@ -42,7 +42,6 @@ const Community = () => {
         setPosts([]); // Empty posts until implemented
 
       } catch (error) {
-        console.error("Error fetching community data:", error);
         setUsers([]);
         setPopularSubmissions([]);
         setPosts([]);

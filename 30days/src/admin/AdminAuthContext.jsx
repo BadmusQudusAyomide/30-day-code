@@ -26,7 +26,6 @@ export const AdminAuthProvider = ({ children }) => {
 
           setAdminUser(user);
         } catch (err) {
-          console.error("Auth verification failed:", err);
           localStorage.removeItem("adminToken");
           localStorage.removeItem("adminUser");
           delete axios.defaults.headers.common["Authorization"];

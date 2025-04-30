@@ -77,7 +77,6 @@ const Submissions = () => {
         setError(response.data.message || "Failed to fetch submissions");
       }
     } catch (err) {
-      console.error("Error fetching submissions:", err);
       setError("Failed to load submissions. Please try again.");
     } finally {
       setLoading(false);
@@ -117,7 +116,6 @@ const Submissions = () => {
         setError(response.data.message || `Failed to ${action} submission`);
       }
     } catch (err) {
-      console.error(`Error ${action} submission:`, err);
       setError(`Failed to ${action} submission. Please try again.`);
     }
   };

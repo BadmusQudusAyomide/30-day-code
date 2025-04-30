@@ -1,16 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import BackgroundOrbs from './BackgroundOrbs';
-import './AuthStyles.css';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import BackgroundOrbs from "./BackgroundOrbs";
+import "./AuthStyles.css";
 
 const AdminLogin = ({ setAuthenticated }) => {
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
-  // In AdminLogin.js
+  useEffect(() => {
+    // Animation for the form appearance
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -57,13 +66,13 @@ const AdminLogin = ({ setAuthenticated }) => {
   return (
     <div className="auth-container">
       <BackgroundOrbs />
-      
-      <div 
+
+      <div
         className="auth-card glass-card"
         style={{
           opacity: isVisible ? 1 : 0,
-          transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
-          transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+          transform: isVisible ? "translateY(0)" : "translateY(20px)",
+          transition: "opacity 0.5s ease-out, transform 0.5s ease-out",
         }}
       >
         <h2 className="auth-title">Admin Login</h2>
@@ -99,24 +108,32 @@ const AdminLogin = ({ setAuthenticated }) => {
             />
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary"
-            style={{ width: "100%" }}
-            disabled={loading}
-          >
-            {loading ? "Logging in..." : "Login"}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? (
+              <span>
+                <i
+                  className="fas fa-circle-notch fa-spin"
+                  style={{ marginRight: "8px" }}
+                ></i>
+                Logging in...
+              </span>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
 
         <div className="auth-footer">
-          <div style={{ marginBottom: "10px" }}>
+          <div style={{ marginBottom: "1rem" }}>
             <Link to="/login" className="auth-link">
-              <i className="fas fa-arrow-left" style={{ marginRight: '5px' }}></i> 
+              <i
+                className="fas fa-arrow-left"
+                style={{ marginRight: "5px" }}
+              ></i>
               Back to User Login
             </Link>
           </div>
-          
+
           <div>
             Don't have an account?{" "}
             <Link to="/admin/signup" className="auth-link">

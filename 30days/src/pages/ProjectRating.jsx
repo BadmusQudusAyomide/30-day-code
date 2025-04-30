@@ -75,15 +75,8 @@ const ProjectRating = () => {
     const averageRating =
       Object.values(criteria).reduce((a, b) => a + b, 0) / 4;
 
-    console.log("Submitted rating:", {
-      projectId,
-      overallRating: rating,
-      criteriaRatings: criteria,
-      calculatedAverage: averageRating,
-      comment,
-    });
+    
 
-    // In a real app, this would be an API call to submit the rating
     setSubmitted(true);
 
     // After submission, wait 2 seconds then navigate back to leaderboard

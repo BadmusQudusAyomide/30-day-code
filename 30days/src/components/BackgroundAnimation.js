@@ -7,11 +7,9 @@ const BackgroundAnimation = () => {
     const container = containerRef.current;
     if (!container) return;
 
-    // Clear previous orbs
     container.innerHTML = "";
 
     const createOrbs = () => {
-      // Create different layers of orbs for depth
       const orbCounts = [8, 6, 4]; // Different counts for each layer
       const layers = 3;
 
@@ -19,7 +17,6 @@ const BackgroundAnimation = () => {
         for (let i = 0; i < orbCounts[layer]; i++) {
           const orb = document.createElement("div");
 
-          // Layer-specific styling
           const size = Math.random() * (250 - layer * 50) + 50;
           const depth = layer + 1;
           const speed = 15 + layer * 5; // Slower for background, faster for foreground
@@ -27,7 +24,6 @@ const BackgroundAnimation = () => {
           orb.classList.add("orb");
           orb.classList.add(`orb-layer-${layer}`);
 
-          // Randomize orb properties
           orb.style.width = `${size}px`;
           orb.style.height = `${size}px`;
           orb.style.left = `${Math.random() * 100}%`;
@@ -37,7 +33,6 @@ const BackgroundAnimation = () => {
           orb.style.opacity = `${0.5 - layer * 0.15}`;
           orb.style.zIndex = `-${depth}`;
 
-          // Randomize orb colors slightly for each layer
           const hueOffset = layer * 20;
           const gradientStart =
             layer % 2 === 0
@@ -50,7 +45,6 @@ const BackgroundAnimation = () => {
 
           orb.style.background = `radial-gradient(circle, ${gradientStart}, ${gradientEnd})`;
 
-          // Add unique animation path for each orb
           const animationPath = Math.floor(Math.random() * 4);
           orb.classList.add(`path-${animationPath}`);
 
@@ -61,7 +55,6 @@ const BackgroundAnimation = () => {
 
     createOrbs();
 
-    // Recreate orbs on window resize for better distribution
     const handleResize = () => {
       container.innerHTML = "";
       createOrbs();

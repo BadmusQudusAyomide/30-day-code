@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link } from "react-router-dom"; 
 import "./SubmitProject.css";
 
 const SubmitProject = () => {
@@ -31,7 +31,7 @@ const SubmitProject = () => {
     const file = e.target.files[0];
 
     if (file) {
-      // Check file size (2MB max)
+   
       if (file.size > 2 * 1024 * 1024) {
         setError("File size exceeds 2MB limit. Please choose a smaller image.");
         e.target.value = null;
@@ -41,7 +41,7 @@ const SubmitProject = () => {
       setProjectImage(file);
       setError(null);
 
-      // Create preview
+     
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -56,23 +56,17 @@ const SubmitProject = () => {
     setError(null);
 
     try {
-      // First upload the image
       const token = localStorage.getItem("token");
 
       if (!token) {
         throw new Error("You must be logged in to submit a project");
       }
 
-      // Create form data for image upload
       const imageFormData = new FormData();
       imageFormData.append("projectImage", projectImage);
 
-      console.log(
-        "Uploading image to:",
-        `${process.env.REACT_APP_API_URL}/api/uploads/project-image`
-      );
+     
 
-      // Upload the image - FIXED URL
       const imageUploadResponse = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/uploads/project-image`,
         imageFormData,
@@ -86,12 +80,8 @@ const SubmitProject = () => {
 
       const imageUrl = imageUploadResponse.data.imageUrl;
 
-      console.log(
-        "Submitting project to:",
-        `${process.env.REACT_APP_API_URL}/api/projects`
-      );
+     
 
-      // Submit the project with the image URL - FIXED URL
       const projectResponse = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/projects`,
         {
@@ -106,10 +96,8 @@ const SubmitProject = () => {
         }
       );
 
-      console.log("Project submitted successfully:", projectResponse.data);
       setSubmitted(true);
 
-      // Reset form after 3 seconds
       setTimeout(() => {
         setFormData({
           projectName: "",
@@ -125,7 +113,6 @@ const SubmitProject = () => {
         setSubmitted(false);
       }, 3000);
     } catch (err) {
-      console.error("Error submitting project:", err);
       setError(
         err.response?.data?.message || err.message || "Failed to submit project"
       );
@@ -281,12 +268,12 @@ const SubmitProject = () => {
                   onChange={handleImageChange}
                   accept="image/*"
                   className="file-input"
-                  style={{ opacity: 0, position: "absolute", zIndex: -1 }} // Hide the actual input
+                  style={{ opacity: 0, position: "absolute", zIndex: -1 }} 
                 />
                 <label
                   htmlFor="projectImage"
                   className="file-input-button"
-                  style={{ cursor: "pointer" }} // Make it clear this is clickable
+                  style={{ cursor: "pointer" }} 
                 >
                   Choose File
                 </label>

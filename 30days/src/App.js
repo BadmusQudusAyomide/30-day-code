@@ -47,9 +47,6 @@ function App() {
       const userToken = localStorage.getItem("token");
       const adminToken = localStorage.getItem("adminToken");
 
-      console.log("Checking auth status:");
-      console.log("User token exists:", !!userToken);
-      console.log("Admin token exists:", !!adminToken);
       setLoading(true);
 
       try {
@@ -70,8 +67,6 @@ function App() {
             throw new Error(response.data.message || "Authentication failed");
           }
         } else if (adminToken) {
-          console.log("Verifying admin token...");
-
           axios.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${adminToken}`;
@@ -79,12 +74,8 @@ function App() {
           const response = await axios.get("/api/auth/me", {
             headers: { Authorization: `Bearer ${adminToken}` },
           });
-          console.log("Admin auth response:", response.data);
-          console.log("Is user admin?", response.data.user?.isAdmin);
 
           if (response.data.success && response.data.user?.isAdmin) {
-            console.log("Admin authentication successful");
-
             setIsAdminAuthenticated(true);
             setIsAuthenticated(false);
             localStorage.setItem(
@@ -92,15 +83,10 @@ function App() {
               JSON.stringify(response.data.user)
             );
           } else {
-            console.log(
-              "Admin check failed - user is not admin or success is false"
-            );
-
             throw new Error("Admin authentication failed");
           }
         }
       } catch (err) {
-        console.error("Auth check failed:", err);
         localStorage.removeItem("token");
         localStorage.removeItem("adminToken");
         localStorage.removeItem("user");
@@ -139,7 +125,6 @@ function App() {
   // In App.js
   const handleAdminLoginSuccess = (token, userData) => {
     if (!token || !userData) {
-      console.error("Invalid token or user data");
       return;
     }
 
@@ -342,6 +327,26 @@ function App() {
             <DailyChallenge onLogout={handleLogout} />
           </ProtectedRoute>
         }
+      />
+      <Route
+        path="/resources"
+        element={
+          <ProtectedRoute>
+            <Resources onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/community"
+        element={
+          <ProtectedRoute>
+            <Community onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/projects/:projectId/ratings"
+        element={<ProjectRatingView />}
       />
 
       {/* Catch-all */}

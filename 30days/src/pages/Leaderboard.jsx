@@ -32,21 +32,21 @@ const Leaderboard = () => {
     totalSubmissions: 0,
     totalPoints: 0,
   });
+  const [currentDay, setCurrentDay] = useState(1); // Add currentDay state
+  const [totalDays, setTotalDays] = useState(30); // Add totalDays state
   const navigate = useNavigate();
+  const progress = {
+    currentDay,
+    totalDays,
+    progressPercentage: Math.floor((currentDay / totalDays) * 100),
+    daysLeft: totalDays - currentDay,
+  };
 
   const API_URL =
     process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
-  // Calculate challenge progress
+  // Calculate challenge progress using the fetched currentDay
   const calculateChallengeProgress = () => {
-    // This is a placeholder - you might want to get this from an API or calculate based on the current date
-    const startDate = new Date("2025-03-10"); // Replace with your actual challenge start date
-    const totalDays = 30;
-
-    const today = new Date();
-    const daysPassed =
-      Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
-    const currentDay = Math.min(daysPassed, totalDays);
     const progressPercentage = Math.floor((currentDay / totalDays) * 100);
     const daysLeft = totalDays - currentDay;
 
@@ -57,8 +57,6 @@ const Leaderboard = () => {
       daysLeft,
     };
   };
-
-  const progress = calculateChallengeProgress();
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
@@ -71,26 +69,41 @@ const Leaderboard = () => {
           return;
         }
 
-        // Fetch leaderboard data from our new endpoint
+        const authHeader = `Bearer ${token}`;
+
+        // Fetch current day first
+        try {
+          const dayResponse = await axios.get(
+            `${API_URL}/api/challenge/current-day`,
+            {
+              headers: {
+                Authorization: authHeader,
+              },
+            }
+          );
+          setCurrentDay(dayResponse.data.day || 1);
+          setTotalDays(dayResponse.data.totalDays || 30);
+        } catch (dayError) {
+          console.error("Error fetching current day:", dayError);
+        }
+
+        // Then fetch leaderboard data
         const response = await axios.get(
           `${API_URL}/api/leaderboard/leaderboard`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: authHeader,
             },
           }
         );
 
         if (response.data.success) {
-          // Ensure all users have totalPoints property
           const processedData = response.data.data.map((user) => ({
             ...user,
-            // If the API returns totalScore instead of totalPoints, map it
             totalPoints: user.totalPoints || user.totalScore || 0,
           }));
           setLeaderboardData(processedData);
 
-          // Calculate summary statistics
           const totalUsers = processedData.length;
           const totalSubmissions = processedData.reduce(
             (sum, user) => sum + (user.projectsSubmitted || 0),
@@ -112,10 +125,7 @@ const Leaderboard = () => {
           );
         }
       } catch (err) {
-        console.error("Error fetching leaderboard data:", err);
         setError("Failed to load leaderboard data. Please try again later.");
-
-        // If API call fails, we could use mock data as fallback
         generateMockData();
       } finally {
         setLoading(false);
@@ -201,13 +211,13 @@ const Leaderboard = () => {
   const generateMockProjects = (userId, count = 5) => {
     const projects = [];
     for (let i = 0; i < count; i++) {
-      const day = Math.floor(Math.random() * progress.currentDay) + 1;
+      const day = Math.floor(Math.random() * currentDay) + 1;
       projects.push({
         _id: `project-${userId}-${i}`,
         projectName: `Project ${i + 1}`,
         day,
         submissionDate: new Date(
-          Date.now() - (progress.currentDay - day) * 24 * 60 * 60 * 1000
+          Date.now() - (currentDay - day) * 24 * 60 * 60 * 1000
         ).toISOString(),
         imageUrl: "https://via.placeholder.com/150",
       });

@@ -13,7 +13,7 @@ const StatsCards = () => {
   const [errors, setErrors] = useState({});
 
   const API_URL =
-    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+    process.env.REACT_APP_API_URL || "my-backend-pkhd.onrender.com";
 
   const fetchStat = async (endpoint, statKey) => {
     try {
@@ -26,7 +26,6 @@ const StatsCards = () => {
       }));
       setErrors((prev) => ({ ...prev, [statKey]: null }));
     } catch (err) {
-      console.error(`Error fetching ${statKey}:`, err);
       setErrors((prev) => ({ ...prev, [statKey]: err.message }));
       if (statKey === "challengeDay") {
         setStats((prev) => ({ ...prev, [statKey]: 1 }));
@@ -54,6 +53,16 @@ const StatsCards = () => {
 
   const formatStat = (value) => {
     return typeof value === "number" ? value.toLocaleString() : value;
+  };
+  const formatDateWithWAT = (dateString) => {
+    return new Date(dateString).toLocaleString("en-US", {
+      timeZone: "Africa/Lagos",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (

@@ -27,7 +27,7 @@ const ProjectList = () => {
   const [expandedProject, setExpandedProject] = useState(null);
 
   const API_URL =
-    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+    process.env.REACT_APP_API_URL || "my-backend-pkhd.onrender.com";
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -61,7 +61,6 @@ const ProjectList = () => {
           setError("Failed to fetch projects");
         }
       } catch (err) {
-        console.error("Error fetching projects:", err);
         setError("An error occurred while fetching projects");
       } finally {
         setLoading(false);

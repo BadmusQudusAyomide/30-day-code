@@ -1,39 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { Save, Camera, X, Edit2, ArrowLeft } from "lucide-react";
-import axios from "axios"; // You'll need to install axios
+import axios from "axios";
 import "./UserProfile.css";
+import { Link } from "react-router-dom";
 
-// Create a custom hook for authentication
 export const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Load user data from localStorage on component mount
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.error("Failed to parse stored user data", err);
-      }
+      } catch (err) {}
     }
     setLoading(false);
   }, []);
 
-  // Set up axios with authentication header
   const api = axios.create({
-<<<<<<< Updated upstream
     baseURL:
       process.env.REACT_APP_API_URL ||
-      "https://my-backend-pkhd.onrender.com/api",
-=======
-    baseURL: process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com/api",
->>>>>>> Stashed changes
+      "https://https://my-backend-pkhd.onrender.com/api",
   });
 
-  // Add auth token to all requests
   api.interceptors.request.use((config) => {
     const token = user?.token;
     if (token) {
@@ -42,24 +33,18 @@ export const useAuth = () => {
     return config;
   });
 
-  // Login function
   const login = async (emailOrUsername, password) => {
     try {
       setLoading(true);
       const response = await axios.post(
         `${
-<<<<<<< Updated upstream
           process.env.REACT_APP_API_URL ||
-          "https://my-backend-pkhd.onrender.com/api"
-=======
-          process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com/api"
->>>>>>> Stashed changes
+          "https://https://my-backend-pkhd.onrender.com/api"
         }/auth/login`,
         { emailOrUsername, password }
       );
       const userData = response.data.user;
 
-      // Store in state and localStorage
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
       return userData;
@@ -71,20 +56,17 @@ export const useAuth = () => {
     }
   };
 
-  // Logout function
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
   };
 
-  // Update user profile
   const updateProfile = async (userData) => {
     try {
       setLoading(true);
       const response = await api.put("/auth/profile", userData);
       const updatedUser = response.data.user;
 
-      // Update state and localStorage with new user data
       setUser({ ...user, ...updatedUser });
       localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUser }));
       return updatedUser;
@@ -107,7 +89,6 @@ export default function UserProfile() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
 
-  // Set initial profile data when user data is loaded
   useEffect(() => {
     if (user) {
       setTempData({
@@ -158,23 +139,10 @@ export default function UserProfile() {
       setUpdateError(null);
       setUpdateSuccess(false);
 
-      // Create a FormData instance if there's an image to upload
       if (profileImage) {
         const formData = new FormData();
         formData.append("profileImage", profileImage);
 
-        // Upload the image first, then update the profile with the image URL
-        // Adjust this API endpoint to match your backend
-        // const imageResponse = await axios.post("/api/uploads/profile-image", formData, {
-        //   headers: {
-        //     "Content-Type": "multipart/form-data",
-        //     Authorization: `Bearer ${user.token}`
-        //   }
-        // });
-        // const imageUrl = imageResponse.data.url;
-        // await updateProfile({ ...tempData, profileImage: imageUrl });
-      } else {
-        // Just update the profile without image
         await updateProfile(tempData);
       }
 
@@ -182,12 +150,10 @@ export default function UserProfile() {
       setEditMode(false);
     } catch (err) {
       setUpdateError(err.response?.data?.message || "Failed to update profile");
-      console.error("Profile update failed", err);
     }
   };
 
   const handleCancel = () => {
-    // Reset tempData to current user data
     if (user) {
       setTempData({
         fullName: user.fullName || "",
@@ -221,9 +187,9 @@ export default function UserProfile() {
       {/* Header */}
       <div className="profile-header">
         <div className="header-left">
-          <button className="back-button">
+          <Link to="/dazboard" className="back-button">
             <ArrowLeft size={20} />
-          </button>
+          </Link>
           <h1 className="profile-title">My Profile</h1>
         </div>
         {!editMode ? (
@@ -343,7 +309,7 @@ export default function UserProfile() {
                     value={tempData.email}
                     onChange={handleInputChange}
                     className="field-input"
-                    disabled // Email should not be editable for security reasons
+                    disabled
                   />
                 ) : (
                   <p className="field-value">{user.email}</p>

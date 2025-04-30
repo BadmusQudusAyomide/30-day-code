@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
-import "./Auth.css"; // Same CSS file for consistent styling
+import "./Auth.css";
 
-// Reusing the same AnimatedBackground component
 const AnimatedBackground = () => {
   return (
     <div className="animated-background">
@@ -85,7 +84,6 @@ const Signup = ({ onLoginSuccess }) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Validate on change only after first blur
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
     }
@@ -123,7 +121,7 @@ const Signup = ({ onLoginSuccess }) => {
 
     try {
       const response = await fetch(
-        "https://my-backend-pkhd.onrender.com/api/auth/signup",
+        "my-backend-pkhd.onrender.com/api/auth/signup",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -333,7 +331,7 @@ const Signup = ({ onLoginSuccess }) => {
                   localStorage.removeItem("token");
                   window.location.href = `${
                     process.env.REACT_APP_API_URL ||
-                    "https://my-backend-pkhd.onrender.com"
+                    "my-backend-pkhd.onrender.com"
                   }/api/auth/github?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;
@@ -349,7 +347,7 @@ const Signup = ({ onLoginSuccess }) => {
                   localStorage.removeItem("token");
                   window.location.href = `${
                     process.env.REACT_APP_API_URL ||
-                    "https://my-backend-pkhd.onrender.com"
+                    "my-backend-pkhd.onrender.com"
                   }/api/auth/google?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;

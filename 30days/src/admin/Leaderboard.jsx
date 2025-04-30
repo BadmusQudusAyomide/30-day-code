@@ -39,7 +39,6 @@ const Leaderboard = () => {
           throw new Error("Invalid response from server");
         }
       } catch (err) {
-        console.error("Error fetching leaderboard data:", err);
         setError("Failed to fetch leaderboard data");
       } finally {
         setLoading(false);

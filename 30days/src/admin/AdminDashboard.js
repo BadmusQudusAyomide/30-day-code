@@ -37,14 +37,12 @@ function AdminDashboard({ onLogout }) {
         const response = await axios.get("/api/auth/me");
 
         if (!response.data.success || !response.data.user?.isAdmin) {
-          console.error("Admin check failed:", response.data);
           onLogout();
           return;
         }
 
         setAdminUser(response.data.user);
       } catch (error) {
-        console.error("Admin verification failed:", error);
         onLogout();
       } finally {
         setLoading(false);

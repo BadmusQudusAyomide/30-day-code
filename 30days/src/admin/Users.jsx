@@ -101,6 +101,8 @@ const UserStyles = () => {
       .avatar-container {
         position: relative;
         flex-shrink: 0;
+        width: 60px;
+        height: 60px;
       }
 
       .user-avatar {
@@ -110,6 +112,20 @@ const UserStyles = () => {
         object-fit: cover;
         border: 2px solid #f0f0f0;
         background-color: #f8f8f8;
+      }
+
+      .user-initials {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+        border: 2px solid #f0f0f0;
       }
 
       .user-details {
@@ -415,7 +431,11 @@ const Users = () => {
   const [loadingProjects, setLoadingProjects] = useState({});
   const [userSubmissionsCount, setUserSubmissionsCount] = useState({});
   const [loadingCounts, setLoadingCounts] = useState(false);
+  const [avatarLoadError, setAvatarLoadError] = useState({});
   const navigate = useNavigate();
+
+  // Maximum number of projects to display per user
+  const MAX_PROJECTS_TO_DISPLAY = 2;
 
   const API_URL =
     process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
@@ -448,7 +468,6 @@ const Users = () => {
               );
               updatedCounts[user._id] = countResponse.data.count || 0;
             } catch (err) {
-              console.error(`Error fetching count for user ${user._id}:`, err);
               updatedCounts[user._id] = initialCounts[user._id];
             }
           })
@@ -468,7 +487,7 @@ const Users = () => {
     if (expandedUserId && !userProjects[expandedUserId]) {
       fetchUserProjects(expandedUserId);
     }
-  }, [expandedUserId, userProjects, API_URL]);
+  }, [expandedUserId, userProjects]);
 
   const fetchUserProjects = async (userId) => {
     setLoadingProjects((prev) => ({ ...prev, [userId]: true }));
@@ -486,7 +505,7 @@ const Users = () => {
         [userId]: projectsResponse.data.projects || [],
       }));
     } catch (err) {
-      console.error(`Error fetching projects for user ${userId}:`, err);
+      console.error("Error fetching user projects:", err);
       setUserProjects((prev) => ({
         ...prev,
         [userId]: [],
@@ -510,8 +529,45 @@ const Users = () => {
     });
   };
 
-  const handleImageError = (e) => {
-    e.target.src = "https://i.pravatar.cc/150?img=3";
+  const handleImageError = (userId) => {
+    setAvatarLoadError((prev) => ({ ...prev, [userId]: true }));
+  };
+
+  // Generate user initials from full name
+  const getUserInitials = (fullName) => {
+    if (!fullName) return "?";
+    return fullName
+      .split(" ")
+      .map((name) => name[0])
+      .join("")
+      .substring(0, 2);
+  };
+
+  // Generate a consistent color based on user ID
+  const getInitialsBackgroundColor = (userId) => {
+    const colors = [
+      "#3498db", // Blue
+      "#2ecc71", // Green
+      "#e74c3c", // Red
+      "#f39c12", // Orange
+      "#9b59b6", // Purple
+      "#1abc9c", // Teal
+      "#d35400", // Dark Orange
+      "#c0392b", // Dark Red
+      "#8e44ad", // Dark Purple
+      "#16a085", // Dark Teal
+    ];
+
+    // Generate a simple hash from userId to pick a consistent color
+    let hash = 0;
+    if (userId) {
+      for (let i = 0; i < userId.length; i++) {
+        hash = userId.charCodeAt(i) + ((hash << 5) - hash);
+      }
+    }
+
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
   };
 
   return (
@@ -536,12 +592,23 @@ const Users = () => {
               >
                 <div className="user-info">
                   <div className="avatar-container">
-                    <img
-                      src={`https://i.pravatar.cc/150?img=${user._id}`}
-                      alt={user.fullName}
-                      className="user-avatar"
-                      onError={handleImageError}
-                    />
+                    {!avatarLoadError[user._id] ? (
+                      <img
+                        src={`https://i.pravatar.cc/150?img=${user._id}`}
+                        alt={user.fullName}
+                        className="user-avatar"
+                        onError={() => handleImageError(user._id)}
+                      />
+                    ) : (
+                      <div
+                        className="user-initials"
+                        style={{
+                          backgroundColor: getInitialsBackgroundColor(user._id),
+                        }}
+                      >
+                        {getUserInitials(user.fullName)}
+                      </div>
+                    )}
                   </div>
                   <div className="user-details">
                     <h3 className="user-name">{user.fullName}</h3>
@@ -594,50 +661,74 @@ const Users = () => {
                     <>
                       {userProjects[user._id]?.length > 0 ? (
                         <div className="projects-list">
-                          {userProjects[user._id].map((project) => (
-                            <div key={project._id} className="project-item">
-                              <div className="project-header">
-                                <h5 className="project-title">
-                                  {project.projectName}
-                                </h5>
-                                <span className="project-day">
-                                  Day {project.day}
-                                </span>
+                          {/* Display only the first MAX_PROJECTS_TO_DISPLAY projects */}
+                          {userProjects[user._id]
+                            .slice(0, MAX_PROJECTS_TO_DISPLAY)
+                            .map((project) => (
+                              <div key={project._id} className="project-item">
+                                <div className="project-header">
+                                  <h5 className="project-title">
+                                    {project.projectName}
+                                  </h5>
+                                  <span className="project-day">
+                                    Day {project.day}
+                                  </span>
+                                </div>
+                                <div className="project-links">
+                                  {project.liveLink && (
+                                    <a
+                                      href={project.liveLink}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="project-link"
+                                    >
+                                      <FiExternalLink size={12} />
+                                      Live Demo
+                                    </a>
+                                  )}
+                                  {project.repoLink && (
+                                    <a
+                                      href={project.repoLink}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="project-link"
+                                    >
+                                      <FiGithub size={12} />
+                                      Repository
+                                    </a>
+                                  )}
+                                </div>
+                                <p className="project-description">
+                                  {project.description.length > 100
+                                    ? `${project.description.substring(
+                                        0,
+                                        100
+                                      )}...`
+                                    : project.description}
+                                </p>
                               </div>
-                              <div className="project-links">
-                                {project.liveLink && (
-                                  <a
-                                    href={project.liveLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="project-link"
-                                  >
-                                    <FiExternalLink size={12} />
-                                    Live Demo
-                                  </a>
-                                )}
-                                {project.repoLink && (
-                                  <a
-                                    href={project.repoLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="project-link"
-                                  >
-                                    <FiGithub size={12} />
-                                    Repository
-                                  </a>
-                                )}
-                              </div>
+                            ))}
+
+                          {/* Show additional projects message if there are more */}
+                          {userProjects[user._id].length >
+                            MAX_PROJECTS_TO_DISPLAY && (
+                            <div
+                              className="project-item"
+                              style={{ textAlign: "center" }}
+                            >
                               <p className="project-description">
-                                {project.description.length > 100
-                                  ? `${project.description.substring(
-                                      0,
-                                      100
-                                    )}...`
-                                  : project.description}
+                                {userProjects[user._id].length -
+                                  MAX_PROJECTS_TO_DISPLAY}{" "}
+                                more project
+                                {userProjects[user._id].length -
+                                  MAX_PROJECTS_TO_DISPLAY !==
+                                1
+                                  ? "s"
+                                  : ""}{" "}
+                                not shown
                               </p>
                             </div>
-                          ))}
+                          )}
                         </div>
                       ) : (
                         <div className="no-projects">

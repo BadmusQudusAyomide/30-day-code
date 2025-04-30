@@ -70,7 +70,6 @@ const ProjectRating = () => {
           setError(response.data.message || "Failed to load project details");
         }
       } catch (err) {
-        console.error("Error fetching project:", err);
         setError("Unable to load project information. Please try again later.");
       } finally {
         setLoading(false);
@@ -173,7 +172,6 @@ const ProjectRating = () => {
         setError(response.data.message || "Failed to submit rating");
       }
     } catch (err) {
-      console.error("Error submitting rating:", err);
       setError("Failed to submit rating. Please try again.");
     } finally {
       setSubmitting(false);

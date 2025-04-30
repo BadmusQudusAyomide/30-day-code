@@ -7,12 +7,9 @@ const Version = () => {
   const [previousChallenge, setPreviousChallenge] = useState(null);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
-  const [exporting, setExporting] = useState({
-    current: false,
-    previous: false,
-  });
+  const [exporting, setExporting] = useState(false);
   const API_URL =
-    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+    process.env.REACT_APP_API_URL || "my-backend-pkhd.onrender.com";
 
   useEffect(() => {
     const fetchChallenges = async () => {
@@ -45,7 +42,6 @@ const Version = () => {
       const today = new Date();
 
       if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-        console.error("Invalid date range");
         return;
       }
 
@@ -64,24 +60,28 @@ const Version = () => {
       }, 20);
 
       return () => clearInterval(interval);
-    } catch (err) {
-      console.error("Error calculating progress:", err);
-    }
+    } catch (err) {}
   }, [currentChallenge]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "Not set";
     try {
       const date = new Date(dateString);
-      return isNaN(date.getTime()) ? "Invalid date" : date.toLocaleDateString();
+      if (isNaN(date.getTime())) return "Invalid date";
+
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
     } catch (err) {
+      console.error("Date formatting error:", err);
       return "Invalid date";
     }
   };
 
-  const exportToCSV = async (challengeId, isCurrent) => {
-    const exportKey = isCurrent ? "current" : "previous";
-    setExporting((prev) => ({ ...prev, [exportKey]: true }));
+  const exportLeaderboardToCSV = async () => {
+    setExporting(true);
 
     try {
       // Check for token in multiple possible locations
@@ -91,29 +91,26 @@ const Version = () => {
         (document.cookie.match(/token=([^;]+)/) || [])[1];
 
       if (!token) {
-        console.error("Token not found in any storage");
         throw new Error("Please log in again - no session found");
       }
 
-      console.log("Using token:", token.substring(0, 10) + "...");
-
-      const response = await axios.get(
-        `${API_URL}/api/challenge/${challengeId}/export`,
-        {
-          responseType: "blob",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          timeout: 30000,
-        }
-      );
+      const response = await axios.get(`${API_URL}/api/leaderboard/export`, {
+        responseType: "blob",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 30000,
+      });
 
       // Handle successful download
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `challenge_${exportKey}_data.csv`);
+      link.setAttribute(
+        "download",
+        `leaderboard_data_${new Date().toISOString().split("T")[0]}.csv`
+      );
       document.body.appendChild(link);
       link.click();
 
@@ -123,11 +120,7 @@ const Version = () => {
         window.URL.revokeObjectURL(url);
       }, 100);
     } catch (err) {
-      console.error("Export error details:", {
-        message: err.message,
-        response: err.response?.data,
-        stack: err.stack,
-      });
+      console.error("Export error:", err);
 
       let errorMessage = "Export failed";
       if (err.message.includes("token")) {
@@ -143,16 +136,30 @@ const Version = () => {
         window.location.href = "/login";
       }
     } finally {
-      setExporting((prev) => ({ ...prev, [exportKey]: false }));
+      setExporting(false);
     }
   };
+
   const renderChallengeCard = (challenge, isCurrent) => {
     if (!challenge) return null;
 
     const isCompleted =
       challenge.endDate && new Date(challenge.endDate) < new Date();
     const statusClass = isCompleted ? "-ver-completed" : "-ver-active";
-    const exportKey = isCurrent ? "current" : "previous";
+
+    // Calculate duration in days if both dates exist
+    let durationText = "";
+    if (challenge.startDate && challenge.endDate) {
+      try {
+        const start = new Date(challenge.startDate);
+        const end = new Date(challenge.endDate);
+        const durationDays =
+          Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+        durationText = ` (${durationDays} days)`;
+      } catch (e) {
+        console.error("Duration calculation error:", e);
+      }
+    }
 
     return (
       <div className={`-ver-card ${statusClass} -ver-animate-fadein`}>
@@ -173,8 +180,10 @@ const Version = () => {
           >
             <span className="-ver-label">End:</span>{" "}
             {formatDate(challenge.endDate)}
+            {durationText}
           </p>
         </div>
+
         <div
           className="-ver-status -ver-animate-slideup"
           style={{ animationDelay: "0.3s" }}
@@ -198,25 +207,6 @@ const Version = () => {
             </div>
           </div>
         )}
-
-        <button
-          className={`-ver-export-btn -ver-animate-slideup ${statusClass}`}
-          style={{ animationDelay: "0.5s" }}
-          onClick={() => exportToCSV(challenge._id, isCurrent)}
-          disabled={exporting[exportKey]}
-        >
-          {exporting[exportKey] ? (
-            <>
-              <span className="-ver-spinner-small"></span>
-              Exporting...
-            </>
-          ) : (
-            <>
-              <i className="-ver-icon">📊</i>
-              Export Data (CSV)
-            </>
-          )}
-        </button>
       </div>
     );
   };
@@ -237,6 +227,26 @@ const Version = () => {
       <div className="-ver-challenges">
         {renderChallengeCard(currentChallenge, true)}
         {renderChallengeCard(previousChallenge, false)}
+      </div>
+
+      <div className="-ver-export-section -ver-animate-slideup">
+        <button
+          className="-ver-export-btn"
+          onClick={exportLeaderboardToCSV}
+          disabled={exporting}
+        >
+          {exporting ? (
+            <>
+              <span className="-ver-spinner-small"></span>
+              Exporting Leaderboard...
+            </>
+          ) : (
+            <>
+              <i className="-ver-icon">📊</i>
+              Export Leaderboard (CSV)
+            </>
+          )}
+        </button>
       </div>
 
       {!currentChallenge && !previousChallenge && (

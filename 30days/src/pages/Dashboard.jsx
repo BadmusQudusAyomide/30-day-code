@@ -43,9 +43,7 @@ const Dashboard = ({ onLogout }) => {
             }
           );
           currentDay = dayResponse.data.day || 1;
-        } catch (dayError) {
-          console.error("Error fetching challenge day:", dayError);
-        }
+        } catch (dayError) {}
 
         // Fetch user data
         const userResponse = await axios.get(`${API_URL}/api/auth/me`, {
@@ -137,7 +135,6 @@ const Dashboard = ({ onLogout }) => {
 
         setTopPerformers(top3Users);
       } catch (err) {
-        console.error("Dashboard error:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -362,76 +359,6 @@ const Dashboard = ({ onLogout }) => {
           )}
         </div>
 
-        <div className="leaderboard-preview">
-          <div className="leaderboard-preview-header">
-            <h2>Current Rankings</h2>
-            <button
-              className="view-all-button"
-              onClick={() => handleNavigation("/leaderboard")}
-            >
-              View Full Leaderboard →
-            </button>
-          </div>
-          <div className="top-performers">
-            {topPerformers.length >= 3 ? (
-              <>
-                {renderTopPerformer(
-                  2,
-                  topPerformers[1].name,
-                  topPerformers[1].points,
-                  topPerformers[1].avatarColor
-                )}
-                {renderTopPerformer(
-                  1,
-                  topPerformers[0].name,
-                  topPerformers[0].points,
-                  topPerformers[0].avatarColor
-                )}
-                {renderTopPerformer(
-                  3,
-                  topPerformers[2].name,
-                  topPerformers[2].points,
-                  topPerformers[2].avatarColor
-                )}
-              </>
-            ) : (
-              <>
-                {renderTopPerformer(2, "Loading...", 0, "#f59e0b")}
-                {renderTopPerformer(1, "Loading...", 0, "#3b82f6")}
-                {renderTopPerformer(3, "Loading...", 0, "#10b981")}
-              </>
-            )}
-          </div>
-          <div className="your-rank-container">
-            <div className="your-rank-card">
-              <div className="rank-number">#{userData.rank}</div>
-              <div className="rank-info">
-                <div className="rank-user">
-                  <div
-                    className="rank-avatar"
-                    style={{ backgroundColor: userData.avatarColor }}
-                  >
-                    {userData.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="rank-name">{userData.name}</div>
-                </div>
-                <div className="rank-points">
-                  <span className="points-value">
-                    {userData.projectsSubmitted * 45}
-                  </span>
-                  <span className="points-label">Points</span>
-                </div>
-              </div>
-              <button
-                className="improve-rank-button"
-                onClick={() => handleNavigation("/SubmitProject")}
-              >
-                Improve Rank
-              </button>
-            </div>
-          </div>
-        </div>
-
         <div className="logout-container">
           <button className="logout-button" onClick={openLogoutModal}>
             <span className="logout-icon">🚪</span>
@@ -493,21 +420,6 @@ const Dashboard = ({ onLogout }) => {
           <p>{description}</p>
         </div>
         <div className="item-action">→</div>
-      </div>
-    );
-  }
-
-  function renderTopPerformer(rank, name, points, color) {
-    return (
-      <div className="top-performer">
-        <div className="performer-rank">#{rank}</div>
-        <div className="performer-avatar" style={{ backgroundColor: color }}>
-          {name.charAt(0).toUpperCase()}
-        </div>
-        <div className="performer-info">
-          <div className="performer-name">{name}</div>
-          <div className="performer-points">{points} points</div>
-        </div>
       </div>
     );
   }
