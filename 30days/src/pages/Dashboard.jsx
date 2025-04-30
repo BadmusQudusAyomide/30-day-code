@@ -265,34 +265,64 @@ const Dashboard = ({ onLogout }) => {
               <span className="day-number">{userData.currentDay}</span>
               <span className="day-label">/ {userData.totalDays}</span>
             </div>
-            <div className="progress-bar-container">
-              <div
-                className="progress-bar"
-                style={{
-                  width: `${calculateProgressPercentage()}%`,
-                  background: `linear-gradient(90deg, ${
-                    userData.avatarColor
-                  }, ${adjustColor(userData.avatarColor, 20)})`,
-                }}
-              ></div>
-              <div className="progress-milestones">
-                {[...Array(userData.totalDays)].map((_, i) => (
-                  <div
-                    key={i}
-                    className={`milestone ${
-                      i < userData.currentDay ? "completed" : ""
-                    }`}
-                    style={{ left: `${(i / userData.totalDays) * 100}%` }}
-                  />
-                ))}
+
+            {/* New progress bar design */}
+            <div className="progress-container">
+              <div className="progress-labels">
+                <span>Start</span>
+                <span>Day {userData.currentDay}</span>
+                <span>Finish</span>
+              </div>
+
+              <div className="progress-track">
+                <div
+                  className="progress-fill"
+                  style={{
+                    width: `${calculateProgressPercentage()}%`,
+                    background: `linear-gradient(90deg, 
+              ${userData.avatarColor}, 
+              ${adjustColor(userData.avatarColor, 10)})`,
+                    boxShadow: `0 0 15px ${adjustColor(
+                      userData.avatarColor,
+                      -20
+                    )}`,
+                  }}
+                >
+                  <div className="progress-thumb" />
+                </div>
+
+                {/* Current day marker */}
+                <div
+                  className="current-day-marker"
+                  style={{
+                    left: `${calculateProgressPercentage()}%`,
+                    backgroundColor: userData.avatarColor,
+                  }}
+                >
+                  <div className="marker-notch" />
+                  <div className="marker-label">Day {userData.currentDay}</div>
+                </div>
               </div>
             </div>
+
             <div className="progress-stats">
-              <div className="day-text">
-                Day {userData.currentDay} of {userData.totalDays}
+              <div className="stats-item">
+                <span className="stats-label">Completed</span>
+                <span className="stats-value">
+                  {userData.currentDay - 1} days
+                </span>
               </div>
-              <div className="percentage-text">
-                {Math.round(calculateProgressPercentage())}% complete
+              <div className="stats-item">
+                <span className="stats-label">Remaining</span>
+                <span className="stats-value">
+                  {userData.totalDays - userData.currentDay} days
+                </span>
+              </div>
+              <div className="stats-item highlight">
+                <span className="stats-label">Total Progress</span>
+                <span className="stats-value">
+                  {Math.round(calculateProgressPercentage())}%
+                </span>
               </div>
             </div>
           </div>
