@@ -89,7 +89,7 @@ const Login = ({ onLoginSuccess }) => {
 
     try {
       const response = await fetch(
-        "my-backend-pkhd.onrender.com/api/auth/login",
+        "https://my-backend-pkhd.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -203,7 +203,7 @@ const Login = ({ onLoginSuccess }) => {
                   localStorage.removeItem("token");
                   window.location.href = `${
                     process.env.REACT_APP_API_URL ||
-                    "my-backend-pkhd.onrender.com"
+                    "https://my-backend-pkhd.onrender.com"
                   }/api/auth/github?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;
@@ -221,7 +221,7 @@ const Login = ({ onLoginSuccess }) => {
                   localStorage.removeItem("token");
                   window.location.href = `${
                     process.env.REACT_APP_API_URL ||
-                    "my-backend-pkhd.onrender.com"
+                    "https://my-backend-pkhd.onrender.com"
                   }/api/auth/google?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;
@@ -246,3 +246,7 @@ const Login = ({ onLoginSuccess }) => {
 };
 
 export default Login;
+
+
+
+
