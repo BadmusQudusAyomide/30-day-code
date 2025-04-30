@@ -1,8 +1,12 @@
 // src/api/auth.js
 import axios from "axios";
 
+<<<<<<< Updated upstream
 const API_URL =
   process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com/api";
+=======
+const API_URL = process.env.REACT_APP_API_URL || 'https://my-backend-pkhd.onrender.com/api';
+>>>>>>> Stashed changes
 
 export const verifyToken = async (token) => {
   try {

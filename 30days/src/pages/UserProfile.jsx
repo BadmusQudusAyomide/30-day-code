@@ -24,9 +24,13 @@ export const useAuth = () => {
 
   // Set up axios with authentication header
   const api = axios.create({
+<<<<<<< Updated upstream
     baseURL:
       process.env.REACT_APP_API_URL ||
       "https://my-backend-pkhd.onrender.com/api",
+=======
+    baseURL: process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com/api",
+>>>>>>> Stashed changes
   });
 
   // Add auth token to all requests
@@ -44,8 +48,12 @@ export const useAuth = () => {
       setLoading(true);
       const response = await axios.post(
         `${
+<<<<<<< Updated upstream
           process.env.REACT_APP_API_URL ||
           "https://my-backend-pkhd.onrender.com/api"
+=======
+          process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com/api"
+>>>>>>> Stashed changes
         }/auth/login`,
         { emailOrUsername, password }
       );

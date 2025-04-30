@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
-import "./Auth.css";
-import "./AuthSuccess.jsx";
+import "./Auth.css"; // We'll keep this CSS file
+import "./AuthSuccess.jsx"; // Adding this import from the second version
 
+// AnimatedBackground component for floating orbs (keeping this from first version)
 const AnimatedBackground = () => {
   return (
     <div className="animated-background">
@@ -38,9 +39,11 @@ const Login = ({ onLoginSuccess }) => {
       case "emailOrUsername":
         if (!value.trim()) error = "Email or username is required";
         break;
+
       case "password":
         if (!value) error = "Password is required";
         break;
+
       default:
         break;
     }
@@ -100,9 +103,26 @@ const Login = ({ onLoginSuccess }) => {
         throw new Error(data.message || "Login failed");
       }
 
+      // Set token and user data in localStorage
       localStorage.setItem("token", data.user.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Call the login success callback
       onLoginSuccess();
+
+      // Log success and token - Adding this from second version
+      console.log("Login successful, token stored:", data.user.token);
+
+      // Set the token again to ensure it's properly stored (from second version)
+      localStorage.setItem("token", data.user.token);
+
+      // Verify the token is actually in localStorage (from second version)
+      console.log(
+        "Token in localStorage after setting:",
+        localStorage.getItem("token")
+      );
+
+      // Navigate to dashboard
       navigate("/dashboard");
     } catch (err) {
       setApiError(err.message);

@@ -417,8 +417,12 @@ const Users = () => {
   const [loadingCounts, setLoadingCounts] = useState(false);
   const navigate = useNavigate();
 
+<<<<<<< Updated upstream
   const API_URL =
     process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+=======
+  const API_URL = process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+>>>>>>> Stashed changes
 
   useEffect(() => {
     const fetchUsersAndCounts = async () => {

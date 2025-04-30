@@ -9,48 +9,39 @@ const AdminLogin = ({ setAuthenticated }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    // Animation for the form appearance
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
+  // In AdminLogin.js
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    
+
     try {
       const response = await axios.post("/api/auth/login", {
         emailOrUsername,
         password,
       });
-      
+
       const { user } = response.data;
-      
+
       // Check if user is an admin
       if (!user.isAdmin) {
         setError("You do not have admin privileges");
         setLoading(false);
         return;
       }
-      
+
       console.log("Admin login successful, user:", user);
       console.log("Token:", user.token);
-      
+
       // Store user data in localStorage
       localStorage.setItem("adminToken", user.token);
       localStorage.setItem("adminUser", JSON.stringify(user));
       localStorage.setItem("isAdminAuthenticated", "true");
-      
+
       // Set axios default header for future requests
       axios.defaults.headers.common["Authorization"] = `Bearer ${user.token}`;
-      
+
       // Pass token and user to parent component
       setAuthenticated(user.token, user);
     } catch (err) {
@@ -76,9 +67,9 @@ const AdminLogin = ({ setAuthenticated }) => {
         }}
       >
         <h2 className="auth-title">Admin Login</h2>
-        
+
         {error && <div className="alert alert-danger">{error}</div>}
-        
+
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="emailOrUsername">Email or Username</label>
@@ -93,7 +84,7 @@ const AdminLogin = ({ setAuthenticated }) => {
               autoComplete="username"
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
@@ -107,25 +98,19 @@ const AdminLogin = ({ setAuthenticated }) => {
               autoComplete="current-password"
             />
           </div>
-          
+
           <button
             type="submit"
             className="btn btn-primary"
+            style={{ width: "100%" }}
             disabled={loading}
           >
-            {loading ? (
-              <span>
-                <i className="fas fa-circle-notch fa-spin" style={{ marginRight: '8px' }}></i>
-                Logging in...
-              </span>
-            ) : (
-              "Login"
-            )}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-        
+
         <div className="auth-footer">
-          <div style={{ marginBottom: '1rem' }}>
+          <div style={{ marginBottom: "10px" }}>
             <Link to="/login" className="auth-link">
               <i className="fas fa-arrow-left" style={{ marginRight: '5px' }}></i> 
               Back to User Login
@@ -133,7 +118,7 @@ const AdminLogin = ({ setAuthenticated }) => {
           </div>
           
           <div>
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link to="/admin/signup" className="auth-link">
               Sign up
             </Link>

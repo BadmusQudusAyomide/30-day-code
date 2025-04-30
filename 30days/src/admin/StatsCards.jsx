@@ -12,8 +12,12 @@ const StatsCards = () => {
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
 
+<<<<<<< Updated upstream
   const API_URL =
     process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+=======
+  const API_URL = process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+>>>>>>> Stashed changes
 
   const fetchStat = async (endpoint, statKey) => {
     try {
