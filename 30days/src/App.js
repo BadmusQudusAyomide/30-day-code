@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 // Public components
 import Header from "./components/Header";
+import SkeletonLoader from "./components/SkeletonLoader";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
 import CtaSection from "./components/CtaSection";
@@ -34,7 +37,7 @@ import "./styles.css";
 
 // Configure axios defaults
 axios.defaults.baseURL =
-  process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+  process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -194,7 +197,7 @@ function App() {
   );
 
   if (loading) {
-    return <div className="loading">Loading application...</div>;
+    return <SkeletonLoader />;
   }
 
   return (

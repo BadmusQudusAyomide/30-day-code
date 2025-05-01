@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaGithub, FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
-import "./Auth.css"; // We'll keep this CSS file
-import "./AuthSuccess.jsx"; // Adding this import from the second version
+import "./Auth.css";
+import "./AuthSuccess.jsx";
+import LoginSkeleton from "./LoginSkeleton";
 
-// AnimatedBackground component for floating orbs (keeping this from first version)
 const AnimatedBackground = () => {
   return (
     <div className="animated-background">
@@ -30,7 +30,16 @@ const Login = ({ onLoginSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
+  const [showSkeleton, setShowSkeleton] = useState(true); // Add this state
   const navigate = useNavigate();
+
+  // Add this useEffect to hide skeleton after initial load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSkeleton(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const validateField = (name, value) => {
     let error = "";
@@ -88,14 +97,11 @@ const Login = ({ onLoginSuccess }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        "https://my-backend-pkhd.onrender.com/api/auth/login",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       const data = await response.json();
 
@@ -117,6 +123,9 @@ const Login = ({ onLoginSuccess }) => {
       setIsLoading(false);
     }
   };
+  if (showSkeleton) {
+    return <LoginSkeleton />;
+  }
 
   return (
     <div className="modern-auth-container">
@@ -202,8 +211,7 @@ const Login = ({ onLoginSuccess }) => {
                   const redirectPath = "/dashboard";
                   localStorage.removeItem("token");
                   window.location.href = `${
-                    process.env.REACT_APP_API_URL ||
-                    "https://my-backend-pkhd.onrender.com"
+                    process.env.REACT_APP_API_URL || "http://localhost:5000"
                   }/api/auth/github?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;
@@ -220,8 +228,7 @@ const Login = ({ onLoginSuccess }) => {
                   const redirectPath = "/dashboard";
                   localStorage.removeItem("token");
                   window.location.href = `${
-                    process.env.REACT_APP_API_URL ||
-                    "https://my-backend-pkhd.onrender.com"
+                    process.env.REACT_APP_API_URL || "http://localhost:5000"
                   }/api/auth/google?redirect=${encodeURIComponent(
                     redirectPath
                   )}`;
@@ -246,7 +253,3 @@ const Login = ({ onLoginSuccess }) => {
 };
 
 export default Login;
-
-
-
-

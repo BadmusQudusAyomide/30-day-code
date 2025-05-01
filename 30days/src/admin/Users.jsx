@@ -420,6 +420,149 @@ const UserStyles = () => {
         background: #eaeaea;
         margin: 0.25rem 0 1rem;
       }
+
+      .skeleton {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .skeleton::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.05) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        animation: shimmer 1.5s infinite;
+        z-index: 1;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .skeleton-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .skeleton-name {
+        height: 20px;
+        width: 120px;
+        background-color: rgba(255, 255, 255, 0.1);
+        margin-bottom: 8px;
+        border-radius: 4px;
+      }
+
+      .skeleton-email {
+        height: 16px;
+        width: 180px;
+        background-color: rgba(255, 255, 255, 0.1);
+        margin-bottom: 12px;
+        border-radius: 4px;
+      }
+
+      .skeleton-meta {
+        height: 14px;
+        width: 80px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+      }
+
+      .skeleton-status {
+        height: 24px;
+        width: 60px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+      }
+
+      .skeleton-expand {
+        height: 28px;
+        width: 28px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+      }
+
+      .skeleton-header {
+        height: 20px;
+        width: 120px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+      }
+
+      .skeleton-count {
+        height: 20px;
+        width: 60px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+      }
+
+      .skeleton-project {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      .skeleton-project-title {
+        height: 18px;
+        width: 70%;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+      }
+
+      .skeleton-project-day {
+        height: 20px;
+        width: 50px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+      }
+
+      .skeleton-link {
+        height: 24px;
+        width: 80px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+      }
+
+      .skeleton-description {
+        height: 16px;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        margin-top: 8px;
+      }
+
+      .skeleton-button {
+        height: 40px;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        margin-top: 16px;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 640px) {
+        .skeleton-name {
+          width: 100px;
+        }
+        .skeleton-email {
+          width: 140px;
+        }
+        .skeleton-meta {
+          width: 60px;
+        }
+      }
     `}</style>
   );
 };
@@ -569,6 +712,67 @@ const Users = () => {
     const index = Math.abs(hash) % colors.length;
     return colors[index];
   };
+  const UserCardSkeleton = () => (
+    <div className="user-card skeleton">
+      <div className="user-summary">
+        <div className="user-info">
+          <div className="avatar-container">
+            <div className="skeleton-avatar"></div>
+          </div>
+          <div className="user-details">
+            <div className="skeleton-name"></div>
+            <div className="skeleton-email"></div>
+            <div className="user-meta">
+              <div className="skeleton-meta"></div>
+              <div className="skeleton-meta"></div>
+            </div>
+          </div>
+        </div>
+        <div className="user-status">
+          <div className="skeleton-status"></div>
+          <div className="skeleton-expand"></div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ProjectsSkeleton = () => (
+    <div className="user-projects skeleton">
+      <div className="divider"></div>
+      <div className="projects-header">
+        <div className="skeleton-header"></div>
+        <div className="skeleton-count"></div>
+      </div>
+      <div className="projects-list">
+        {[1, 2].map((i) => (
+          <div key={i} className="project-item skeleton-project">
+            <div className="project-header">
+              <div className="skeleton-project-title"></div>
+              <div className="skeleton-project-day"></div>
+            </div>
+            <div className="project-links">
+              <div className="skeleton-link"></div>
+              <div className="skeleton-link"></div>
+            </div>
+            <div className="skeleton-description"></div>
+          </div>
+        ))}
+      </div>
+      <div className="skeleton-button"></div>
+    </div>
+  );
+
+  const renderSkeletonLoader = () => (
+    <div className="users-grid">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <React.Fragment key={i}>
+          <UserCardSkeleton />
+          {/* Randomly show expanded projects for some cards */}
+          {i % 2 === 0 && <ProjectsSkeleton />}
+        </React.Fragment>
+      ))}
+    </div>
+  );
 
   return (
     <div className="users-page">
@@ -578,10 +782,7 @@ const Users = () => {
       </div>
 
       {loadingCounts ? (
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p className="loading-message">Loading user data...</p>
-        </div>
+        renderSkeletonLoader()
       ) : (
         <div className="users-grid">
           {users.map((user) => (
@@ -653,10 +854,7 @@ const Users = () => {
                   </div>
 
                   {loadingProjects[user._id] ? (
-                    <div className="loading-projects">
-                      <div className="spinner"></div>
-                      <p className="loading-message">Loading projects...</p>
-                    </div>
+                    <ProjectsSkeleton />
                   ) : (
                     <>
                       {userProjects[user._id]?.length > 0 ? (

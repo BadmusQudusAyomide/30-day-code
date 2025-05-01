@@ -20,9 +20,7 @@ export const useAuth = () => {
   }, []);
 
   const api = axios.create({
-    baseURL:
-      process.env.REACT_APP_API_URL ||
-      "https://my-backend-pkhd.onrender.com/api",
+    baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
   });
 
   api.interceptors.request.use((config) => {
@@ -38,8 +36,7 @@ export const useAuth = () => {
       setLoading(true);
       const response = await axios.post(
         `${
-          process.env.REACT_APP_API_URL ||
-          "https://my-backend-pkhd.onrender.com/api"
+          process.env.REACT_APP_API_URL || "http://localhost:5000/api"
         }/auth/login`,
         { emailOrUsername, password }
       );

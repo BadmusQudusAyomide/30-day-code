@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import ResourcesSkeleton from "./ResourcesSkeleton"; // Add this import
 import "./Resources.css";
 
 const Resources = () => {
@@ -9,19 +10,28 @@ const Resources = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
   const [darkMode, setDarkMode] = useState(true);
+  const [loading, setLoading] = useState(true); // Add loading state
 
   // Load bookmarks from localStorage on component mount
   useEffect(() => {
-    const savedBookmarks = localStorage.getItem("devResourcesBookmarks");
-    if (savedBookmarks) {
-      setBookmarks(JSON.parse(savedBookmarks));
-    }
+    const timer = setTimeout(() => {
+      const savedBookmarks = localStorage.getItem("devResourcesBookmarks");
+      if (savedBookmarks) {
+        setBookmarks(JSON.parse(savedBookmarks));
+      }
+      setLoading(false);
+    }, 1000); // Simulate loading delay
+
+    return () => clearTimeout(timer);
   }, []);
 
-  // Save bookmarks to localStorage when updated
   useEffect(() => {
     localStorage.setItem("devResourcesBookmarks", JSON.stringify(bookmarks));
   }, [bookmarks]);
+
+  if (loading) {
+    return <ResourcesSkeleton />;
+  }
 
   const toggleBookmark = (resourceUrl) => {
     if (bookmarks.includes(resourceUrl)) {
@@ -1574,7 +1584,7 @@ const Resources = () => {
         <div className="res-footer-bottom">
           <p>
             © {new Date().getFullYear()} Developer Resources Hub. Made with 💻
-            by developers for developers.
+            by SnapDragon Team for developers.
           </p>
         </div>
       </footer>

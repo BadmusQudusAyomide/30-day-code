@@ -173,6 +173,59 @@ const ProjectList = () => {
       "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80";
   };
 
+   const ProjectCardSkeleton = () => (
+    <div className="pl-project-card pl-skeleton">
+      <div className="pl-project-image-container pl-skeleton-image">
+        <div className="pl-day-indicator pl-skeleton-text">Day 0</div>
+      </div>
+      <div className="pl-project-content">
+        <div className="pl-project-header">
+          <h3 className="pl-skeleton-text" style={{ width: '70%' }}></h3>
+          <span className="pl-status-badge pl-skeleton-text" style={{ width: '60px' }}></span>
+        </div>
+        
+        <div className="pl-tags-container">
+          {[1, 2, 3].map((i) => (
+            <span key={i} className="pl-language-tag pl-skeleton-text" style={{ width: `${Math.random() * 30 + 40}px` }}></span>
+          ))}
+        </div>
+        
+        <div className="pl-project-description">
+          <div className="pl-skeleton-text" style={{ width: '100%', height: '16px', marginBottom: '8px' }}></div>
+          <div className="pl-skeleton-text" style={{ width: '90%', height: '16px', marginBottom: '8px' }}></div>
+          <div className="pl-skeleton-text" style={{ width: '80%', height: '16px' }}></div>
+        </div>
+        
+        <div className="pl-project-footer">
+          <div className="pl-project-date pl-skeleton-text" style={{ width: '100px' }}></div>
+          <div className="pl-project-links">
+            <span className="pl-project-link pl-skeleton-text" style={{ width: '70px' }}></span>
+            <span className="pl-project-link pl-skeleton-text" style={{ width: '70px' }}></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSkeletonLoader = () => (
+    <div className="pl-projects-container">
+      {[1, 2, 3].map((day) => (
+        <div key={day} className="pl-day-group">
+          <div className="pl-day-header">
+            <h2 className="pl-skeleton-text" style={{ width: '100px' }}></h2>
+            <span className="pl-project-count pl-skeleton-text" style={{ width: '80px' }}></span>
+          </div>
+          
+          <div className="pl-projects-grid">
+            {[1, 2, 3].map((project) => (
+              <ProjectCardSkeleton key={project} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="pl-container">
       <div className="pl-back-navigation">
@@ -269,10 +322,7 @@ const ProjectList = () => {
       </div>
 
       {loading ? (
-        <div className="pl-loading-state">
-          <div className="pl-spinner"></div>
-          <p>Loading your projects...</p>
-        </div>
+        renderSkeletonLoader()
       ) : error ? (
         <div className="pl-error-state">
           <div className="pl-error-icon">!</div>

@@ -140,10 +140,9 @@
 .res-mobile-menu-toggle:hover {
   background-color: var(--res-card-border);
 }
-
 /* Header Styles */
 .res-header {
-  background: linear-gradient(135deg, var(--res-primary-color), var(--res-accent-color));
+  background: linear-gradient(135deg, #000000, #482568);
   border-radius: var(--res-border-radius);
   margin: 2rem 1rem;
   padding: 4rem 2rem;
@@ -1128,5 +1127,42 @@
   .res-stats {
     flex-direction: column;
     gap: 0.5rem;
+  }
+}
+
+/* Skeleton Loading Styles */
+.react-loading-skeleton {
+  --base-color: rgba(30, 27, 75, 0.5);
+  --highlight-color: rgba(46, 42, 94, 0.5);
+  opacity: 0.8;
+}
+
+/* Dark mode skeleton colors */
+@media (prefers-color-scheme: dark) {
+  .react-loading-skeleton {
+    --base-color: rgba(15, 6, 39, 0.5);
+    --highlight-color: rgba(30, 27, 75, 0.5);
+  }
+}
+
+/* Animation for skeleton fade out */
+@keyframes skeletonFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.skeleton-fade-out {
+  animation: skeletonFadeOut 0.3s ease-out forwards;
+}
+
+/* Responsive adjustments for skeleton */
+@media (max-width: 768px) {
+  .res-featured-grid,
+  .res-cards-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .res-category-tabs {
+    padding: 0.5rem;
   }
 }

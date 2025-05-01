@@ -1242,3 +1242,210 @@
   color: #6b7280;
   margin-top: 4px;
 }
+
+/* Skimmer Loading Styles */
+.us-skimmer {
+  animation: us-skeleton-pulse 1.5s ease-in-out infinite;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+}
+
+.us-skimmer-dark {
+  background-color: #d1d5db;
+}
+
+@keyframes us-skeleton-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Skimmer Card */
+.us-skimmer-card {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.us-skimmer-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  margin-right: 16px;
+}
+
+.us-skimmer-info {
+  flex: 1;
+}
+
+.us-skimmer-line {
+  height: 16px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.us-skimmer-line.short {
+  width: 60%;
+}
+
+.us-skimmer-line.medium {
+  width: 80%;
+}
+
+.us-skimmer-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.us-skimmer-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.us-skimmer-stat-value {
+  height: 18px;
+  width: 40px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+}
+
+.us-skimmer-stat-label {
+  height: 12px;
+  width: 50px;
+  border-radius: 4px;
+}
+
+/* Skimmer Stats Overview */
+.us-skimmer-stats-overview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 16px 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 20px auto;
+}
+
+.us-skimmer-stat-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.us-skimmer-stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 16px;
+}
+
+.us-skimmer-stat-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.us-skimmer-stat-main {
+  height: 24px;
+  width: 80%;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.us-skimmer-stat-secondary {
+  height: 14px;
+  width: 60%;
+  border-radius: 4px;
+}
+
+/* Skimmer Challenge Header */
+.us-skimmer-challenge-header {
+  background: linear-gradient(135deg, #000000, #3e325c);
+  border-radius: 16px;
+  color: white;
+  padding: 28px 24px;
+  margin-bottom: 24px;
+}
+
+.us-skimmer-title {
+  height: 28px;
+  width: 60%;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+.us-skimmer-subtitle {
+  height: 16px;
+  width: 80%;
+  margin-bottom: 24px;
+  border-radius: 4px;
+}
+
+.us-skimmer-progress-container {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.us-skimmer-progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.us-skimmer-progress-day {
+  height: 14px;
+  width: 20%;
+  border-radius: 4px;
+}
+
+.us-skimmer-progress-current {
+  height: 16px;
+  width: 15%;
+  border-radius: 4px;
+}
+
+.us-skimmer-progress-percent {
+  height: 14px;
+  width: 20%;
+  border-radius: 4px;
+}
+
+.us-skimmer-progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.us-skimmer-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.us-skimmer-action-btn {
+  height: 60px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+@media (max-width: 768px) {
+  .us-skimmer-stats-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .us-skimmer-stats-overview {
+    grid-template-columns: 1fr;
+  }
+}

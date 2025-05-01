@@ -1356,3 +1356,248 @@
     font-size: 16px;
   }
 }
+
+/* Skeleton Loader Styles */
+.skeleton-sidebar {
+  background: #f8f9fa;
+}
+
+.skeleton-logo,
+.skeleton-icon,
+.skeleton-menu-item,
+.skeleton-avatar,
+.skeleton-search,
+.skeleton-stats-card,
+.skeleton-content,
+.skeleton-leaderboard-header,
+.skeleton-podium,
+.skeleton-champion-card,
+.skeleton-table-header,
+.skeleton-table-row,
+.skeleton-title,
+.skeleton-subtitle,
+.skeleton-name,
+.skeleton-points,
+.skeleton-stat,
+.skeleton-button,
+.skeleton-sort,
+.skeleton-th,
+.skeleton-td,
+.skeleton-user {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.skeleton-menu-item {
+  height: 40px;
+  margin: 10px;
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.skeleton-search {
+  height: 40px;
+  width: 200px;
+}
+
+.skeleton-stats-card {
+  height: 120px;
+}
+
+.skeleton-title {
+  height: 32px;
+  width: 200px;
+  margin: 0 auto 10px;
+}
+
+.skeleton-subtitle {
+  height: 16px;
+  width: 300px;
+  margin: 0 auto;
+}
+
+.skeleton-podium {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.skeleton-champion-card {
+  width: 100%;
+  max-width: 280px;
+  height: 380px;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.skeleton-1 {
+  height: 420px;
+}
+
+.skeleton-2 {
+  height: 380px;
+}
+
+.skeleton-3 {
+  height: 360px;
+}
+
+.skeleton-avatar {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+}
+
+.skeleton-name {
+  height: 24px;
+  width: 80%;
+  margin: 0 auto 15px;
+}
+
+.skeleton-points {
+  height: 30px;
+  width: 60%;
+  margin: 0 auto 15px;
+}
+
+.skeleton-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.skeleton-stat {
+  height: 40px;
+  width: 60px;
+}
+
+.skeleton-button {
+  height: 40px;
+  width: 80%;
+  margin: 0 auto;
+  border-radius: 20px;
+}
+
+.skeleton-table-header {
+  height: 60px;
+  margin-bottom: 20px;
+}
+
+.skeleton-sort {
+  height: 40px;
+  width: 100px;
+}
+
+.skeleton-table {
+  width: 100%;
+}
+
+.skeleton-th {
+  height: 40px;
+}
+
+.skeleton-tr {
+  height: 60px;
+}
+
+.skeleton-td {
+  position: relative;
+}
+
+.skeleton-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skeleton-user:before {
+  content: '';
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: inherit;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .skeleton-podium {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .skeleton-champion-card {
+    height: 300px !important;
+    max-width: 320px;
+  }
+  
+  .skeleton-avatar {
+    width: 80px;
+    height: 80px;
+  }
+}
+/* Add this to your CSS file */
+@media (max-width: 768px) {
+  .ad-leaderboard-table-modern thead th {
+    white-space: nowrap;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .ad-leaderboard-table-modern thead th.ad-user-column,
+  .ad-leaderboard-table-modern thead th.ad-actions-column {
+    min-width: 80px;
+  }
+  
+  .ad-leaderboard-table-modern thead th.ad-rank-column {
+    min-width: 40px;
+  }
+  
+  .ad-leaderboard-table-modern thead th.ad-points-column,
+  .ad-leaderboard-table-modern thead th.ad-streak-column,
+  .ad-leaderboard-table-modern thead th.ad-projects-column {
+    min-width: 60px;
+  }
+  
+  .ad-leaderboard-table-modern {
+    min-width: 100%;
+  }
+}
+/* Optional additional improvements */
+@media (max-width: 576px) {
+  .ad-leaderboard-table-modern thead th {
+    font-size: 0.65rem;
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .ad-user-name {
+    max-width: 80px;
+  }
+  
+  .ad-view-button-modern {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .ad-points-badge-modern {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+}

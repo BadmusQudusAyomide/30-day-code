@@ -42,8 +42,7 @@ const Leaderboard = () => {
     daysLeft: totalDays - currentDay,
   };
 
-  const API_URL =
-    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   // Calculate challenge progress using the fetched currentDay
   const calculateChallengeProgress = () => {
@@ -315,14 +314,106 @@ const Leaderboard = () => {
   if (loading) {
     return (
       <div className="us-leaderboard-page">
-        <div className="us-loading-state">
-          <div className="us-spinner"></div>
-          <p>Loading leaderboard data...</p>
+        {/* Back to Dashboard Button - Skimmer */}
+        <div className="us-back-button-container">
+          <div
+            className="us-back-button us-skimmer"
+            style={{ width: "150px", height: "36px" }}
+          ></div>
+        </div>
+
+        {/* Stats Overview - Skimmer */}
+        <div className="us-skimmer-stats-overview">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="us-skimmer-stat-card">
+              <div className="us-skimmer-stat-icon us-skimmer"></div>
+              <div className="us-skimmer-stat-content">
+                <div className="us-skimmer-stat-main us-skimmer"></div>
+                <div className="us-skimmer-stat-secondary us-skimmer"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Challenge Header - Skimmer */}
+        <div className="us-skimmer-challenge-header">
+          <div className="us-skimmer-title us-skimmer us-skimmer-dark"></div>
+          <div className="us-skimmer-subtitle us-skimmer us-skimmer-dark"></div>
+
+          <div className="us-skimmer-progress-container">
+            <div className="us-skimmer-progress-info">
+              <div className="us-skimmer-progress-day us-skimmer us-skimmer-dark"></div>
+              <div className="us-skimmer-progress-current us-skimmer us-skimmer-dark"></div>
+              <div className="us-skimmer-progress-percent us-skimmer us-skimmer-dark"></div>
+            </div>
+            <div className="us-skimmer-progress-bar us-skimmer us-skimmer-dark"></div>
+          </div>
+
+          <div className="us-skimmer-actions">
+            {[1, 2, 3].map((item) => (
+              <div
+                key={item}
+                className="us-skimmer-action-btn us-skimmer us-skimmer-dark"
+              ></div>
+            ))}
+          </div>
+        </div>
+
+        {/* Leaderboard List - Skimmer */}
+        <div className="us-leaderboard-container">
+          <div className="us-leaderboard-header">
+            <h2 className="us-section-title">Challenge Leaderboard</h2>
+            <div className="us-leaderboard-stats">
+              <div
+                className="us-stat-bubble us-skimmer"
+                style={{ width: "120px", height: "32px" }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="us-leaderboard-controls">
+            {["Total Points", "Projects", "Quality", "Streak"].map((item) => (
+              <div
+                key={item}
+                className="us-sort-btn us-skimmer"
+                style={{ width: "100px", height: "36px" }}
+              ></div>
+            ))}
+          </div>
+
+          <div className="us-leaderboard-list">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+              <div key={item} className="us-skimmer-card">
+                <div
+                  className="us-rank-badge us-skimmer"
+                  style={{ width: "28px", height: "28px" }}
+                ></div>
+                <div className="us-skimmer-avatar us-skimmer"></div>
+                <div className="us-skimmer-info">
+                  <div className="us-skimmer-line short us-skimmer"></div>
+                  <div className="us-skimmer-line medium us-skimmer"></div>
+                </div>
+                <div className="us-skimmer-stats">
+                  <div className="us-skimmer-stat">
+                    <div className="us-skimmer-stat-value us-skimmer"></div>
+                    <div className="us-skimmer-stat-label us-skimmer"></div>
+                  </div>
+                  <div className="us-skimmer-stat">
+                    <div className="us-skimmer-stat-value us-skimmer"></div>
+                    <div className="us-skimmer-stat-label us-skimmer"></div>
+                  </div>
+                  <div className="us-skimmer-stat">
+                    <div className="us-skimmer-stat-value us-skimmer"></div>
+                    <div className="us-skimmer-stat-label us-skimmer"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
-
   if (error) {
     return (
       <div className="us-leaderboard-page">

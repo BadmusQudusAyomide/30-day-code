@@ -1,97 +1,117 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import axios from "axios";
+import "./Settings.css";
 
 const Settings = () => {
-  const [duration, setDuration] = useState(30);
-  const [dailyLimit, setDailyLimit] = useState(1);
-  const [emailAlerts, setEmailAlerts] = useState(true);
-  const [notifications, setNotifications] = useState(true);
+  const [isResetting, setIsResetting] = useState(false);
+  const [resetStatus, setResetStatus] = useState(null);
+
+  const handleStartChallenge = () => {
+    alert("🔥 Challenge started! 30 days of awesomeness begins now!");
+  };
+
+const handleResetData = async () => {
+  if (!window.confirm("⚠️ This will delete ALL challenge data (projects, points) but keep user accounts. Create backup first?")) {
+    return;
+  }
+
+  setIsResetting(true);
+  setResetStatus(null);
+
+  try {
+    const adminToken = localStorage.getItem("adminToken");
+    const response = await axios.post("/api/admin/reset-with-backup", {}, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+
+    setResetStatus({
+      type: "success",
+      message: "Challenge reset successfully! Backup created.",
+    });
+  } catch (error) {
+    setResetStatus({
+      type: "error",
+      message: error.response?.data?.message || "Failed to reset challenge"
+    });
+  } finally {
+    setIsResetting(false);
+  }
+};
+
+  const viewBackup = () => {
+    if (resetStatus?.backupId) {
+      // Navigate to backup view or show modal
+      alert(
+        `Backup ID: ${resetStatus.backupId}\nRedirecting to backup details...`
+      );
+      // window.location.href = `/admin/backups/${resetStatus.backupId}`;
+    }
+  };
 
   return (
-    <div>
-      <h2 className="section-title">Challenge Settings</h2>
-      
-      <div className="setting-group glass-card">
-        <div className="setting-title">
-          <i className="fas fa-calendar-alt"></i>
-          <span>Challenge Configuration</span>
+    <div className="simple-challenge-container">
+      <h1 className="main-title">Admin Challenge Controls</h1>
+
+      <div className="settings-card">
+        <h2 className="settings-title">
+          <i className="fas fa-crown"></i> Challenge Administration
+        </h2>
+
+        <div className="fixed-setting">
+          <i className="fas fa-calendar"></i>
+          <span>Fixed Duration: 30 Days</span>
         </div>
-        
-        <div className="setting-item">
-          <div className="setting-label">Challenge Duration</div>
-          <div className="slider-container">
-            <input 
-              type="range" 
-              min="7" 
-              max="60" 
-              value={duration} 
-              onChange={(e) => setDuration(e.target.value)}
-              className="slider" 
-            />
-            <div>{duration} days</div>
+
+        <div className="action-buttons">
+          <button className="start-button pulse" onClick={handleStartChallenge}>
+            <i className="fas fa-rocket"></i> START CHALLENGE
+          </button>
+
+          <button
+            className={`reset-button ${isResetting ? "loading" : ""}`}
+            onClick={handleResetData}
+            disabled={isResetting}
+          >
+            {isResetting ? (
+              <>
+                <i className="fas fa-spinner fa-spin"></i> Resetting...
+              </>
+            ) : (
+              <>
+                <i className="fas fa-trash-alt"></i> Reset Challenge Data
+              </>
+            )}
+          </button>
+        </div>
+
+        {resetStatus && (
+          <div className={`reset-status ${resetStatus.type}`}>
+            <p>
+              {resetStatus.type === "success" ? (
+                <i className="fas fa-check-circle"></i>
+              ) : (
+                <i className="fas fa-exclamation-triangle"></i>
+              )}
+              {resetStatus.message}
+            </p>
+            {resetStatus.backupId && (
+              <button className="view-backup-button" onClick={viewBackup}>
+                <i className="fas fa-archive"></i> View Backup
+              </button>
+            )}
           </div>
-        </div>
-        
-        <div className="setting-item">
-          <div className="setting-label">Daily Submission Limit</div>
-          <div className="slider-container">
-            <input 
-              type="range" 
-              min="1" 
-              max="5" 
-              value={dailyLimit} 
-              onChange={(e) => setDailyLimit(e.target.value)}
-              className="slider" 
-            />
-            <div>{dailyLimit} per day</div>
-          </div>
-        </div>
+        )}
       </div>
-      
-      <div className="setting-group glass-card">
-        <div className="setting-title">
-          <i className="fas fa-bell"></i>
-          <span>Notifications</span>
+
+      <div className="quick-settings">
+        <h3>
+          <i className="fas fa-sliders-h"></i> Quick Options
+        </h3>
+        <div className="setting-option">
+          <i className="fas fa-bell"></i> Notifications: ON
         </div>
-        
-        <div className="setting-item">
-          <div className="setting-label">Email Alerts</div>
-          <label className="toggle-switch">
-            <input 
-              type="checkbox" 
-              checked={emailAlerts} 
-              onChange={() => setEmailAlerts(!emailAlerts)} 
-            />
-            <span className="toggle-slider"></span>
-          </label>
-        </div>
-        
-        <div className="setting-item">
-          <div className="setting-label">In-App Notifications</div>
-          <label className="toggle-switch">
-            <input 
-              type="checkbox" 
-              checked={notifications} 
-              onChange={() => setNotifications(!notifications)} 
-            />
-            <span className="toggle-slider"></span>
-          </label>
-        </div>
-      </div>
-      
-      <div className="setting-group glass-card">
-        <div className="setting-title">
-          <i className="fas fa-shield-alt"></i>
-          <span>Admin Settings</span>
-        </div>
-        
-        <div className="setting-item">
-          <div className="setting-label">Reset Challenge</div>
-          <button className="btn btn-neumorphic">Reset Data</button>
-        </div>
-        
-        <div className="setting-item">
-          <div className="setting-label">Export Data</div>
-          <button className="btn btn-neumorphic">Download CSV</button>
+        <div className="setting-option">
+          <i className="fas fa-envelope"></i> Email Reminders: ON
         </div>
       </div>
     </div>

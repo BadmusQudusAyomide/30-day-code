@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import DashboardSkeleton from "./DashboardSkeleton"; // Add this import
 import "./Dashboard.css";
 
 const Dashboard = ({ onLogout }) => {
@@ -18,9 +19,10 @@ const Dashboard = ({ onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [topPerformers, setTopPerformers] = useState([]);
+    const [showSkeleton, setShowSkeleton] = useState(true);
 
-  const API_URL =
-    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
+
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -138,6 +140,7 @@ const Dashboard = ({ onLogout }) => {
         setError(err.message);
       } finally {
         setLoading(false);
+        setTimeout(() => setShowSkeleton(false), 500);
       }
     };
 
@@ -193,29 +196,25 @@ const Dashboard = ({ onLogout }) => {
     return color;
   };
 
-  if (loading) {
-    return (
-      <div className="dashboard-loading">
-        <div className="loading-spinner"></div>
-      </div>
-    );
+  if (loading && showSkeleton) {
+    return <DashboardSkeleton />;
   }
 
-  if (error) {
-    return (
-      <div className="dashboard-error">
-        <div className="error-icon">⚠️</div>
-        <h3>Error Loading Dashboard</h3>
-        <p>{error}</p>
-        <button
-          className="retry-button"
-          onClick={() => window.location.reload()}
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
+    if (error) {
+      return (
+        <div className="dashboard-error">
+          <div className="error-icon">⚠️</div>
+          <h3>Error Loading Dashboard</h3>
+          <p>{error}</p>
+          <button
+            className="retry-button"
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </button>
+        </div>
+      );
+    }
 
   return (
     <div className="dashboard">

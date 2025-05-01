@@ -874,3 +874,68 @@
   background-color: rgba(109, 40, 217, 0.2);
   color: var(--primary-hover);
 }
+
+
+/* Skeleton Loader Styles */
+.pl-skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+.pl-skeleton::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1.5s infinite;
+  z-index: 1;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.pl-skeleton-image {
+  background-color: rgba(255, 255, 255, 0.05);
+  height: 220px;
+}
+
+.pl-skeleton-text {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  height: 1em;
+  display: inline-block;
+  color: transparent !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.pl-skeleton .pl-language-tag,
+.pl-skeleton .pl-project-link,
+.pl-skeleton .pl-project-date,
+.pl-skeleton .pl-status-badge,
+.pl-skeleton .pl-day-indicator {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.pl-skeleton h2,
+.pl-skeleton h3 {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: transparent !important;
+  border-radius: 4px;
+}

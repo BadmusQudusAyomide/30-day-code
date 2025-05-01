@@ -106,9 +106,63 @@ const Leaderboard = () => {
 
   if (loading) {
     return (
-      <div className="ad-leaderboard-loading">
-        <div className="ad-loading-pulse"></div>
-        <p>Loading leaderboard data...</p>
+      <div className="ad-leaderboard-container-modern skeleton-leaderboard">
+        <div className="ad-leaderboard-header-modern skeleton-header">
+          <div className="skeleton-title"></div>
+          <div className="skeleton-subtitle"></div>
+        </div>
+
+        {/* Podium Skeleton */}
+        <div className="ad-leaderboard-champions skeleton-podium">
+          {[1, 2, 3].map((position) => (
+            <div
+              key={position}
+              className={`ad-champion-card skeleton-champion skeleton-${position}`}
+            >
+              <div className="skeleton-avatar"></div>
+              <div className="skeleton-name"></div>
+              <div className="skeleton-points"></div>
+              <div className="skeleton-stats">
+                <div className="skeleton-stat"></div>
+                <div className="skeleton-stat"></div>
+              </div>
+              <div className="skeleton-button"></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Table Skeleton */}
+        <div className="ad-leaderboard-table-container-modern skeleton-table-container">
+          <div className="ad-table-header skeleton-table-header">
+            <div className="skeleton-sort"></div>
+          </div>
+          <div className="ad-table-wrapper">
+            <table className="ad-leaderboard-table-modern skeleton-table">
+              <thead>
+                <tr>
+                  <th className="skeleton-th"></th>
+                  <th className="skeleton-th"></th>
+                  <th className="skeleton-th"></th>
+                  <th className="skeleton-th"></th>
+                  <th className="skeleton-th"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {[1, 2, 3, 4, 5].map((row) => (
+                  <tr key={row} className="skeleton-tr">
+                    <td className="skeleton-td"></td>
+                    <td className="skeleton-td">
+                      <div className="skeleton-user"></div>
+                    </td>
+                    <td className="skeleton-td"></td>
+                    <td className="skeleton-td"></td>
+                    <td className="skeleton-td"></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     );
   }
