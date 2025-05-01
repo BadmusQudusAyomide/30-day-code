@@ -1,70 +1,228 @@
-# Getting Started with Create React App
+# 30 days Submission Platform By Vickyjay Built By SnapDragon Team🚀
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**30 days Submission Platform By Vickyjay Built By SnapDragon Team** is a 30-day project submission challenge platform where developers commit to building and submitting one project every day for 30 days. This platform enables users to submit daily projects, track their streaks, get scored and ranked on a leaderboard, and view projects by others. Admins can rate submissions, manage users, and keep the challenge fair and exciting.
 
-## Available Scripts
 
-In the project directory, you can run:
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🌐 Live Demo
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+> [Visit the Live Platform](https://30-day-code-w46x.vercel.app)  
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🧑‍💻 Team
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+[Team  Leader](https://github.com/niklaus699)  
+[Frontend](https://github.com/BadmusQudusAyomide)  
+[Backend](https://github.com/Dannys-notepad)  
+[Backend](https://github.com/JoyDTechGirl)  
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🛠️ Features
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 👤 Users
+- Signup/Login and Profile management
+- Daily project submissions (title, links, image, description, tools used, etc.)
+- Streak and quality scoring system (up to 6 points daily)
+- View all submissions (own)
+- Public leaderboard with ranking
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 🧑‍💼 Admin
+- Secure login/signup for admins
+- Dashboard to view and rate all daily submissions
+- Score each project:
+  - 7 points for quality
+  - 3 points for streak
+- View all users and their submission history
+- Expandable user profiles
 
-## Learn More
+### 📋 Project Submission
+- Project Day (1–30)
+- Live Link
+- GitHub Repo
+- Optional Screenshot
+- Description
+- Tools/Frameworks
+- Programming Languages
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 📁 Project Structure
 
-### Code Splitting
+```bash
+zubmizion/
+├── client/               # React frontend
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       ├── pages/
+│       ├── context/
+│       ├── utils/
+│       └── App.jsx
+├── server/               # Express backend
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── middleware/
+│   ├── config/
+│   └── server.js
+├── .env
+├── README.md
+└── package.json
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## ⚙️ Installation & Setup
 
-### Making a Progressive Web App
+### 1. Clone the Repository
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+git clone https://github.com/BadmusQudusAyomide/30-day-code.git
+cd 30day
+```
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### 2. Setup Backend
 
-### Deployment
+```bash
+cd server
+npm install
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+#### Create `.env` in `/server`
 
-### `npm run build` fails to minify
+```
+PORT=5000
+MONGO_URI=your_mongo_connection_string
+JWT_SECRET=your_jwt_secret
+CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+npm run dev
+```
+
+---
+
+### 3. Setup Frontend
+
+```bash
+cd ../client
+npm install
+```
+
+#### Create `.env` in `/client`
+
+```
+REACT_API_URL=http://localhost:5000/api
+```
+
+```bash
+npm run dev
+```
+
+---
+
+## 📦 API Endpoints
+
+### Auth
+
+- `POST /api/auth/register` – Register user
+- `POST /api/auth/login` – Login user/admin
+
+### Projects
+
+- `POST /api/projects/submit`
+- `GET /api/projects/day/:day`
+- `GET /api/projects/user/:userId`
+- `GET /api/projects` – Get all submissions
+
+### Admin
+
+- `GET /api/admin/users`
+- `PATCH /api/admin/score/:projectId` – Rate submission
+
+---
+
+## 🧮 Scoring System
+
+| Metric       | Max Points |
+|--------------|------------|
+| Quality      | 5 pts      |
+
+## 🧮   Leaderboard Scoring System
+
+5 point from Quality + 1 
+
+That mean 6 point per project
+(We can eplain Better)
+Admins rate submissions manually daily.
+
+---
+
+## 🗺️ Roadmap
+
+- [x] User registration/login
+- [x] Daily project submission
+- [x] Admin panel for scoring
+- [x] Leaderboard with streak tracking
+
+
+---
+
+## 🛡️ Security
+
+- JWT authentication
+- Protected admin routes
+- Validations on all forms
+- HTTPS (on deployment)
+
+---
+
+
+
+## 🧑‍💻 Contributing
+
+1. Fork this repository
+2. Create your feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m 'Add feature'`
+4. Push to the branch: `git push origin feature/your-feature`
+5. Open a pull request 🎉
+
+---
+
+## 📃 License
+
+MIT License  
+Feel free to use, share, and modify with credit.
+
+---
+
+## 🙌 Acknowledgements
+
+- [React](https://reactjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Node.js](https://nodejs.org/)
+- [Express](https://expressjs.com/)
+- [MongoDB](https://www.mongodb.com/)
+- [Cloudinary](https://cloudinary.com/)
+
+---
+
+## 💬 Contact
+
+**Made with ❤️ by Badmus Qudus Ayomide**  
+GitHub: [@qudusayomide](https://github.com/qudusayomide)
+
+---
