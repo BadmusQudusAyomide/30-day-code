@@ -42,7 +42,8 @@ const Leaderboard = () => {
     daysLeft: totalDays - currentDay,
   };
 
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_URL =
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   // Calculate challenge progress using the fetched currentDay
   const calculateChallengeProgress = () => {

@@ -37,7 +37,7 @@ import "./styles.css";
 
 // Configure axios defaults
 axios.defaults.baseURL =
-  process.env.REACT_APP_API_URL || "http://localhost:5000";
+  process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

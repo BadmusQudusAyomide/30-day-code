@@ -19,10 +19,10 @@ const Dashboard = ({ onLogout }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [topPerformers, setTopPerformers] = useState([]);
-    const [showSkeleton, setShowSkeleton] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(true);
 
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API_URL =
+    process.env.REACT_APP_API_URL || "https://my-backend-pkhd.onrender.com";
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -200,21 +200,21 @@ const Dashboard = ({ onLogout }) => {
     return <DashboardSkeleton />;
   }
 
-    if (error) {
-      return (
-        <div className="dashboard-error">
-          <div className="error-icon">⚠️</div>
-          <h3>Error Loading Dashboard</h3>
-          <p>{error}</p>
-          <button
-            className="retry-button"
-            onClick={() => window.location.reload()}
-          >
-            Retry
-          </button>
-        </div>
-      );
-    }
+  if (error) {
+    return (
+      <div className="dashboard-error">
+        <div className="error-icon">⚠️</div>
+        <h3>Error Loading Dashboard</h3>
+        <p>{error}</p>
+        <button
+          className="retry-button"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard">
